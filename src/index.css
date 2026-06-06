@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+/* Colour palette derived from the reptile-scale banner image.
+   Overrides Tailwind's built-in green so every green-* class
+   across the app automatically uses the new navy tones. */
+@theme {
+  --color-green-50:  #f0f6f9;
+  --color-green-100: #dce9f0;
+  --color-green-200: #a8c4d4;
+  --color-green-300: #6a8fb8;
+  --color-green-400: #3a5a90;
+  --color-green-500: #253f74;
+  --color-green-600: #1f3561;
+  --color-green-700: #1b2c4e;
+  --color-green-800: #152240;
+  --color-green-900: #0f1a30;
+  --color-green-950: #090f1e;
+}
+
 @layer base {
   * {
     -webkit-tap-highlight-color: transparent;

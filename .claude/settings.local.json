@@ -8,7 +8,19 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(gh auth *)",
-      "Bash(gh repo *)"
+      "Bash(gh repo *)",
+      "Bash(cp \"c:/Users/do_do/Dropbox/00. Saori's Life/website/ReptileManager/images/preview.jpg\" \"c:/Users/do_do/Dropbox/00. Saori's Life/website/ReptileManager/public/preview.jpg\")",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(npx --yes chromium-cli screenshot http://localhost:5173 --output /tmp/home.png --width 390 --height 844)",
+      "Bash(npx --yes playwright screenshot http://localhost:5173 --viewport-size=\"390,844\" /tmp/home.png)",
+      "Bash(npx playwright *)",
+      "Bash(taskkill /F /IM node.exe)",
+      "PowerShell(Stop-Process -Name node -Force -ErrorAction SilentlyContinue)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\do_do\\Dropbox\\00. Saori's Life\\website\\ReptileManager\\images"
     ]
   }
 }

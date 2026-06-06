@@ -92,7 +92,7 @@ export function ReptileDetailPage() {
         </div>
       }
     >
-      <div className="bg-green-700 text-white px-4 pb-4">
+      <div className="bg-green-700 text-white px-4 pt-4 pb-4">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl bg-green-600 flex items-center justify-center text-3xl overflow-hidden">
             {reptile.photoUrl ? <img src={reptile.photoUrl} alt={reptile.name} className="w-full h-full object-cover" /> : '🦎'}

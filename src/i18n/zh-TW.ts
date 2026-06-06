@@ -42,6 +42,7 @@ const zhTW = {
   },
   home: {
     title: 'ReptileManager',
+    tagline: '爬蟲日常照護管理',
     overview: '爬蟲總覽',
     todayTodosCount: '今日待辦 ({{count}} 待完成)',
     lastFed: '上次餵食：{{time}}',

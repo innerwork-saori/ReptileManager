@@ -13,15 +13,15 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.ts',
       injectManifest: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,jpg,woff2}'],
       },
       includeAssets: ['icon.svg'],
       manifest: {
         name: 'ReptileManager',
         short_name: 'ReptileManager',
         description: '爬蟲日常管理工具',
-        theme_color: '#16a34a',
-        background_color: '#f0fdf4',
+        theme_color: '#1b2c4e',
+        background_color: '#f0f6f9',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/',

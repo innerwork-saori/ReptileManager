@@ -60,9 +60,35 @@ export function HomePage() {
   const pendingTodos = todos.filter((t) => t.status === 'pending')
   const doneTodos = todos.filter((t) => t.status !== 'pending')
 
+  const heroBanner = (
+    <div className="relative w-full h-44 overflow-hidden">
+      <img
+        src="/preview.jpg"
+        alt="reptile scale mosaic pattern"
+        className="w-full h-full object-cover object-center"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-green-900/75" />
+      <div className="absolute bottom-0 inset-x-0 px-4 pb-3 flex items-end justify-between">
+        <div>
+          <p className="text-white font-bold text-lg leading-tight drop-shadow-md">{t('home.title')}</p>
+          <p className="text-white/75 text-xs drop-shadow">{t('home.tagline')}</p>
+        </div>
+        <a
+          href="http://www.freepik.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-white/40 text-[9px] hover:text-white/70 transition-colors leading-tight text-right"
+        >
+          Nadezhda_grapes<br />/ Freepik
+        </a>
+      </div>
+    </div>
+  )
+
   if (loading) {
     return (
       <Layout title={t('home.title')}>
+        {heroBanner}
         <div className="flex items-center justify-center py-20 text-gray-400">{t('common.loading')}</div>
       </Layout>
     )
@@ -80,8 +106,9 @@ export function HomePage() {
         </button>
       }
     >
+      {heroBanner}
       {cards.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-4 text-gray-400 px-6">
+        <div className="flex flex-col items-center justify-center py-20 gap-4 text-gray-400 px-6">
           <AlertCircle size={48} className="text-gray-300" />
           <p className="text-center text-sm">{t('home.noReptiles')}</p>
           <button

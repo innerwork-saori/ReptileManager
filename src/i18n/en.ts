@@ -44,6 +44,7 @@ const en: Translation = {
   },
   home: {
     title: 'ReptileManager',
+    tagline: 'Daily reptile care tracker',
     overview: 'Reptile Overview',
     todayTodosCount: "Today's Todos ({{count}} pending)",
     lastFed: 'Last fed: {{time}}',
