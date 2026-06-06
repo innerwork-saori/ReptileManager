@@ -58,7 +58,7 @@ export function BackupPage() {
 
   return (
     <Layout title={t('backup.title')}>
-      <div className="px-4 pt-4 space-y-4">
+      <div className="px-4 pt-4 pb-6 space-y-4">
         <Section title={t('backup.languageSection')}>
           <Card>
             <div className="px-4 py-3">
