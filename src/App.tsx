@@ -1,0 +1,68 @@
+import { HashRouter, Routes, Route } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useRegisterSW } from 'virtual:pwa-register/react'
+import { HomePage } from './pages/HomePage'
+import { ReptilesPage } from './pages/ReptilesPage'
+import { ReptileDetailPage } from './pages/ReptileDetailPage'
+import { ReptileFormPage } from './pages/ReptileFormPage'
+import { FeedLogPage } from './pages/FeedLogPage'
+import { MedicationPage } from './pages/MedicationPage'
+import { EnvironmentPage } from './pages/EnvironmentPage'
+import { HealthPage } from './pages/HealthPage'
+import { TodoRulesPage } from './pages/TodoRulesPage'
+import { BackupPage } from './pages/BackupPage'
+
+function UpdatePrompt() {
+  const { t } = useTranslation()
+  const {
+    needRefresh: [needRefresh, setNeedRefresh],
+    updateServiceWorker,
+  } = useRegisterSW()
+
+  if (!needRefresh) return null
+
+  return (
+    <div className="fixed bottom-20 inset-x-4 z-50 bg-green-700 text-white rounded-xl shadow-lg flex items-center gap-3 px-4 py-3">
+      <p className="flex-1 text-sm">{t('pwa.newVersion')}</p>
+      <button
+        onClick={() => updateServiceWorker(true)}
+        className="shrink-0 bg-white text-green-700 px-3 py-1.5 rounded-lg text-sm font-medium"
+      >
+        {t('pwa.update')}
+      </button>
+      <button onClick={() => setNeedRefresh(false)} className="shrink-0 text-green-200 text-sm">
+        {t('pwa.later')}
+      </button>
+    </div>
+  )
+}
+
+export default function App() {
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    setReady(true)
+  }, [])
+
+  if (!ready) return null
+
+  return (
+    <HashRouter>
+      <UpdatePrompt />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/reptiles" element={<ReptilesPage />} />
+        <Route path="/reptile/new" element={<ReptileFormPage />} />
+        <Route path="/reptile/:id" element={<ReptileDetailPage />} />
+        <Route path="/reptile/:id/edit" element={<ReptileFormPage />} />
+        <Route path="/reptile/:id/feed" element={<FeedLogPage />} />
+        <Route path="/reptile/:id/medication" element={<MedicationPage />} />
+        <Route path="/reptile/:id/environment" element={<EnvironmentPage />} />
+        <Route path="/reptile/:id/health" element={<HealthPage />} />
+        <Route path="/reptile/:id/todos" element={<TodoRulesPage />} />
+        <Route path="/backup" element={<BackupPage />} />
+      </Routes>
+    </HashRouter>
+  )
+}
