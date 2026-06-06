@@ -17,7 +17,9 @@
       "Bash(npx --yes playwright screenshot http://localhost:5173 --viewport-size=\"390,844\" /tmp/home.png)",
       "Bash(npx playwright *)",
       "Bash(taskkill /F /IM node.exe)",
-      "PowerShell(Stop-Process -Name node -Force -ErrorAction SilentlyContinue)"
+      "PowerShell(Stop-Process -Name node -Force -ErrorAction SilentlyContinue)",
+      "Bash(curl -s http://localhost:5174)",
+      "Bash(npx tsc *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\do_do\\Dropbox\\00. Saori's Life\\website\\ReptileManager\\images"

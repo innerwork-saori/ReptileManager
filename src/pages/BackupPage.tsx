@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
-import { Download, Database, AlertTriangle } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Download, Upload, Database, AlertTriangle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
 import { Card, Section } from '../components/Card'
-import { exportAllData, getDataSummary } from '../lib/backup'
+import { exportAllData, importAllData, getDataSummary } from '../lib/backup'
 
 const LANGUAGES = [
   { code: 'zh-TW', label: '繁體中文' },
@@ -15,6 +15,9 @@ export function BackupPage() {
   const [summary, setSummary] = useState({ reptiles: 0, feedLogs: 0, medicationLogs: 0, otherRecords: 0, total: 0 })
   const [exporting, setExporting] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [importResult, setImportResult] = useState<'success' | 'error' | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     getDataSummary().then(setSummary)
@@ -29,6 +32,23 @@ export function BackupPage() {
       setTimeout(() => setSuccess(false), 3000)
     } finally {
       setExporting(false)
+    }
+  }
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    if (!window.confirm(t('backup.importConfirm'))) return
+    setImporting(true)
+    setImportResult(null)
+    try {
+      await importAllData(file)
+      setImportResult('success')
+      setTimeout(() => window.location.reload(), 1500)
+    } catch {
+      setImportResult('error')
+      setImporting(false)
     }
   }
 
@@ -100,6 +120,38 @@ export function BackupPage() {
               </button>
               {success && (
                 <p className="text-center text-sm text-green-600 font-medium">{t('backup.exportSuccess')}</p>
+              )}
+            </div>
+          </Card>
+        </Section>
+
+        <Section title={t('backup.importSection')}>
+          <Card>
+            <div className="p-4 space-y-3">
+              <div className="flex items-start gap-3 bg-amber-50 rounded-lg p-3">
+                <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-700">{t('backup.importWarning')}</p>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                className="hidden"
+                onChange={handleImport}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={importing}
+                className="w-full flex items-center justify-center gap-2 bg-green-700 text-white py-3 rounded-xl font-semibold disabled:opacity-60 transition-colors"
+              >
+                <Upload size={18} />
+                {importing ? t('backup.importing') : t('backup.importBtn')}
+              </button>
+              {importResult === 'success' && (
+                <p className="text-center text-sm text-green-600 font-medium">{t('backup.importSuccess')}</p>
+              )}
+              {importResult === 'error' && (
+                <p className="text-center text-sm text-red-500 font-medium">{t('backup.importError')}</p>
               )}
             </div>
           </Card>

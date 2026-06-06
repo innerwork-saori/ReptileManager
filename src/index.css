@@ -22,6 +22,10 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  html {
+    background-color: #1b2c4e;
+  }
+
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     overscroll-behavior: none;
