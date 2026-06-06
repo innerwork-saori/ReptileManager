@@ -24,13 +24,14 @@ export function FeedLogPage() {
   const [saving, setSaving] = useState(false)
 
   const FOOD_TYPES = [
-    t('feed.foods.cricket'),
-    t('feed.foods.superworm'),
+    t('feed.foods.black_cricket'),
+    t('feed.foods.white_cricket'),
     t('feed.foods.dubia'),
-    t('feed.foods.mealworm'),
-    t('feed.foods.zophobas'),
-    t('feed.foods.waxworm'),
-    t('feed.foods.pinky'),
+    t('feed.foods.rat_pinky'),
+    t('feed.foods.rat_s'),
+    t('feed.foods.rat_m'),
+    t('feed.foods.rat_l'),
+    t('feed.foods.rat_xl'),
     t('feed.foods.other'),
   ]
 
