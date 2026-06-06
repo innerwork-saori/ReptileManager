@@ -17,7 +17,7 @@ const en: Translation = {
     time: 'Time',
     name: 'Name',
     species: 'Species',
-    breed: 'Breed',
+    breed: 'Morph',
     sex: {
       label: 'Sex',
       unset: 'Not set',
@@ -58,7 +58,7 @@ const en: Translation = {
     new: 'Add Reptile',
     edit: 'Edit Reptile',
     detail: 'Reptile Detail',
-    unknownBreed: 'Unknown breed',
+    unknownBreed: 'Unknown morph',
     noReptiles: 'No reptiles added yet',
     addFirst: 'Add your first reptile',
     qrTitle: '{{name}}\'s QR Code',

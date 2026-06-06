@@ -15,7 +15,7 @@ const zhTW = {
     time: '時間',
     name: '名稱',
     species: '物種',
-    breed: '品種',
+    breed: '花色',
     sex: {
       label: '性別',
       unset: '未設定',
@@ -56,7 +56,7 @@ const zhTW = {
     new: '新增爬蟲',
     edit: '編輯爬蟲',
     detail: '爬蟲詳細',
-    unknownBreed: '未知品種',
+    unknownBreed: '未知花色',
     noReptiles: '尚未新增任何爬蟲',
     addFirst: '新增第一隻爬蟲',
     qrTitle: '{{name}} 的 QR Code',
