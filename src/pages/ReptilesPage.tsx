@@ -19,9 +19,9 @@ export function ReptilesPage() {
   }, [])
 
   const sexLabel = (sex: Reptile['sex']) => {
-    if (sex === 'male') return t('male')
-    if (sex === 'female') return t('female')
-    return t('sex.unknown')
+    if (sex === 'male') return t('common.sex.male')
+    if (sex === 'female') return t('common.sex.female')
+    return t('common.sex.unknown')
   }
 
   return (
@@ -67,7 +67,11 @@ export function ReptilesPage() {
                   </p>
                   <div className="flex gap-2 mt-1 flex-wrap">
                     {r.sex && (
-                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        r.sex === 'male' ? 'bg-blue-100 text-blue-600' :
+                        r.sex === 'female' ? 'bg-pink-100 text-pink-600' :
+                        'bg-gray-100 text-gray-500'
+                      }`}>
                         {sexLabel(r.sex)}
                       </span>
                     )}
