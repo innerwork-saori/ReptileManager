@@ -133,7 +133,7 @@ export function ReptileDetailPage() {
                 <Stethoscope size={20} className="mx-auto text-green-600 mb-1" />
                 <p className="text-xs text-gray-500">{t('reptile.overview.lastWeight')}</p>
                 <p className="text-sm font-semibold text-gray-800">
-                  {weightLogs.length > 0 ? `${[...weightLogs].at(-1)!.weight} g` : t('common.noRecords')}
+                  {weightLogs.length > 0 ? `${weightLogs[weightLogs.length - 1].weight} g` : t('common.noRecords')}
                 </p>
               </div>
             </Link>
