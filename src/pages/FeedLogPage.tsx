@@ -7,7 +7,7 @@ import { Card, Section } from '../components/Card'
 import { InputField, TextareaField } from '../components/FormField'
 import { feedLogRepo, reptileRepo } from '../db/repos'
 import type { FeedLog } from '../db/schema'
-import { formatDateTime } from '../lib/todoEngine'
+import { formatDate } from '../lib/todoEngine'
 
 export function FeedLogPage() {
   const { id } = useParams<{ id: string }>()
@@ -16,7 +16,7 @@ export function FeedLogPage() {
   const [reptileName, setReptileName] = useState('')
   const [logs, setLogs] = useState<FeedLog[]>([])
   const [form, setForm] = useState({
-    fedAt: new Date().toISOString().slice(0, 16),
+    fedAt: new Date().toISOString().slice(0, 10),
     foodType: '',
     amount: '',
     notes: '',
@@ -55,7 +55,7 @@ export function FeedLogPage() {
     setSaving(true)
     await feedLogRepo.create({
       reptileId: id,
-      fedAt: new Date(form.fedAt).toISOString(),
+      fedAt: new Date(`${form.fedAt}T00:00:00`).toISOString(),
       foodType: form.foodType.trim(),
       amount: form.amount.trim(),
       notes: form.notes.trim() || undefined,
@@ -68,7 +68,7 @@ export function FeedLogPage() {
   return (
     <Layout title={`${reptileName} · ${t('feed.title')}`} back={`/reptile/${id}`}>
       <form onSubmit={handleSubmit} className="px-4 pt-4 space-y-3">
-        <InputField label={t('common.time')} type="datetime-local" value={form.fedAt} onChange={set('fedAt')} required />
+        <InputField label={t('common.time')} type="date" value={form.fedAt} onChange={set('fedAt')} required />
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">
             {t('feed.foodType')} <span className="text-red-500">*</span>
@@ -110,7 +110,7 @@ export function FeedLogPage() {
               <div key={l.id} className="px-4 py-3 border-b border-gray-100 last:border-0 flex items-start gap-3">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-800">{l.foodType}</p>
-                  <p className="text-xs text-gray-500">{l.amount} · {formatDateTime(l.fedAt)}</p>
+                  <p className="text-xs text-gray-500">{l.amount} · {formatDate(l.fedAt)}</p>
                   {l.notes && <p className="text-xs text-gray-400 mt-0.5">{l.notes}</p>}
                 </div>
                 <button onClick={() => feedLogRepo.delete(l.id).then(load)}
