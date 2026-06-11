@@ -140,7 +140,7 @@ export function HomePage() {
                         </p>
                         {reptile.sex && reptile.sex !== 'unknown' && (
                           <span className={`shrink-0 text-[10px] font-semibold px-1 rounded ${reptile.sex === 'male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
-                            {t(`reptile.sex.${reptile.sex}`)}
+                            {t(`${reptile.sex}`)}
                           </span>
                         )}
                       </div>

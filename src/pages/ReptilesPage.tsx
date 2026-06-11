@@ -19,9 +19,9 @@ export function ReptilesPage() {
   }, [])
 
   const sexLabel = (sex: Reptile['sex']) => {
-    if (sex === 'male') return t('common.sex.male')
-    if (sex === 'female') return t('common.sex.female')
-    return t('common.sex.unknown')
+    if (sex === 'male') return t('male')
+    if (sex === 'female') return t('female')
+    return t('sex.unknown')
   }
 
   return (
