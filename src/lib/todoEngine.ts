@@ -120,8 +120,14 @@ export function formatDateTime(iso: string | undefined): string {
 
 export function calcAge(birthDate: string | undefined): string {
   if (!birthDate) return '—'
-  const birth = new Date(birthDate)
+  const parts = birthDate.split('-')
   const now = new Date()
+  if (parts.length === 1) {
+    const y = now.getFullYear() - parseInt(parts[0])
+    return `${y} 歲`
+  }
+  // For YYYY-MM, treat as first day of that month to calculate months correctly
+  const birth = new Date(parts.length === 2 ? `${birthDate}-01` : birthDate)
   const years = now.getFullYear() - birth.getFullYear()
   const months = now.getMonth() - birth.getMonth()
   const totalMonths = years * 12 + months
