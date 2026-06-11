@@ -78,6 +78,8 @@ const en: Translation = {
       todoRules: 'Todo Rules',
       weightChart: 'Weight Chart',
       coursesCount: '{{count}}',
+      addWeight: 'Add Weight',
+      lastWeight: 'Last Weight',
     },
     form: {
       namePlaceholder: 'e.g. Mochi',

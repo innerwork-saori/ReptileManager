@@ -1,11 +1,10 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
-import { Edit, QrCode, Utensils, Pill, Thermometer, CheckSquare, Scale, Stethoscope } from 'lucide-react'
+import { Edit, QrCode, Utensils, Pill, Thermometer, Scale, Stethoscope } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
 import { Card, Section } from '../components/Card'
-import { WeightChart } from '../components/WeightChart'
 import { reptileRepo, feedLogRepo, weightLogRepo, medicationCourseRepo, shedLogRepo, habitatLogRepo, visitLogRepo } from '../db/repos'
 import type { Reptile, FeedLog, WeightLog, MedicationCourse, ShedLog, HabitatLog, VisitLog } from '../db/schema'
 import { formatRelativeTime, formatDate, formatDateTime, calcAge } from '../lib/todoEngine'
@@ -129,35 +128,16 @@ export function ReptileDetailPage() {
                 <p className="text-sm font-semibold text-gray-800">{formatRelativeTime(feedLogs[0]?.fedAt)}</p>
               </div>
             </Link>
-            <Link to={`/reptile/${id}/medication`}>
-              <div className="bg-blue-50 rounded-xl p-3 text-center">
-                <Pill size={20} className="mx-auto text-blue-500 mb-1" />
-                <p className="text-xs text-gray-500">{t('reptile.overview.activeCourses')}</p>
+            <Link to={`/reptile/${id}/health`}>
+              <div className="bg-green-50 rounded-xl p-3 text-center">
+                <Stethoscope size={20} className="mx-auto text-green-600 mb-1" />
+                <p className="text-xs text-gray-500">{t('reptile.overview.lastWeight')}</p>
                 <p className="text-sm font-semibold text-gray-800">
-                  {t('reptile.overview.coursesCount', { count: courses.filter((c) => c.active).length })}
+                  {weightLogs.length > 0 ? `${[...weightLogs].at(-1)!.weight} g` : t('common.noRecords')}
                 </p>
-              </div>
-            </Link>
-            <Link to={`/reptile/${id}/environment`}>
-              <div className="bg-teal-50 rounded-xl p-3 text-center">
-                <Thermometer size={20} className="mx-auto text-teal-500 mb-1" />
-                <p className="text-xs text-gray-500">{t('reptile.overview.recentTemp')}</p>
-                <p className="text-sm font-semibold text-gray-800">
-                  {habitatLogs[0]?.temperature != null ? `${habitatLogs[0].temperature} °C` : '—'}
-                </p>
-              </div>
-            </Link>
-            <Link to={`/reptile/${id}/todos`}>
-              <div className="bg-purple-50 rounded-xl p-3 text-center">
-                <CheckSquare size={20} className="mx-auto text-purple-500 mb-1" />
-                <p className="text-xs text-gray-500">{t('reptile.overview.todoRules')}</p>
-                <p className="text-sm font-semibold text-gray-800">{t('common.manage')}</p>
               </div>
             </Link>
           </div>
-          <Section title={t('reptile.overview.weightChart')}>
-            <WeightChart logs={weightLogs} />
-          </Section>
           {reptile.notes && (
             <Section title={t('common.notes')}>
               <Card className="mx-0">

@@ -76,6 +76,8 @@ const zhTW = {
       todoRules: '待辦規則',
       weightChart: '體重曲線',
       coursesCount: '{{count}} 個',
+      addWeight: '新增體重紀錄',
+      lastWeight: '最近體重',
     },
     form: {
       namePlaceholder: '例：阿花',
