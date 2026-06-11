@@ -134,9 +134,16 @@ export function HomePage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-800 truncate">{reptile.name}</p>
-                      <p className="text-xs text-gray-500 truncate">
-                        {reptile.species}{reptile.breed && ` · ${reptile.breed}`}
-                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-xs text-gray-500 truncate">
+                          {reptile.species}{reptile.breed && ` · ${reptile.breed}`}
+                        </p>
+                        {reptile.sex && reptile.sex !== 'unknown' && (
+                          <span className={`shrink-0 text-[10px] font-semibold px-1 rounded ${reptile.sex === 'male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
+                            {t(`reptile.sex.${reptile.sex}`)}
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-1 mt-1">
                         <Clock size={11} className="text-gray-400" />
                         <span className="text-xs text-gray-400">
