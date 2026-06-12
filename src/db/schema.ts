@@ -13,6 +13,8 @@ export interface Reptile {
   allergyInfo?: string
   chronicInfo?: string
   qrTargetUrl: string
+  fatherId?: string
+  motherId?: string
   createdAt: string
   updatedAt: string
 }
@@ -150,6 +152,16 @@ export interface VisitLog {
   createdAt: string
 }
 
+export interface ClutchLog {
+  id: string
+  date: string
+  fatherReptileId?: string
+  motherReptileId?: string
+  eggCount: number
+  notes?: string
+  createdAt: string
+}
+
 export interface Setting {
   key: string
   value: unknown
@@ -168,6 +180,7 @@ export class ReptileManagerDb extends Dexie {
   todo_rules!: Table<TodoRule, string>
   todo_instances!: Table<TodoInstance, string>
   visit_logs!: Table<VisitLog, string>
+  clutch_logs!: Table<ClutchLog, string>
   settings!: Table<Setting, string>
 
   constructor() {
@@ -186,6 +199,23 @@ export class ReptileManagerDb extends Dexie {
       todo_rules: 'id, reptileId, type, enabled',
       todo_instances: 'id, reptileId, date, status, [reptileId+date], [date+status]',
       visit_logs: 'id, reptileId, date, [reptileId+date]',
+      settings: 'key',
+    })
+
+    this.version(2).stores({
+      reptiles: 'id, name, species, createdAt',
+      weight_logs: 'id, reptileId, date, [reptileId+date]',
+      feed_logs: 'id, reptileId, fedAt, [reptileId+fedAt]',
+      medication_courses: 'id, reptileId, active, [reptileId+active]',
+      medication_logs: 'id, reptileId, takenAt, [reptileId+takenAt]',
+      shed_logs: 'id, reptileId, date, [reptileId+date]',
+      habitat_logs: 'id, reptileId, loggedAt, [reptileId+loggedAt]',
+      uvb_logs: 'id, reptileId, startedAt',
+      substrate_logs: 'id, reptileId, changedAt, [reptileId+changedAt]',
+      todo_rules: 'id, reptileId, type, enabled',
+      todo_instances: 'id, reptileId, date, status, [reptileId+date], [date+status]',
+      visit_logs: 'id, reptileId, date, [reptileId+date]',
+      clutch_logs: 'id, fatherReptileId, motherReptileId, date',
       settings: 'key',
     })
   }

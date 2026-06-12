@@ -13,6 +13,7 @@ import type {
   TodoInstance,
   TodoStatus,
   VisitLog,
+  ClutchLog,
 } from './schema'
 
 function uid(): string {
@@ -50,6 +51,7 @@ export const reptileRepo = {
       db.reptiles, db.feed_logs, db.weight_logs, db.medication_courses,
       db.medication_logs, db.shed_logs, db.habitat_logs, db.uvb_logs,
       db.substrate_logs, db.todo_rules, db.todo_instances, db.visit_logs,
+      db.clutch_logs,
     ], async () => {
       await db.reptiles.delete(id)
       await db.feed_logs.where('reptileId').equals(id).delete()
@@ -63,6 +65,8 @@ export const reptileRepo = {
       await db.todo_rules.where('reptileId').equals(id).delete()
       await db.todo_instances.where('reptileId').equals(id).delete()
       await db.visit_logs.where('reptileId').equals(id).delete()
+      await db.clutch_logs.where('fatherReptileId').equals(id).delete()
+      await db.clutch_logs.where('motherReptileId').equals(id).delete()
     })
   },
 }
@@ -285,6 +289,29 @@ export const visitLogRepo = {
   },
 
   delete: (id: string) => db.visit_logs.delete(id),
+}
+
+// ─── ClutchLog ───────────────────────────────────────────────────────────────
+
+export const clutchLogRepo = {
+  getAll: () => db.clutch_logs.orderBy('date').reverse().toArray(),
+
+  getByReptile: async (reptileId: string): Promise<ClutchLog[]> => {
+    const [asFather, asMother] = await Promise.all([
+      db.clutch_logs.where('fatherReptileId').equals(reptileId).toArray(),
+      db.clutch_logs.where('motherReptileId').equals(reptileId).toArray(),
+    ])
+    const merged = [...asFather, ...asMother.filter((m) => !asFather.some((f) => f.id === m.id))]
+    return merged.sort((a, b) => b.date.localeCompare(a.date))
+  },
+
+  create: async (input: Omit<ClutchLog, 'id' | 'createdAt'>): Promise<ClutchLog> => {
+    const log: ClutchLog = { ...input, id: uid(), createdAt: now() }
+    await db.clutch_logs.add(log)
+    return log
+  },
+
+  delete: (id: string) => db.clutch_logs.delete(id),
 }
 
 // ─── Settings ─────────────────────────────────────────────────────────────────

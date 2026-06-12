@@ -24,7 +24,9 @@
       "Bash(python -c ' *)",
       "PowerShell(Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Image]::FromFile\\(\"c:\\\\Users\\\\do_do\\\\Dropbox\\\\00. Saori's Life\\\\website\\\\ReptileManager\\\\images\\\\chameleon.png\"\\); \"$\\($img.Width\\) x $\\($img.Height\\)\"; $img.Dispose\\(\\))",
       "Read(//c/Users/do_do/Downloads/Telegram Desktop/**)",
-      "Bash(sort -Property LastWriteTime -Descending)"
+      "Bash(sort -Property LastWriteTime -Descending)",
+      "Bash(netlify deploy *)",
+      "Bash(git hash-object *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\do_do\\Dropbox\\00. Saori's Life\\website\\ReptileManager\\images"

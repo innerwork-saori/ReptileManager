@@ -1,15 +1,15 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
-import { Edit, QrCode, Utensils, Pill, Thermometer, CheckSquare, Scale, Stethoscope } from 'lucide-react'
+import { Edit, QrCode, Utensils, Pill, Thermometer, CheckSquare, Scale, Stethoscope, Heart } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
 import { Card, Section } from '../components/Card'
-import { reptileRepo, feedLogRepo, weightLogRepo, medicationCourseRepo, shedLogRepo, habitatLogRepo, visitLogRepo } from '../db/repos'
-import type { Reptile, FeedLog, WeightLog, MedicationCourse, ShedLog, HabitatLog, VisitLog } from '../db/schema'
+import { reptileRepo, feedLogRepo, weightLogRepo, medicationCourseRepo, shedLogRepo, habitatLogRepo, visitLogRepo, clutchLogRepo } from '../db/repos'
+import type { Reptile, FeedLog, WeightLog, MedicationCourse, ShedLog, HabitatLog, VisitLog, ClutchLog } from '../db/schema'
 import { formatRelativeTime, formatDate, formatDateTime, calcAge } from '../lib/todoEngine'
 
-type Tab = 'overview' | 'feed' | 'medication' | 'environment' | 'health'
+type Tab = 'overview' | 'feed' | 'medication' | 'environment' | 'health' | 'clutch'
 
 export function ReptileDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -23,6 +23,8 @@ export function ReptileDetailPage() {
   const [shedLogs, setShedLogs] = useState<ShedLog[]>([])
   const [habitatLogs, setHabitatLogs] = useState<HabitatLog[]>([])
   const [visitLogs, setVisitLogs] = useState<VisitLog[]>([])
+  const [clutchLogs, setClutchLogs] = useState<ClutchLog[]>([])
+  const [allReptiles, setAllReptiles] = useState<Reptile[]>([])
   const [showQr, setShowQr] = useState(false)
 
   const load = useCallback(async () => {
@@ -30,13 +32,15 @@ export function ReptileDetailPage() {
     const r = await reptileRepo.getById(id)
     if (!r) { navigate('/reptiles'); return }
     setReptile(r)
-    const [feeds, weights, meds, sheds, habitats, visits] = await Promise.all([
+    const [feeds, weights, meds, sheds, habitats, visits, clutches, reptiles] = await Promise.all([
       feedLogRepo.getByReptile(id),
       weightLogRepo.getByReptile(id),
       medicationCourseRepo.getByReptile(id),
       shedLogRepo.getByReptile(id),
       habitatLogRepo.getByReptile(id),
       visitLogRepo.getByReptile(id),
+      clutchLogRepo.getByReptile(id),
+      reptileRepo.getAll(),
     ])
     setFeedLogs(feeds)
     setWeightLogs(weights)
@@ -44,6 +48,8 @@ export function ReptileDetailPage() {
     setShedLogs(sheds)
     setHabitatLogs(habitats)
     setVisitLogs(visits)
+    setClutchLogs(clutches)
+    setAllReptiles(reptiles)
   }, [id, navigate])
 
   useEffect(() => { void load() }, [load])
@@ -74,7 +80,13 @@ export function ReptileDetailPage() {
     { key: 'medication', label: t('reptile.tabs.medication'), icon: <Pill size={14} /> },
     { key: 'environment', label: t('reptile.tabs.environment'), icon: <Thermometer size={14} /> },
     { key: 'health', label: t('reptile.tabs.health'), icon: <Stethoscope size={14} /> },
+    { key: 'clutch', label: t('reptile.tabs.clutch'), icon: <Heart size={14} /> },
   ]
+
+  const reptileNameById = (rid: string | undefined) => {
+    if (!rid) return t('clutch.unset')
+    return allReptiles.find((r) => r.id === rid)?.name ?? t('common.unknown')
+  }
 
   return (
     <Layout
@@ -145,6 +157,24 @@ export function ReptileDetailPage() {
               </div>
             </Link>
           </div>
+          {(reptile.fatherId || reptile.motherId) && (
+            <Section title={t('reptile.overview.parents')}>
+              <Card className="mx-0">
+                {reptile.fatherId && (
+                  <Link to={`/reptile/${reptile.fatherId}`} className="flex justify-between items-center px-4 py-3 border-b border-gray-100">
+                    <span className="text-xs text-gray-500">{t('reptile.overview.father')}</span>
+                    <span className="text-sm font-medium text-green-700">{reptileNameById(reptile.fatherId)}</span>
+                  </Link>
+                )}
+                {reptile.motherId && (
+                  <Link to={`/reptile/${reptile.motherId}`} className="flex justify-between items-center px-4 py-3">
+                    <span className="text-xs text-gray-500">{t('reptile.overview.mother')}</span>
+                    <span className="text-sm font-medium text-green-700">{reptileNameById(reptile.motherId)}</span>
+                  </Link>
+                )}
+              </Card>
+            </Section>
+          )}
           {reptile.notes && (
             <Section title={t('common.notes')}>
               <Card className="mx-0">
@@ -304,6 +334,36 @@ export function ReptileDetailPage() {
               </Card>
             )}
           </Section>
+        </div>
+      )}
+
+      {tab === 'clutch' && (
+        <div className="py-4">
+          <div className="px-4 mb-3">
+            <Link to={`/reptile/${id}/clutch`}
+              className="block w-full bg-green-600 text-white py-2.5 rounded-xl text-center font-medium text-sm">
+              + {t('clutch.addRecord')}
+            </Link>
+          </div>
+          {clutchLogs.length === 0 ? (
+            <p className="text-center text-gray-400 text-sm py-8">{t('clutch.noRecords')}</p>
+          ) : (
+            <Card className="mx-4">
+              {clutchLogs.map((l) => (
+                <div key={l.id} className="px-4 py-3 border-b border-gray-100 last:border-0">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-semibold text-gray-800">{l.eggCount} {t('clutch.eggCountUnit')}</span>
+                    <span className="text-xs text-gray-400">{formatDate(l.date)}</span>
+                  </div>
+                  <div className="text-xs text-gray-500 space-y-0.5">
+                    <p>{t('clutch.father')}：{reptileNameById(l.fatherReptileId)}</p>
+                    <p>{t('clutch.mother')}：{reptileNameById(l.motherReptileId)}</p>
+                  </div>
+                  {l.notes && <p className="text-xs text-gray-400 mt-1 italic">{l.notes}</p>}
+                </div>
+              ))}
+            </Card>
+          )}
         </div>
       )}
 

@@ -56,6 +56,7 @@ const en: Translation = {
   },
   reptile: {
     list: 'Reptile List',
+    searchPlaceholder: 'Search name, species, morph…',
     new: 'Add Reptile',
     edit: 'Edit Reptile',
     detail: 'Reptile Detail',
@@ -70,6 +71,7 @@ const en: Translation = {
       medication: 'Medication',
       environment: 'Environment',
       health: 'Health',
+      clutch: 'Breeding',
     },
     overview: {
       lastFed: 'Last Fed',
@@ -80,6 +82,9 @@ const en: Translation = {
       coursesCount: '{{count}}',
       addWeight: 'Add Weight',
       lastWeight: 'Last Weight',
+      parents: 'Parents',
+      father: 'Father',
+      mother: 'Mother',
     },
     form: {
       namePlaceholder: 'e.g. Mochi',
@@ -102,6 +107,9 @@ const en: Translation = {
       deleteTitle: 'Confirm Delete',
       deleteWarning: 'All related records will also be deleted. This cannot be undone.',
       confirmDelete: 'Delete',
+      father: 'Father (male)',
+      mother: 'Mother (female)',
+      parentUnset: 'Not set',
     },
     age: {
       months: '{{count}} mo',
@@ -268,6 +276,18 @@ const en: Translation = {
   todoItem: {
     done: 'Done',
     skipped: 'Skipped',
+  },
+  clutch: {
+    title: 'Breeding Records',
+    addRecord: 'Add Breeding Record',
+    noRecords: 'No breeding records yet',
+    father: 'Father (male)',
+    mother: 'Mother (female)',
+    eggCount: 'Egg Count',
+    eggCountUnit: 'egg(s)',
+    date: 'Clutch Date',
+    saveBtn: 'Save Record',
+    unset: 'Not set',
   },
   backup: {
     title: 'Backup & Data',

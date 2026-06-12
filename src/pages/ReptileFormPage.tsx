@@ -7,6 +7,8 @@ import { InputField, SelectField, TextareaField } from '../components/FormField'
 import { reptileRepo } from '../db/repos'
 import type { Reptile } from '../db/schema'
 
+const SEX_LABEL: Record<string, string> = { male: '公', female: '母', unknown: '未知' }
+
 function buildQrUrl(id: string): string {
   return `${window.location.origin}${window.location.pathname}#/reptile/${id}`
 }
@@ -37,11 +39,18 @@ export function ReptileFormPage() {
     notes: '',
     allergyInfo: '',
     chronicInfo: '',
+    fatherId: '',
+    motherId: '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
+  const [allReptiles, setAllReptiles] = useState<Reptile[]>([])
+
+  useEffect(() => {
+    reptileRepo.getAll().then(setAllReptiles)
+  }, [])
 
   useEffect(() => {
     if (!isEdit) return
@@ -61,6 +70,8 @@ export function ReptileFormPage() {
         notes: r.notes ?? '',
         allergyInfo: r.allergyInfo ?? '',
         chronicInfo: r.chronicInfo ?? '',
+        fatherId: r.fatherId ?? '',
+        motherId: r.motherId ?? '',
       })
       setLoading(false)
     })
@@ -107,6 +118,8 @@ export function ReptileFormPage() {
       notes: form.notes.trim() || undefined,
       allergyInfo: form.allergyInfo.trim() || undefined,
       chronicInfo: form.chronicInfo.trim() || undefined,
+      fatherId: form.fatherId || undefined,
+      motherId: form.motherId || undefined,
       qrTargetUrl: '',
     }
 
@@ -181,6 +194,28 @@ export function ReptileFormPage() {
         <TextareaField label={t('reptile.form.allergyInfo')} value={form.allergyInfo} onChange={set('allergyInfo')} />
         <TextareaField label={t('reptile.form.chronicInfo')} value={form.chronicInfo} onChange={set('chronicInfo')} />
         <TextareaField label={t('common.notes')} value={form.notes} onChange={set('notes')} />
+        <SelectField
+          label={t('reptile.form.father')}
+          value={form.fatherId}
+          onChange={set('fatherId')}
+          options={[
+            { value: '', label: t('reptile.form.parentUnset') },
+            ...allReptiles
+              .filter((r) => r.id !== id)
+              .map((r) => ({ value: r.id, label: `${r.name}${r.sex ? ` (${SEX_LABEL[r.sex] ?? r.sex})` : ''}` })),
+          ]}
+        />
+        <SelectField
+          label={t('reptile.form.mother')}
+          value={form.motherId}
+          onChange={set('motherId')}
+          options={[
+            { value: '', label: t('reptile.form.parentUnset') },
+            ...allReptiles
+              .filter((r) => r.id !== id)
+              .map((r) => ({ value: r.id, label: `${r.name}${r.sex ? ` (${SEX_LABEL[r.sex] ?? r.sex})` : ''}` })),
+          ]}
+        />
 
         <button type="submit" disabled={saving}
           className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold disabled:opacity-60">

@@ -54,6 +54,7 @@ const zhTW = {
   },
   reptile: {
     list: '爬蟲列表',
+    searchPlaceholder: '搜尋名稱、物種、花色…',
     new: '新增爬蟲',
     edit: '編輯爬蟲',
     detail: '爬蟲詳細',
@@ -68,6 +69,7 @@ const zhTW = {
       medication: '投藥',
       environment: '環境',
       health: '健康',
+      clutch: '繁殖',
     },
     overview: {
       lastFed: '上次餵食',
@@ -78,6 +80,9 @@ const zhTW = {
       coursesCount: '{{count}} 個',
       addWeight: '新增體重紀錄',
       lastWeight: '最近體重',
+      parents: '親代',
+      father: '父',
+      mother: '母',
     },
     form: {
       namePlaceholder: '例：阿花',
@@ -100,6 +105,9 @@ const zhTW = {
       deleteTitle: '確認刪除',
       deleteWarning: '刪除後所有相關紀錄也會一併刪除，無法復原。',
       confirmDelete: '確認刪除',
+      father: '父（公蛇）',
+      mother: '母（母蛇）',
+      parentUnset: '未設定',
     },
     age: {
       months: '{{count}} 個月',
@@ -266,6 +274,18 @@ const zhTW = {
   todoItem: {
     done: '已完成',
     skipped: '已略過',
+  },
+  clutch: {
+    title: '繁殖紀錄',
+    addRecord: '新增繁殖紀錄',
+    noRecords: '尚無繁殖紀錄',
+    father: '父蛇',
+    mother: '母蛇',
+    eggCount: '蛋數',
+    eggCountUnit: '顆',
+    date: '產蛋日期',
+    saveBtn: '儲存紀錄',
+    unset: '未設定',
   },
   backup: {
     title: '備份與資料',
