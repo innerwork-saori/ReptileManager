@@ -22,7 +22,9 @@
       "Bash(npx tsc *)",
       "Bash(python3 -c ' *)",
       "Bash(python -c ' *)",
-      "PowerShell(Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Image]::FromFile\\(\"c:\\\\Users\\\\do_do\\\\Dropbox\\\\00. Saori's Life\\\\website\\\\ReptileManager\\\\images\\\\chameleon.png\"\\); \"$\\($img.Width\\) x $\\($img.Height\\)\"; $img.Dispose\\(\\))"
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Image]::FromFile\\(\"c:\\\\Users\\\\do_do\\\\Dropbox\\\\00. Saori's Life\\\\website\\\\ReptileManager\\\\images\\\\chameleon.png\"\\); \"$\\($img.Width\\) x $\\($img.Height\\)\"; $img.Dispose\\(\\))",
+      "Read(//c/Users/do_do/Downloads/Telegram Desktop/**)",
+      "Bash(sort -Property LastWriteTime -Descending)"
     ],
     "additionalDirectories": [
       "c:\\Users\\do_do\\Dropbox\\00. Saori's Life\\website\\ReptileManager\\images"
