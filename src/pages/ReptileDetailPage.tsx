@@ -272,13 +272,16 @@ export function ReptileDetailPage() {
             ) : (
               <Card className="mx-0">
                 {shedLogs.slice(0, 5).map((l) => (
-                  <div key={l.id} className="px-4 py-3 border-b border-gray-100 last:border-0 flex justify-between items-center">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      l.status === 'complete' ? 'bg-green-100 text-green-700' :
-                      l.status === 'partial' ? 'bg-amber-100 text-amber-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>{shedLabel(l.status)}</span>
-                    <p className="text-xs text-gray-400">{formatDate(l.date)}</p>
+                  <div key={l.id} className="px-4 py-3 border-b border-gray-100 last:border-0">
+                    <div className="flex justify-between items-center">
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        l.status === 'complete' ? 'bg-green-100 text-green-700' :
+                        l.status === 'partial' ? 'bg-amber-100 text-amber-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>{shedLabel(l.status)}</span>
+                      <p className="text-xs text-gray-400">{formatDate(l.date)}</p>
+                    </div>
+                    {l.notes && <p className="text-xs text-gray-500 italic mt-1">{l.notes}</p>}
                   </div>
                 ))}
               </Card>
