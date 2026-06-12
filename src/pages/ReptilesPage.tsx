@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, ChevronRight } from 'lucide-react'
+import { Plus, ChevronRight, Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
 import { Card } from '../components/Card'
@@ -8,15 +8,25 @@ import { reptileRepo } from '../db/repos'
 import type { Reptile } from '../db/schema'
 import { calcAge } from '../lib/todoEngine'
 
+function fuzzyMatch(reptile: Reptile, query: string): boolean {
+  const q = query.trim().toLowerCase()
+  if (!q) return true
+  const haystack = `${reptile.name} ${reptile.species} ${reptile.breed}`.toLowerCase()
+  return q.split(/\s+/).every((word) => haystack.includes(word))
+}
+
 export function ReptilesPage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [reptiles, setReptiles] = useState<Reptile[]>([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     reptileRepo.getAll().then((r) => { setReptiles(r); setLoading(false) })
   }, [])
+
+  const filtered = useMemo(() => reptiles.filter((r) => fuzzyMatch(r, search)), [reptiles, search])
 
   const sexLabel = (sex: Reptile['sex']) => {
     if (sex === 'male') return t('common.sex.male')
@@ -50,7 +60,17 @@ export function ReptilesPage() {
         </div>
       ) : (
         <div className="px-4 pt-4 space-y-3">
-          {reptiles.map((r) => (
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t('reptile.searchPlaceholder')}
+              className="w-full pl-9 pr-3 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
+          </div>
+          {filtered.map((r) => (
             <Card key={r.id} onClick={() => navigate(`/reptile/${r.id}`)}>
               <div className="flex items-center gap-3 p-3">
                 <div className="w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center text-3xl shrink-0 overflow-hidden">
@@ -91,6 +111,9 @@ export function ReptilesPage() {
               </div>
             </Card>
           ))}
+          {filtered.length === 0 && search && (
+            <p className="text-center text-gray-400 text-sm py-8">{t('common.noRecords')}</p>
+          )}
         </div>
       )}
     </Layout>
