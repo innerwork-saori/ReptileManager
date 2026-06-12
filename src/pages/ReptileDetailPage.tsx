@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
-import { Edit, QrCode, Utensils, Pill, Thermometer, Scale, Stethoscope } from 'lucide-react'
+import { Edit, QrCode, Utensils, Pill, Thermometer, CheckSquare, Scale, Stethoscope } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
@@ -135,6 +135,13 @@ export function ReptileDetailPage() {
                 <p className="text-sm font-semibold text-gray-800">
                   {weightLogs.length > 0 ? `${weightLogs[weightLogs.length - 1].weight} g` : t('common.noRecords')}
                 </p>
+              </div>
+            </Link>
+            <Link to={`/reptile/${id}/todos`}>
+              <div className="bg-purple-50 rounded-xl p-3 text-center">
+                <CheckSquare size={20} className="mx-auto text-purple-500 mb-1" />
+                <p className="text-xs text-gray-500">{t('reptile.overview.todoRules')}</p>
+                <p className="text-sm font-semibold text-gray-800">{t('common.manage')}</p>
               </div>
             </Link>
           </div>
