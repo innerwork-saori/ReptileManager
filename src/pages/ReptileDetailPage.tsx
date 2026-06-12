@@ -26,6 +26,7 @@ export function ReptileDetailPage() {
   const [clutchLogs, setClutchLogs] = useState<ClutchLog[]>([])
   const [allReptiles, setAllReptiles] = useState<Reptile[]>([])
   const [showQr, setShowQr] = useState(false)
+  const [showPhoto, setShowPhoto] = useState(false)
 
   const load = useCallback(async () => {
     if (!id) return
@@ -105,7 +106,10 @@ export function ReptileDetailPage() {
     >
       <div className="bg-green-700 text-white px-4 pt-4 pb-4">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-green-600 flex items-center justify-center text-3xl overflow-hidden">
+          <div
+            className={`w-16 h-16 rounded-2xl bg-green-600 flex items-center justify-center text-3xl overflow-hidden ${reptile.photoUrl ? 'cursor-pointer active:opacity-80' : ''}`}
+            onClick={() => reptile.photoUrl && setShowPhoto(true)}
+          >
             {reptile.photoUrl ? <img src={reptile.photoUrl} alt={reptile.name} className="w-full h-full object-cover" /> : '🦎'}
           </div>
           <div>
@@ -364,6 +368,12 @@ export function ReptileDetailPage() {
               ))}
             </Card>
           )}
+        </div>
+      )}
+
+      {showPhoto && reptile.photoUrl && (
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4" onClick={() => setShowPhoto(false)}>
+          <img src={reptile.photoUrl} alt={reptile.name} className="max-w-full max-h-full rounded-xl object-contain" />
         </div>
       )}
 

@@ -107,8 +107,8 @@ const en: Translation = {
       deleteTitle: 'Confirm Delete',
       deleteWarning: 'All related records will also be deleted. This cannot be undone.',
       confirmDelete: 'Delete',
-      father: 'Father (male)',
-      mother: 'Mother (female)',
+      father: 'Father',
+      mother: 'Mother',
       parentUnset: 'Not set',
     },
     age: {

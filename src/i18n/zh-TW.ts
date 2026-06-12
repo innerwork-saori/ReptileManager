@@ -105,8 +105,8 @@ const zhTW = {
       deleteTitle: '確認刪除',
       deleteWarning: '刪除後所有相關紀錄也會一併刪除，無法復原。',
       confirmDelete: '確認刪除',
-      father: '父（公蛇）',
-      mother: '母（母蛇）',
+      father: '父',
+      mother: '母',
       parentUnset: '未設定',
     },
     age: {
