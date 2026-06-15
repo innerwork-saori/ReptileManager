@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, List, PlusCircle, HeartPulse, Settings, ArrowLeft } from 'lucide-react'
+import { Home, List, PlusCircle, Egg, Settings, ArrowLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
 
@@ -23,7 +23,7 @@ export function Layout({ children, title, back, action }: Props) {
     { to: '/', end: true,  icon: Home,       label: t('nav.home') },
     { to: '/reptiles',     icon: List,        label: t('nav.reptiles') },
     { to: '/reptile/new',  icon: PlusCircle,  label: t('nav.log') },
-    { to: '/reptiles',     icon: HeartPulse,  label: t('nav.health'), matchPath: '/health' },
+    { to: '/breeding',     icon: Egg,         label: t('nav.breeding') },
     { to: '/backup',       icon: Settings,    label: t('nav.backup') },
   ]
 

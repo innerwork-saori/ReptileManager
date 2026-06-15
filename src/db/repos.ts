@@ -311,6 +311,14 @@ export const clutchLogRepo = {
     return log
   },
 
+  update: async (id: string, patch: Partial<ClutchLog>): Promise<ClutchLog> => {
+    const existing = await db.clutch_logs.get(id)
+    if (!existing) throw new Error('ClutchLog not found')
+    const updated: ClutchLog = { ...existing, ...patch }
+    await db.clutch_logs.put(updated)
+    return updated
+  },
+
   delete: (id: string) => db.clutch_logs.delete(id),
 }
 

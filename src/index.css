@@ -31,6 +31,7 @@
   --color-secondary: #944925;
   --color-secondary-container: #ffdbc8;
   --color-on-secondary-container: #360f00;
+  --color-surface-container-high: #e7e9e1;
 }
 
 @layer base {

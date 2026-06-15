@@ -161,6 +161,9 @@ export interface ClutchLog {
   fatherReptileId?: string
   motherReptileId?: string
   eggCount: number
+  fertileCount?: number
+  hatchedCount?: number
+  moldedCount?: number
   notes?: string
   createdAt: string
 }
@@ -206,6 +209,23 @@ export class ReptileManagerDb extends Dexie {
     })
 
     this.version(2).stores({
+      reptiles: 'id, name, species, createdAt',
+      weight_logs: 'id, reptileId, date, [reptileId+date]',
+      feed_logs: 'id, reptileId, fedAt, [reptileId+fedAt]',
+      medication_courses: 'id, reptileId, active, [reptileId+active]',
+      medication_logs: 'id, reptileId, takenAt, [reptileId+takenAt]',
+      shed_logs: 'id, reptileId, date, [reptileId+date]',
+      habitat_logs: 'id, reptileId, loggedAt, [reptileId+loggedAt]',
+      uvb_logs: 'id, reptileId, startedAt',
+      substrate_logs: 'id, reptileId, changedAt, [reptileId+changedAt]',
+      todo_rules: 'id, reptileId, type, enabled',
+      todo_instances: 'id, reptileId, date, status, [reptileId+date], [date+status]',
+      visit_logs: 'id, reptileId, date, [reptileId+date]',
+      clutch_logs: 'id, fatherReptileId, motherReptileId, date',
+      settings: 'key',
+    })
+
+    this.version(3).stores({
       reptiles: 'id, name, species, createdAt',
       weight_logs: 'id, reptileId, date, [reptileId+date]',
       feed_logs: 'id, reptileId, fedAt, [reptileId+fedAt]',

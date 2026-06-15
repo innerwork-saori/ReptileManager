@@ -1,6 +1,6 @@
 # ReptileManager — 功能架構書
 
-> 版本：0.2.1　　最後更新：2026-06-15
+> 版本：0.2.2　　最後更新：2026-06-15
 
 ---
 
@@ -160,7 +160,23 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 
 ---
 
-### 3.7 備份與設定（Backup & Settings）
+### 3.7 繁殖管理（Breeding Management）
+
+全域繁殖紀錄總覽，可跨爬蟲查看所有配對與產卵記錄。
+
+| 項目 | 說明 |
+|------|------|
+| 統計看板 | 一窩總數、本月新增、孵化率 |
+| 繁殖紀錄列表 | 產蛋日期、父母爬蟲名稱與照片、蛋數、受精數、孵化數 |
+| 孵化中任務 | 依產卵日計算孵化里程碑（照蛋 Day 14、補水 Day 30、預計孵化 Day 60） |
+| 新增表單 | FAB + 底部彈出 Modal，支援選擇父母爬蟲、輸入蛋數與受精數 |
+| 入口 | 底部導覽第 4 項（蛋形圖示） |
+
+**ClutchLog 欄位**：`date`、`fatherReptileId`、`motherReptileId`、`eggCount`、`fertileCount`、`hatchedCount`、`moldedCount`、`notes`
+
+---
+
+### 3.8 備份與設定（Backup & Settings）
 
 | 功能 | 說明 |
 |------|------|
@@ -173,7 +189,7 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 
 ## 4. 資料模型
 
-資料庫以 Dexie 定義，共 **12 張資料表**，全部儲存於瀏覽器 IndexedDB。
+資料庫以 Dexie 定義，共 **14 張資料表**，全部儲存於瀏覽器 IndexedDB。
 
 ```
 ReptileDB (Dexie)
@@ -190,6 +206,7 @@ ReptileDB (Dexie)
 ├── visitLogs         → 就診記錄
 ├── todoRules         → 待辦規則
 ├── todoInstances     → 待辦實例
+├── clutch_logs       → 繁殖記錄（ClutchLog）
 └── settings          → 應用設定（key-value）
 ```
 
@@ -228,6 +245,8 @@ Reptile (1)
 | `/reptile/:id/environment` | EnvironmentPage | 環境三合一（棲息 / UVB / 底材） |
 | `/reptile/:id/health` | HealthPage | 健康三合一（體重 / 脫皮 / 就診） |
 | `/reptile/:id/todos` | TodoRulesPage | 待辦規則設定 |
+| `/reptile/:id/clutch` | ClutchFormPage | 新增繁殖紀錄（預填父母欄位） |
+| `/breeding` | BreedingPage | 全域繁殖管理（統計 + 列表 + 新增） |
 | `/backup` | BackupPage | 設定 + 備份匯出入 |
 
 ---
