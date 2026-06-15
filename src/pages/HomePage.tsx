@@ -1,10 +1,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Clock, AlertCircle } from 'lucide-react'
+import { ClipboardList, UtensilsCrossed, Check, ChevronRight, Plus, Bell, SkipForward } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
-import { Card, Section } from '../components/Card'
-import { TodoItem } from '../components/TodoItem'
 import { reptileRepo, feedLogRepo, todoRuleRepo, todoInstanceRepo, medicationCourseRepo } from '../db/repos'
 import type { Reptile, FeedLog, TodoInstance, MedicationCourse } from '../db/schema'
 import { computeTodayInstances, formatRelativeTime } from '../lib/todoEngine'
@@ -60,36 +58,24 @@ export function HomePage() {
   const pendingTodos = todos.filter((t) => t.status === 'pending')
   const doneTodos = todos.filter((t) => t.status !== 'pending')
 
-  const heroBanner = (
-    <div className="relative w-full h-44 overflow-hidden">
-      <img
-        src="/preview.jpg"
-        alt="reptile scale mosaic pattern"
-        className="w-full h-full object-cover object-center"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-green-900/75" />
-      <div className="absolute bottom-0 inset-x-0 px-4 pb-3 flex items-end justify-between">
-        <div>
-          <p className="text-white font-bold text-lg leading-tight drop-shadow-md">{t('home.title')}</p>
-          <p className="text-white/75 text-xs drop-shadow">{t('home.tagline')}</p>
-        </div>
-        <a
-          href="http://www.freepik.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-white/40 text-[9px] hover:text-white/70 transition-colors leading-tight text-right"
-        >
-          Nadezhda_grapes<br />/ Freepik
-        </a>
-      </div>
-    </div>
+  const allPendingMeds = cards.flatMap(({ reptile, pendingMeds }) =>
+    pendingMeds.map((med) => ({ ...med, reptileName: reptile.name }))
   )
+
+  const handleTodoDone = async (id: string) => {
+    await todoInstanceRepo.updateStatus(id, 'done')
+    void load()
+  }
+
+  const handleTodoSkip = async (id: string) => {
+    await todoInstanceRepo.updateStatus(id, 'skipped')
+    void load()
+  }
 
   if (loading) {
     return (
       <Layout title={t('home.title')}>
-        {heroBanner}
-        <div className="flex items-center justify-center py-20 text-gray-400">{t('common.loading')}</div>
+        <div className="flex items-center justify-center py-20 text-on-surface-variant">{t('common.loading')}</div>
       </Layout>
     )
   }
@@ -100,102 +86,207 @@ export function HomePage() {
       action={
         <button
           onClick={() => navigate('/reptile/new')}
-          className="p-1.5 rounded-full bg-green-600 hover:bg-green-500 transition-colors"
+          className="p-1.5 rounded-full bg-primary-container text-on-primary-container hover:bg-primary-container/80 transition-colors"
         >
           <Plus size={18} />
         </button>
       }
     >
-      {heroBanner}
-      {cards.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-4 text-gray-400 px-6">
-          <AlertCircle size={48} className="text-gray-300" />
-          <p className="text-center text-sm">{t('home.noReptiles')}</p>
-          <button
-            onClick={() => navigate('/reptile/new')}
-            className="bg-green-600 text-white px-6 py-2 rounded-full text-sm font-medium"
-          >
-            {t('home.addFirst')}
-          </button>
-        </div>
-      ) : (
-        <>
-          <Section title={t('home.overview')}>
-            <div className="px-4 space-y-3">
-              {cards.map(({ reptile, lastFeed, pendingMeds }) => (
-                <Card key={reptile.id} onClick={() => navigate(`/reptile/${reptile.id}`)}>
-                  <div className="flex items-center gap-3 p-3">
-                    <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-2xl shrink-0 overflow-hidden">
-                      {reptile.photoUrl ? (
-                        <img src={reptile.photoUrl} alt={reptile.name} className="w-full h-full object-cover" />
-                      ) : (
-                        '🦎'
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-800 truncate">{reptile.name}</p>
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-xs text-gray-500 truncate">
-                          {reptile.species}{reptile.breed && ` · ${reptile.breed}`}
-                        </p>
-                        {reptile.sex && reptile.sex !== 'unknown' && (
-                          <span className={`shrink-0 text-[10px] font-semibold px-1 rounded ${reptile.sex === 'male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
-                            {t(`common.sex.${reptile.sex}`)}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1 mt-1">
-                        <Clock size={11} className="text-gray-400" />
-                        <span className="text-xs text-gray-400">
-                          {t('home.lastFed', { time: formatRelativeTime(lastFeed?.fedAt) })}
-                        </span>
-                      </div>
-                    </div>
-                    {pendingMeds.length > 0 && (
-                      <div className="shrink-0">
-                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
-                          {pendingMeds.length}
-                        </span>
+      <div className="py-4 space-y-6">
+
+        {/* Dashboard Overview Card */}
+        {cards.length > 0 && (
+          <section className="mx-4 bg-surface-container-lowest p-4 rounded-2xl shadow-sm border border-outline-variant">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h2 className="font-bold text-lg text-on-surface">儀表板概覽</h2>
+                <p className="text-xs text-on-surface-variant">Dashboard Overview</p>
+              </div>
+              <span className="bg-primary-container text-on-primary-container text-xs font-semibold px-3 py-1 rounded-full">
+                今日活躍
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-primary rounded-full">
+                <ClipboardList size={22} className="text-on-primary" />
+              </div>
+              <div>
+                <p className="font-bold text-primary">
+                  {t('home.todayTodosCount', { count: pendingTodos.length })}
+                </p>
+                <p className="text-xs text-on-surface-variant">{pendingTodos.length} Tasks Pending</p>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* My Reptiles */}
+        {cards.length > 0 ? (
+          <section className="px-4">
+            <div className="flex justify-between items-end mb-3">
+              <div>
+                <h2 className="font-bold text-lg text-on-surface">我的爬寵</h2>
+                <p className="text-xs text-on-surface-variant">My Reptiles</p>
+              </div>
+              <button
+                onClick={() => navigate('/reptiles')}
+                className="text-primary text-sm font-semibold"
+              >
+                查看全部
+              </button>
+            </div>
+            <div className="flex overflow-x-auto gap-3 hide-scrollbar -mx-4 px-4 py-2">
+              {cards.map(({ reptile, lastFeed }) => (
+                <div
+                  key={reptile.id}
+                  onClick={() => navigate(`/reptile/${reptile.id}`)}
+                  className="min-w-[180px] bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant overflow-hidden shrink-0 cursor-pointer active:scale-95 transition-transform"
+                >
+                  <div className="h-28 w-full bg-surface-container">
+                    {reptile.photoUrl ? (
+                      <img
+                        src={reptile.photoUrl}
+                        alt={reptile.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-4xl">
+                        🦎
                       </div>
                     )}
                   </div>
-                </Card>
+                  <div className="p-3">
+                    <h3 className="font-semibold text-sm text-on-surface truncate">{reptile.name}</h3>
+                    <p className="text-xs text-on-surface-variant truncate">
+                      {reptile.species}{reptile.breed && ` · ${reptile.breed}`}
+                    </p>
+                    <div className="flex items-center gap-1 mt-1.5">
+                      <UtensilsCrossed size={11} className="text-primary shrink-0" />
+                      <p className="text-xs text-on-surface-variant truncate">
+                        {t('home.lastFed', { time: formatRelativeTime(lastFeed?.fedAt) })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
-          </Section>
+          </section>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-16 gap-4 text-on-surface-variant mx-4">
+            <span className="text-6xl">🦎</span>
+            <p className="text-center text-sm">{t('home.noReptiles')}</p>
+            <button
+              onClick={() => navigate('/reptile/new')}
+              className="bg-primary text-on-primary px-6 py-2.5 rounded-full text-sm font-semibold"
+            >
+              {t('home.addFirst')}
+            </button>
+          </div>
+        )}
 
-          {todos.length > 0 && (
-            <Section title={t('home.todayTodosCount', { count: pendingTodos.length })}>
-              <Card className="mx-4">
-                {pendingTodos.map((todo) => (
-                  <TodoItem
-                    key={todo.id}
-                    item={todo}
-                    reptileName={todo.reptileId ? reptileMap.get(todo.reptileId) : undefined}
-                    onUpdate={load}
+        {/* Today's Tasks */}
+        {todos.length > 0 && (
+          <section className="mx-4 space-y-2">
+            <div className="mb-3">
+              <h2 className="font-bold text-lg text-on-surface">今日任務</h2>
+              <p className="text-xs text-on-surface-variant">Today's Tasks</p>
+            </div>
+
+            {pendingTodos.map((todo) => (
+              <div
+                key={todo.id}
+                className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant"
+              >
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <button
+                    onClick={() => handleTodoDone(todo.id)}
+                    className="w-6 h-6 rounded border-2 border-primary flex items-center justify-center shrink-0 active:scale-90 transition-transform"
+                    aria-label={t('todoItem.done')}
                   />
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm text-on-surface truncate">{todo.label}</p>
+                    {todo.reptileId && reptileMap.get(todo.reptileId) && (
+                      <p className="text-xs text-on-surface-variant">{reptileMap.get(todo.reptileId)}</p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => handleTodoSkip(todo.id)}
+                    className="p-1.5 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors"
+                    aria-label={t('todoItem.skipped')}
+                  >
+                    <SkipForward size={16} />
+                  </button>
+                  <ChevronRight size={20} className="text-on-surface-variant" />
+                </div>
+              </div>
+            ))}
+
+            {pendingTodos.length === 0 && (
+              <div className="flex items-center justify-center p-4 bg-primary-container/30 rounded-2xl">
+                <p className="text-sm text-primary font-semibold">{t('home.allDone')}</p>
+              </div>
+            )}
+
+            {doneTodos.length > 0 && (
+              <>
+                <div className="px-1 pt-2 pb-1 text-xs text-on-surface-variant font-semibold">
+                  {t('home.handled')}
+                </div>
+                {doneTodos.map((todo) => (
+                  <div
+                    key={todo.id}
+                    className="flex items-center gap-3 p-4 bg-surface-container rounded-2xl border border-outline-variant opacity-60"
+                  >
+                    <div className="w-6 h-6 rounded bg-primary flex items-center justify-center shrink-0">
+                      <Check size={14} className="text-on-primary" />
+                    </div>
+                    <p className="text-sm text-on-surface line-through truncate">{todo.label}</p>
+                  </div>
                 ))}
-                {pendingTodos.length === 0 && (
-                  <p className="text-center text-sm text-gray-400 py-4">{t('home.allDone')}</p>
-                )}
-                {doneTodos.length > 0 && (
-                  <>
-                    <div className="px-4 py-2 bg-gray-50 text-xs text-gray-400 font-medium">{t('home.handled')}</div>
-                    {doneTodos.map((todo) => (
-                      <TodoItem
-                        key={todo.id}
-                        item={todo}
-                        reptileName={todo.reptileId ? reptileMap.get(todo.reptileId) : undefined}
-                        onUpdate={load}
-                      />
-                    ))}
-                  </>
-                )}
-              </Card>
-            </Section>
-          )}
-        </>
-      )}
+              </>
+            )}
+          </section>
+        )}
+
+        {/* Medication Reminders */}
+        {allPendingMeds.length > 0 && (
+          <section className="mx-4 bg-secondary-container/20 p-4 rounded-2xl border border-secondary/30">
+            <div className="flex items-center gap-2 mb-1">
+              <Bell size={18} className="text-secondary shrink-0" />
+              <h2 className="font-bold text-lg text-on-surface">{t('home.activeMeds')}</h2>
+            </div>
+            <p className="text-xs text-on-surface-variant mb-3">Medication Reminders</p>
+            <div className="space-y-2">
+              {allPendingMeds.map((med) => (
+                <button
+                  key={med.id}
+                  onClick={() => navigate(`/reptile/${med.reptileId}/medication`)}
+                  className="w-full bg-white/60 p-3 rounded-xl border border-secondary/20 text-left active:scale-[0.98] transition-transform"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-sm text-on-surface truncate">{med.drugName}</span>
+                    <span className="text-xs text-secondary font-medium shrink-0 ml-2">{med.reptileName}</span>
+                  </div>
+                  <p className="text-xs text-on-surface-variant mt-0.5">{med.dosage}</p>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <div className="h-2" />
+      </div>
+
+      {/* FAB */}
+      <button
+        onClick={() => navigate('/reptile/new')}
+        className="fixed right-4 bottom-24 bg-primary text-on-primary p-4 rounded-full shadow-xl active:scale-95 transition-transform z-40"
+        aria-label={t('reptile.new')}
+      >
+        <Plus size={24} />
+      </button>
     </Layout>
   )
 }

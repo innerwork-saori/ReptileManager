@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, List, Download, ArrowLeft } from 'lucide-react'
+import { Home, List, Settings, ArrowLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
 
@@ -20,55 +20,73 @@ export function Layout({ children, title, back, action }: Props) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-surface">
       {title && (
-        <header className="sticky top-0 z-10 bg-green-700 text-white px-4 py-3 flex items-center gap-3 shadow-md">
+        <header className="sticky top-0 z-10 bg-surface border-b border-outline-variant px-4 h-16 flex items-center gap-3 shadow-sm">
           {back && (
-            <button onClick={handleBack} className="p-1 rounded-full hover:bg-green-600 transition-colors">
-              <ArrowLeft size={20} />
+            <button onClick={handleBack} className="p-1 rounded-full hover:bg-surface-container transition-colors">
+              <ArrowLeft size={20} className="text-on-surface" />
             </button>
           )}
-          <h1 className="flex-1 text-lg font-semibold truncate">{title}</h1>
+          <h1 className="flex-1 text-lg font-semibold truncate text-on-surface">{title}</h1>
           {action && <div className="shrink-0">{action}</div>}
         </header>
       )}
 
-      <main className="flex-1 pb-20">{children}</main>
+      <main className="flex-1 pb-24">{children}</main>
 
-      <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 flex safe-bottom">
+      <nav className="fixed bottom-0 inset-x-0 bg-surface border-t border-outline-variant flex safe-bottom rounded-t-xl shadow-lg z-40">
         <NavLink
           to="/"
           end
           className={({ isActive }) =>
-            `flex-1 flex flex-col items-center py-2 text-xs gap-0.5 transition-colors ${
-              isActive ? 'text-green-700' : 'text-gray-500'
+            `flex-1 flex flex-col items-center pt-2 pb-1 text-xs gap-0.5 transition-colors ${
+              isActive ? 'text-primary' : 'text-on-surface-variant'
             }`
           }
         >
-          <Home size={22} />
-          <span>{t('nav.home')}</span>
+          {({ isActive }) => (
+            <>
+              <div className={`px-4 py-1 rounded-full transition-colors ${isActive ? 'bg-primary-container' : ''}`}>
+                <Home size={22} />
+              </div>
+              <span className="font-medium">{t('nav.home')}</span>
+            </>
+          )}
         </NavLink>
         <NavLink
           to="/reptiles"
           className={({ isActive }) =>
-            `flex-1 flex flex-col items-center py-2 text-xs gap-0.5 transition-colors ${
-              isActive ? 'text-green-700' : 'text-gray-500'
+            `flex-1 flex flex-col items-center pt-2 pb-1 text-xs gap-0.5 transition-colors ${
+              isActive ? 'text-primary' : 'text-on-surface-variant'
             }`
           }
         >
-          <List size={22} />
-          <span>{t('nav.reptiles')}</span>
+          {({ isActive }) => (
+            <>
+              <div className={`px-4 py-1 rounded-full transition-colors ${isActive ? 'bg-primary-container' : ''}`}>
+                <List size={22} />
+              </div>
+              <span className="font-medium">{t('nav.reptiles')}</span>
+            </>
+          )}
         </NavLink>
         <NavLink
           to="/backup"
           className={({ isActive }) =>
-            `flex-1 flex flex-col items-center py-2 text-xs gap-0.5 transition-colors ${
-              isActive ? 'text-green-700' : 'text-gray-500'
+            `flex-1 flex flex-col items-center pt-2 pb-1 text-xs gap-0.5 transition-colors ${
+              isActive ? 'text-primary' : 'text-on-surface-variant'
             }`
           }
         >
-          <Download size={22} />
-          <span>{t('nav.backup')}</span>
+          {({ isActive }) => (
+            <>
+              <div className={`px-4 py-1 rounded-full transition-colors ${isActive ? 'bg-primary-container' : ''}`}>
+                <Settings size={22} />
+              </div>
+              <span className="font-medium">{t('nav.backup')}</span>
+            </>
+          )}
         </NavLink>
       </nav>
     </div>

@@ -15,6 +15,22 @@
   --color-green-800: #152240;
   --color-green-900: #0f1a30;
   --color-green-950: #090f1e;
+
+  /* Material Design 3 green tokens for dashboard design */
+  --color-primary: #3b6934;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #bcf0ae;
+  --color-on-primary-container: #002201;
+  --color-surface: #f9faf2;
+  --color-surface-container: #edefe7;
+  --color-surface-container-low: #f3f4ed;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-surface: #191c18;
+  --color-on-surface-variant: #42493e;
+  --color-outline-variant: #c2c9bb;
+  --color-secondary: #944925;
+  --color-secondary-container: #ffdbc8;
+  --color-on-secondary-container: #360f00;
 }
 
 @layer base {
@@ -23,7 +39,7 @@
   }
 
   html {
-    background-color: #1b2c4e;
+    background-color: #f9faf2;
   }
 
   body {
@@ -35,5 +51,12 @@
 @layer utilities {
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

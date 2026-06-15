@@ -26,7 +26,10 @@
       "Read(//c/Users/do_do/Downloads/Telegram Desktop/**)",
       "Bash(sort -Property LastWriteTime -Descending)",
       "Bash(netlify deploy *)",
-      "Bash(git hash-object *)"
+      "Bash(git hash-object *)",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(p.version\\)\")",
+      "Bash(npm pkg *)",
+      "Bash(node -e ' *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\do_do\\Dropbox\\00. Saori's Life\\website\\ReptileManager\\images"
