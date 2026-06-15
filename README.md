@@ -151,20 +151,33 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 
 ---
 
-### 3.7 備份與設定（Backup & Settings）
+### 3.7 繁殖管理（Clutch/Breeding Management）
+
+**核心功能**：記錄爬蟲的繁殖事件與子代信息。
+
+| 項目 | 說明 |
+|------|------|
+| 繁殖日期 | 卵産日期或孵化日期 |
+| 親代 | 父爬蟲 / 母爬蟲的 ID 關聯 |
+| 卵數 / 孵化數 | 繁殖成果統計 |
+| 備注 | 自由文字，記錄特殊情況 |
+
+---
+
+### 3.8 備份與設定（Backup & Settings）
 
 | 功能 | 說明 |
 |------|------|
 | 語言切換 | 繁體中文 / English，偏好存於 localStorage |
 | 資料統計 | 顯示各資料表筆數 |
-| 匯出備份 | 將所有 12 張資料表序列化為 JSON 下載 |
+| 匯出備份 | 將所有 13 張資料表序列化為 JSON 下載 |
 | 匯入備份 | 上傳 JSON 檔，驗證後寫入 IndexedDB（覆蓋模式） |
 
 ---
 
 ## 4. 資料模型
 
-資料庫以 Dexie 定義，共 **12 張資料表**，全部儲存於瀏覽器 IndexedDB。
+資料庫以 Dexie 定義，共 **13 張資料表**，全部儲存於瀏覽器 IndexedDB。
 
 ```
 ReptileDB (Dexie)
@@ -181,6 +194,7 @@ ReptileDB (Dexie)
 ├── visitLogs         → 就診記錄
 ├── todoRules         → 待辦規則
 ├── todoInstances     → 待辦實例
+├── clutchLogs        → 繁殖記錄
 └── settings          → 應用設定（key-value）
 ```
 
@@ -196,9 +210,10 @@ Reptile (1)
   ├──< UvbLog
   ├──< SubstrateLog
   ├──< MedicationCourse (1) ──< MedicationLog
-  └──< TodoRule (0..1) ──< TodoInstance
-          │
-          └── 亦可為全域規則（reptileId = null）
+  ├──< TodoRule (0..1) ──< TodoInstance
+  │     │
+  │     └── 亦可為全域規則（reptileId = null）
+  └──< ClutchLog（作為父或母）
 ```
 
 ---
@@ -219,6 +234,7 @@ Reptile (1)
 | `/reptile/:id/environment` | EnvironmentPage | 環境三合一（棲息 / UVB / 底材） |
 | `/reptile/:id/health` | HealthPage | 健康三合一（體重 / 脫皮 / 就診） |
 | `/reptile/:id/todos` | TodoRulesPage | 待辦規則設定 |
+| `/reptile/:id/clutch` | ClutchPage | 繁殖記錄管理 |
 | `/backup` | BackupPage | 設定 + 備份匯出入 |
 
 ---
@@ -293,9 +309,10 @@ Reptile (1)
          HabitatLog / UvbLog / SubstrateLog
          MedicationCourse + MedicationLog
          TodoRule + TodoInstance
+         ClutchLog
 
 備份（Backup）
-  讀寫 → 全部 12 張資料表
+  讀寫 → 全部 13 張資料表
 ```
 
 ---
