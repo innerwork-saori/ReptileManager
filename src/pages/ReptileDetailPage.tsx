@@ -332,7 +332,7 @@ export function ReptileDetailPage() {
         )}
 
         <Link
-          to={`/reptile/${id}/feed`}
+          to={`/reptile/${id}/logs`}
           className="w-full py-3 text-primary font-semibold text-sm flex items-center justify-center gap-1.5 hover:bg-surface-container rounded-lg transition-colors"
         >
           {t('reptile.overview.viewAllLogs')}

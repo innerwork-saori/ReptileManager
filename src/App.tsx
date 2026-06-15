@@ -15,6 +15,7 @@ import { BackupPage } from './pages/BackupPage'
 import { ClutchFormPage } from './pages/ClutchFormPage'
 import { BreedingPage } from './pages/BreedingPage'
 import { FeedQuickPage } from './pages/FeedQuickPage'
+import { ActivityLogPage } from './pages/ActivityLogPage'
 
 function UpdatePrompt() {
   const { t } = useTranslation()
@@ -60,6 +61,7 @@ export default function App() {
         <Route path="/reptile/:id" element={<ReptileDetailPage />} />
         <Route path="/reptile/:id/edit" element={<ReptileFormPage />} />
         <Route path="/reptile/:id/feed" element={<FeedLogPage />} />
+        <Route path="/reptile/:id/logs" element={<ActivityLogPage />} />
         <Route path="/reptile/:id/medication" element={<MedicationPage />} />
         <Route path="/reptile/:id/environment" element={<EnvironmentPage />} />
         <Route path="/reptile/:id/health" element={<HealthPage />} />

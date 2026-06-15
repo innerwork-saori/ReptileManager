@@ -1,6 +1,6 @@
 # ReptileManager — 功能架構書
 
-> 版本：0.2.3　　最後更新：2026-06-15
+> 版本：0.2.4　　最後更新：2026-06-15
 
 ---
 
@@ -249,6 +249,7 @@ Reptile (1)
 | `/reptile/:id/health` | HealthPage | 健康三合一（體重 / 脫皮 / 就診） |
 | `/reptile/:id/todos` | TodoRulesPage | 待辦規則設定 |
 | `/reptile/:id/clutch` | ClutchFormPage | 新增繁殖紀錄（預填父母欄位） |
+| `/reptile/:id/logs` | ActivityLogPage | 完整紀錄歷程（餵食 / 健康 / 投藥 / 環境，時間軸排列，支援篩選與關鍵字搜尋） |
 | `/breeding` | BreedingPage | 全域繁殖管理（統計 + 列表 + 新增） |
 | `/backup` | BackupPage | 設定 + 備份匯出入 |
 
