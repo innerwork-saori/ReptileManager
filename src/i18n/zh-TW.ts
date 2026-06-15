@@ -32,7 +32,9 @@ const zhTW = {
   },
   nav: {
     home: '首頁',
-    reptiles: '爬蟲',
+    reptiles: '爬寵',
+    log: '記錄',
+    health: '健康',
     backup: '設定',
   },
   pwa: {

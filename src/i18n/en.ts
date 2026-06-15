@@ -34,7 +34,9 @@ const en: Translation = {
   },
   nav: {
     home: 'Home',
-    reptiles: 'Reptiles',
+    reptiles: 'Collection',
+    log: 'Log',
+    health: 'Health',
     backup: 'Settings',
   },
   pwa: {

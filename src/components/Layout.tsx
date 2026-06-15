@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, List, Settings, ArrowLeft } from 'lucide-react'
+import { Home, List, PlusCircle, HeartPulse, Settings, ArrowLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
 
@@ -19,6 +19,14 @@ export function Layout({ children, title, back, action }: Props) {
     else navigate(-1)
   }
 
+  const navItems = [
+    { to: '/', end: true,  icon: Home,       label: t('nav.home') },
+    { to: '/reptiles',     icon: List,        label: t('nav.reptiles') },
+    { to: '/reptile/new',  icon: PlusCircle,  label: t('nav.log') },
+    { to: '/reptiles',     icon: HeartPulse,  label: t('nav.health'), matchPath: '/health' },
+    { to: '/backup',       icon: Settings,    label: t('nav.backup') },
+  ]
+
   return (
     <div className="flex flex-col min-h-screen bg-surface">
       {title && (
@@ -35,59 +43,24 @@ export function Layout({ children, title, back, action }: Props) {
 
       <main className="flex-1 pb-24">{children}</main>
 
-      <nav className="fixed bottom-0 inset-x-0 bg-surface border-t border-outline-variant flex safe-bottom rounded-t-xl shadow-lg z-40">
-        <NavLink
-          to="/"
-          end
-          className={({ isActive }) =>
-            `flex-1 flex flex-col items-center pt-2 pb-1 text-xs gap-0.5 transition-colors ${
-              isActive ? 'text-primary' : 'text-on-surface-variant'
-            }`
-          }
-        >
-          {({ isActive }) => (
-            <>
-              <div className={`px-4 py-1 rounded-full transition-colors ${isActive ? 'bg-primary-container' : ''}`}>
-                <Home size={22} />
-              </div>
-              <span className="font-medium">{t('nav.home')}</span>
-            </>
-          )}
-        </NavLink>
-        <NavLink
-          to="/reptiles"
-          className={({ isActive }) =>
-            `flex-1 flex flex-col items-center pt-2 pb-1 text-xs gap-0.5 transition-colors ${
-              isActive ? 'text-primary' : 'text-on-surface-variant'
-            }`
-          }
-        >
-          {({ isActive }) => (
-            <>
-              <div className={`px-4 py-1 rounded-full transition-colors ${isActive ? 'bg-primary-container' : ''}`}>
-                <List size={22} />
-              </div>
-              <span className="font-medium">{t('nav.reptiles')}</span>
-            </>
-          )}
-        </NavLink>
-        <NavLink
-          to="/backup"
-          className={({ isActive }) =>
-            `flex-1 flex flex-col items-center pt-2 pb-1 text-xs gap-0.5 transition-colors ${
-              isActive ? 'text-primary' : 'text-on-surface-variant'
-            }`
-          }
-        >
-          {({ isActive }) => (
-            <>
-              <div className={`px-4 py-1 rounded-full transition-colors ${isActive ? 'bg-primary-container' : ''}`}>
-                <Settings size={22} />
-              </div>
-              <span className="font-medium">{t('nav.backup')}</span>
-            </>
-          )}
-        </NavLink>
+      <nav className="fixed bottom-0 inset-x-0 bg-surface border-t border-outline-variant flex justify-around items-center px-4 py-2 rounded-t-xl shadow-lg z-40 safe-bottom">
+        {navItems.map(({ to, end, icon: Icon, label }) => (
+          <NavLink
+            key={to + label}
+            to={to}
+            end={end}
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center px-3 py-1 rounded-full text-xs font-semibold transition-all active:scale-90 duration-200 ${
+                isActive
+                  ? 'bg-primary-container text-on-primary-container'
+                  : 'text-on-surface-variant hover:bg-surface-container'
+              }`
+            }
+          >
+            <Icon size={22} />
+            <span className="mt-0.5 tracking-wide">{label}</span>
+          </NavLink>
+        ))}
       </nav>
     </div>
   )
