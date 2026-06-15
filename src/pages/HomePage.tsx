@@ -99,11 +99,11 @@ export function HomePage() {
           <section className="mx-4 bg-surface-container-lowest p-4 rounded-2xl shadow-sm border border-outline-variant">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h2 className="font-bold text-lg text-on-surface">儀表板概覽</h2>
-                <p className="text-xs text-on-surface-variant">Dashboard Overview</p>
+                <h2 className="font-bold text-lg text-on-surface">{t('home.dashboardTitle')}</h2>
+                {t('home.dashboardSubtitle') && <p className="text-xs text-on-surface-variant">{t('home.dashboardSubtitle')}</p>}
               </div>
               <span className="bg-primary-container text-on-primary-container text-xs font-semibold px-3 py-1 rounded-full">
-                今日活躍
+                {t('home.todayActive')}
               </span>
             </div>
             <div className="flex items-center gap-3">
@@ -114,7 +114,7 @@ export function HomePage() {
                 <p className="font-bold text-primary">
                   {t('home.todayTodosCount', { count: pendingTodos.length })}
                 </p>
-                <p className="text-xs text-on-surface-variant">{pendingTodos.length} Tasks Pending</p>
+                <p className="text-xs text-on-surface-variant">{t('home.tasksPending', { count: pendingTodos.length })}</p>
               </div>
             </div>
           </section>
@@ -125,14 +125,14 @@ export function HomePage() {
           <section className="px-4">
             <div className="flex justify-between items-end mb-3">
               <div>
-                <h2 className="font-bold text-lg text-on-surface">我的爬寵</h2>
-                <p className="text-xs text-on-surface-variant">My Reptiles</p>
+                <h2 className="font-bold text-lg text-on-surface">{t('home.myReptiles')}</h2>
+                {t('home.myReptilesSubtitle') && <p className="text-xs text-on-surface-variant">{t('home.myReptilesSubtitle')}</p>}
               </div>
               <button
                 onClick={() => navigate('/reptiles')}
                 className="text-primary text-sm font-semibold"
               >
-                查看全部
+                {t('home.viewAll')}
               </button>
             </div>
             <div className="flex overflow-x-auto gap-3 hide-scrollbar -mx-4 px-4 py-2">
@@ -188,8 +188,8 @@ export function HomePage() {
         {todos.length > 0 && (
           <section className="mx-4 space-y-2">
             <div className="mb-3">
-              <h2 className="font-bold text-lg text-on-surface">今日任務</h2>
-              <p className="text-xs text-on-surface-variant">Today's Tasks</p>
+              <h2 className="font-bold text-lg text-on-surface">{t('home.todayTasks')}</h2>
+              {t('home.todayTasksSubtitle') && <p className="text-xs text-on-surface-variant">{t('home.todayTasksSubtitle')}</p>}
             </div>
 
             {pendingTodos.map((todo) => (
@@ -257,7 +257,7 @@ export function HomePage() {
               <Bell size={18} className="text-secondary shrink-0" />
               <h2 className="font-bold text-lg text-on-surface">{t('home.activeMeds')}</h2>
             </div>
-            <p className="text-xs text-on-surface-variant mb-3">Medication Reminders</p>
+            {t('home.activeMedsSubtitle') && <p className="text-xs text-on-surface-variant mb-3">{t('home.activeMedsSubtitle')}</p>}
             <div className="space-y-2">
               {allPendingMeds.map((med) => (
                 <button
