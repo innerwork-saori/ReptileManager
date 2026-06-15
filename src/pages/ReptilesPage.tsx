@@ -1,12 +1,13 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, ChevronRight, Search } from 'lucide-react'
+import { Plus, Search, CalendarDays, MapPin, SlidersHorizontal } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
-import { Card } from '../components/Card'
 import { reptileRepo } from '../db/repos'
 import type { Reptile } from '../db/schema'
 import { calcAge } from '../lib/todoEngine'
+
+type FilterCategory = 'all' | 'snakes' | 'lizards' | 'turtles'
 
 function fuzzyMatch(reptile: Reptile, query: string): boolean {
   const q = query.trim().toLowerCase()
@@ -15,107 +16,141 @@ function fuzzyMatch(reptile: Reptile, query: string): boolean {
   return q.split(/\s+/).every((word) => haystack.includes(word))
 }
 
+function matchesCategory(reptile: Reptile, filter: FilterCategory): boolean {
+  if (filter === 'all') return true
+  const cat = reptile.category ?? 'snake'
+  if (filter === 'snakes')  return cat === 'snake'
+  if (filter === 'lizards') return cat === 'lizard'
+  if (filter === 'turtles') return cat === 'turtle'
+  return false
+}
+
 export function ReptilesPage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [reptiles, setReptiles] = useState<Reptile[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [category, setCategory] = useState<FilterCategory>('all')
 
   useEffect(() => {
     reptileRepo.getAll().then((r) => { setReptiles(r); setLoading(false) })
   }, [])
 
-  const filtered = useMemo(() => reptiles.filter((r) => fuzzyMatch(r, search)), [reptiles, search])
+  const filtered = useMemo(
+    () => reptiles.filter((r) => fuzzyMatch(r, search) && matchesCategory(r, category)),
+    [reptiles, search, category],
+  )
 
-  const sexLabel = (sex: Reptile['sex']) => {
-    if (sex === 'male') return t('common.sex.male')
-    if (sex === 'female') return t('common.sex.female')
-    return t('common.sex.unknown')
-  }
+  const categories: { key: FilterCategory; label: string }[] = [
+    { key: 'all',     label: t('reptile.filterAll') },
+    { key: 'snakes',  label: t('reptile.filterSnakes') },
+    { key: 'lizards', label: t('reptile.filterLizards') },
+    { key: 'turtles', label: t('reptile.filterTurtles') },
+  ]
 
   return (
-    <Layout
-      title={t('reptile.list')}
-      action={
-        <button
-          onClick={() => navigate('/reptile/new')}
-          className="p-1.5 rounded-full bg-green-600 hover:bg-green-500 transition-colors"
-        >
-          <Plus size={18} />
-        </button>
-      }
-    >
+    <Layout title={t('reptile.list')}>
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-gray-400">{t('common.loading')}</div>
+        <div className="flex items-center justify-center py-20 text-on-surface-variant">
+          {t('common.loading')}
+        </div>
       ) : reptiles.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-4 text-gray-400 px-6">
+        <div className="flex flex-col items-center justify-center py-24 gap-4 text-on-surface-variant px-6">
           <p className="text-center text-sm">{t('reptile.noReptiles')}</p>
           <button
             onClick={() => navigate('/reptile/new')}
-            className="bg-green-600 text-white px-6 py-2 rounded-full text-sm font-medium"
+            className="bg-primary text-on-primary px-6 py-2 rounded-full text-sm font-semibold"
           >
             {t('reptile.addFirst')}
           </button>
         </div>
       ) : (
-        <div className="px-4 pt-4 space-y-3">
-          <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t('reptile.searchPlaceholder')}
-              className="w-full pl-9 pr-3 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
+        <div className="max-w-md mx-auto px-4 pt-4">
+          {/* Search & filter chips */}
+          <div className="flex flex-col gap-2 mb-6">
+            <div className="relative flex items-center">
+              <Search size={16} className="absolute left-3 text-outline pointer-events-none" />
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t('reptile.searchPlaceholder')}
+                className="w-full pl-10 pr-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm"
+              />
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {categories.map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setCategory(key)}
+                  className={`flex items-center gap-1 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 shrink-0 ${
+                    category === key
+                      ? 'bg-primary text-on-primary'
+                      : 'bg-surface-container text-on-surface-variant border border-outline-variant hover:bg-surface-container-high'
+                  }`}
+                >
+                  {key === 'all' && <SlidersHorizontal size={13} />}
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
-          {filtered.map((r) => (
-            <Card key={r.id} onClick={() => navigate(`/reptile/${r.id}`)}>
-              <div className="flex items-center gap-3 p-3">
-                <div className="w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center text-3xl shrink-0 overflow-hidden">
+
+          {/* Reptile cards */}
+          <div className="flex flex-col gap-4">
+            {filtered.map((r) => (
+              <div
+                key={r.id}
+                onClick={() => navigate(`/reptile/${r.id}`)}
+                className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-4 flex gap-4 cursor-pointer active:scale-[0.98] transition-transform"
+              >
+                <div className="w-24 h-24 rounded-lg overflow-hidden shrink-0 border border-outline-variant bg-surface-container">
                   {r.photoUrl ? (
                     <img src={r.photoUrl} alt={r.name} className="w-full h-full object-cover" />
                   ) : (
-                    '🦎'
+                    <div className="w-full h-full flex items-center justify-center text-4xl select-none">🦎</div>
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-800">{r.name}</p>
-                  <p className="text-xs text-gray-500">
-                    {r.species} · {r.breed || t('reptile.unknownBreed')}
-                  </p>
-                  <div className="flex gap-2 mt-1 flex-wrap">
-                    {r.sex && (
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        r.sex === 'male' ? 'bg-blue-100 text-blue-600' :
-                        r.sex === 'female' ? 'bg-pink-100 text-pink-600' :
-                        'bg-gray-100 text-gray-500'
-                      }`}>
-                        {sexLabel(r.sex)}
-                      </span>
-                    )}
+                <div className="flex flex-col justify-between py-1 flex-1 min-w-0">
+                  <div>
+                    <h2 className="text-base font-semibold text-on-surface truncate">{r.name}</h2>
+                    <p className="text-xs text-outline mt-0.5">
+                      {r.species}{r.breed ? ` · ${r.breed}` : ''}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
                     {r.birthDate && (
-                      <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">
-                        {calcAge(r.birthDate)}
-                      </span>
+                      <div className="flex items-center gap-1 text-on-surface-variant">
+                        <CalendarDays size={14} />
+                        <span className="text-xs font-semibold">{calcAge(r.birthDate)}</span>
+                      </div>
                     )}
                     {r.enclosureName && (
-                      <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
-                        {r.enclosureName}
-                      </span>
+                      <div className="flex items-center gap-1 text-on-surface-variant">
+                        <MapPin size={14} />
+                        <span className="text-xs font-semibold truncate">{r.enclosureName}</span>
+                      </div>
                     )}
                   </div>
                 </div>
-                <ChevronRight size={18} className="text-gray-400 shrink-0" />
               </div>
-            </Card>
-          ))}
-          {filtered.length === 0 && search && (
-            <p className="text-center text-gray-400 text-sm py-8">{t('common.noRecords')}</p>
-          )}
+            ))}
+            {filtered.length === 0 && (
+              <p className="text-center text-on-surface-variant text-sm py-8">{t('common.noRecords')}</p>
+            )}
+          </div>
         </div>
       )}
+
+      {/* FAB */}
+      <button
+        onClick={() => navigate('/reptile/new')}
+        aria-label={t('reptile.new')}
+        className="fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary rounded-2xl shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform z-40"
+      >
+        <Plus size={28} />
+      </button>
     </Layout>
   )
 }

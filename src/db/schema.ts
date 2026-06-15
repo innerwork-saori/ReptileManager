@@ -1,10 +1,13 @@
 import Dexie, { type Table } from 'dexie'
 
+export type ReptileCategory = 'snake' | 'lizard' | 'turtle' | 'other'
+
 export interface Reptile {
   id: string
   name: string
   species: string
   breed: string
+  category?: ReptileCategory
   sex?: 'male' | 'female' | 'unknown'
   birthDate?: string
   enclosureName?: string

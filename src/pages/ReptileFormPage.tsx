@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
 import { InputField, SelectField, TextareaField } from '../components/FormField'
 import { reptileRepo } from '../db/repos'
-import type { Reptile } from '../db/schema'
+import type { Reptile, ReptileCategory } from '../db/schema'
 
 const SEX_LABEL: Record<string, string> = { male: '公', female: '母', unknown: '未知' }
 
@@ -26,10 +26,18 @@ export function ReptileFormPage() {
     { value: 'unknown', label: t('common.sex.unknown') },
   ]
 
+  const CATEGORY_OPTIONS = [
+    { value: 'snake',  label: t('reptile.filterSnakes') },
+    { value: 'lizard', label: t('reptile.filterLizards') },
+    { value: 'turtle', label: t('reptile.filterTurtles') },
+    { value: 'other',  label: t('reptile.filterOther') },
+  ]
+
   const [form, setForm] = useState({
     name: '',
     species: '',
     breed: '',
+    category: 'snake' as ReptileCategory,
     sex: '' as '' | 'male' | 'female' | 'unknown',
     birthYear: '',
     birthMonth: '',
@@ -61,6 +69,7 @@ export function ReptileFormPage() {
         name: r.name,
         species: r.species,
         breed: r.breed,
+        category: r.category ?? 'snake',
         sex: r.sex ?? '',
         birthYear: bdParts[0] ?? '',
         birthMonth: bdParts[1] ?? '',
@@ -111,6 +120,7 @@ export function ReptileFormPage() {
       name: form.name.trim(),
       species: form.species.trim(),
       breed: form.breed.trim(),
+      category: form.category,
       sex: (form.sex || undefined) as Reptile['sex'],
       birthDate: buildBirthDate(),
       enclosureName: form.enclosureName.trim() || undefined,
@@ -162,6 +172,7 @@ export function ReptileFormPage() {
         <InputField label={t('common.name')} required value={form.name} onChange={set('name')} error={errors.name} placeholder={t('reptile.form.namePlaceholder')} />
         <InputField label={t('common.species')} required value={form.species} onChange={set('species')} error={errors.species} placeholder={t('reptile.form.speciesPlaceholder')} />
         <InputField label={t('common.breed')} value={form.breed} onChange={set('breed')} placeholder={t('reptile.form.breedPlaceholder')} />
+        <SelectField label={t('reptile.form.category')} value={form.category} onChange={set('category')} options={CATEGORY_OPTIONS} />
         <SelectField label={t('common.sex.label')} value={form.sex} onChange={set('sex')} options={SEX_OPTIONS} />
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">{t('reptile.form.birthDate')}</label>
