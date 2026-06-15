@@ -54,5 +54,5 @@ npm run preview  # 預覽 dist
 
 ## 資料庫
 
-Dexie ORM，共 13 張資料表（含 `settings`），定義於 `src/db/`。  
+Dexie ORM，共 14 張資料表（含 `settings`），定義於 `src/db/`。  
 無全域狀態管理，mutation 後直接呼叫 `load()` 重整畫面。

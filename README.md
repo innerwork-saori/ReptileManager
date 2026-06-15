@@ -65,6 +65,7 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 | 照片 URL | 自定義大頭照 |
 | 過敏資訊 / 慢性病記錄 | 健康備注 |
 | QR Code | 可設定自訂目標 URL，於詳細頁產生 QR Code |
+| 父母 ID（fatherId / motherId） | 選填，用於記錄血統來源 |
 
 **爬蟲清單 UI**：
 
@@ -197,20 +198,20 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 ```
 ReptileDB (Dexie)
 │
-├── reptiles          → 爬蟲基本資料
-├── feedLogs          → 餵食記錄
-├── weightLogs        → 體重記錄
-├── medicationCourses → 藥物療程
-├── medicationLogs    → 投藥記錄
-├── shedLogs          → 脫皮記錄
-├── habitatLogs       → 棲息環境記錄
-├── uvbLogs           → UVB 燈管記錄
-├── substrateLogs     → 底材更換記錄
-├── visitLogs         → 就診記錄
-├── todoRules         → 待辦規則
-├── todoInstances     → 待辦實例
-├── clutch_logs       → 繁殖記錄（ClutchLog）
-└── settings          → 應用設定（key-value）
+├── reptiles             → 爬蟲基本資料
+├── feed_logs            → 餵食記錄
+├── weight_logs          → 體重記錄
+├── medication_courses   → 藥物療程
+├── medication_logs      → 投藥記錄
+├── shed_logs            → 脫皮記錄
+├── habitat_logs         → 棲息環境記錄
+├── uvb_logs             → UVB 燈管記錄
+├── substrate_logs       → 底材更換記錄
+├── visit_logs           → 就診記錄
+├── todo_rules           → 待辦規則
+├── todo_instances       → 待辦實例
+├── clutch_logs          → 繁殖記錄（ClutchLog）
+└── settings             → 應用設定（key-value）
 ```
 
 ### 核心實體關聯
@@ -251,6 +252,7 @@ Reptile (1)
 | `/reptile/:id/todos` | TodoRulesPage | 待辦規則設定 |
 | `/reptile/:id/clutch` | ClutchFormPage | 新增繁殖紀錄（預填父母欄位） |
 | `/reptile/:id/logs` | ActivityLogPage | 完整紀錄歷程（餵食 / 健康 / 投藥 / 環境，時間軸排列，支援篩選與關鍵字搜尋） |
+| `/feed` | FeedQuickPage | 快速餵食記錄（底部導覽第 3 項，跨爬蟲快速新增餵食） |
 | `/breeding` | BreedingPage | 全域繁殖管理（統計 + 列表 + 新增） |
 | `/backup` | BackupPage | 設定 + 備份匯出入 |
 
@@ -264,7 +266,7 @@ Reptile (1)
 | 語言偵測 | 優先讀取 localStorage，次為瀏覽器語系 |
 | 支援語言 | `zh-TW`（繁體中文，預設）、`en`（英文） |
 | 翻譯檔路徑 | `src/i18n/zh-TW.ts`、`src/i18n/en.ts` |
-| 命名空間 | common, nav, pwa, home, reptile, feed, medication, environment, health, todo, todoItem, backup |
+| 命名空間 | common, nav, pwa, home, reptile, feed, medication, environment, health, todo, todoItem, clutch, activityLog, backup |
 | 偏好儲存 | localStorage key: `reptileManager_lang` |
 
 ---
@@ -329,7 +331,7 @@ Reptile (1)
          ClutchLog
 
 備份（Backup）
-  讀寫 → 全部 13 張資料表
+  讀寫 → 全部 14 張資料表
 ```
 
 ---
