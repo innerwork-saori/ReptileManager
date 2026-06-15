@@ -140,7 +140,7 @@ export function HomePage() {
                 <div
                   key={reptile.id}
                   onClick={() => navigate(`/reptile/${reptile.id}`)}
-                  className="min-w-[180px] bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant overflow-hidden shrink-0 cursor-pointer active:scale-95 transition-transform"
+                  className="w-[160px] bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant overflow-hidden shrink-0 cursor-pointer active:scale-95 transition-transform"
                 >
                   <div className="h-28 w-full bg-surface-container">
                     {reptile.photoUrl ? (
