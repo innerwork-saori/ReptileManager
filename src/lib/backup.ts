@@ -58,11 +58,23 @@ export async function exportAllData(): Promise<void> {
   const date = new Date().toISOString().slice(0, 10).replace(/-/g, '')
   const filename = `reptilemanager_backup_${date}.json`
 
-  if (navigator.share && navigator.canShare?.({ files: [new File([blob], filename)] })) {
-    await navigator.share({
-      title: 'ReptileManager 備份',
-      files: [new File([blob], filename, { type: 'application/json' })],
-    })
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+  if (isMobile && navigator.share && navigator.canShare?.({ files: [new File([blob], filename)] })) {
+    try {
+      await navigator.share({
+        title: 'ReptileManager 備份',
+        files: [new File([blob], filename, { type: 'application/json' })],
+      })
+    } catch (e) {
+      if (!(e instanceof Error && e.name === 'AbortError')) {
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+      }
+    }
   } else {
     const a = document.createElement('a')
     a.href = url
@@ -102,6 +114,17 @@ export async function importAllData(file: File): Promise<void> {
       const rows = data[t]
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (rows?.length) await (db as any)[t].bulkAdd(rows)
+    }
+  })
+}
+
+export async function resetAllData(): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tableRefs = ALL_TABLES.map((t) => (db as any)[t])
+  await db.transaction('rw', tableRefs, async () => {
+    for (const t of ALL_TABLES) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (db as any)[t].clear()
     }
   })
 }
