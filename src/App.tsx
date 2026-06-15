@@ -14,6 +14,7 @@ import { TodoRulesPage } from './pages/TodoRulesPage'
 import { BackupPage } from './pages/BackupPage'
 import { ClutchFormPage } from './pages/ClutchFormPage'
 import { BreedingPage } from './pages/BreedingPage'
+import { FeedQuickPage } from './pages/FeedQuickPage'
 
 function UpdatePrompt() {
   const { t } = useTranslation()
@@ -64,6 +65,7 @@ export default function App() {
         <Route path="/reptile/:id/health" element={<HealthPage />} />
         <Route path="/reptile/:id/todos" element={<TodoRulesPage />} />
         <Route path="/reptile/:id/clutch" element={<ClutchFormPage />} />
+        <Route path="/feed" element={<FeedQuickPage />} />
         <Route path="/breeding" element={<BreedingPage />} />
         <Route path="/backup" element={<BackupPage />} />
       </Routes>

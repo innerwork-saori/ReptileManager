@@ -35,7 +35,7 @@ const en: Translation = {
   nav: {
     home: 'Home',
     reptiles: 'Collection',
-    log: 'Log',
+    log: 'Feed',
     breeding: 'Breeding',
     backup: 'Settings',
   },
