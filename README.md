@@ -225,9 +225,10 @@ Reptile (1)
   ├──< UvbLog
   ├──< SubstrateLog
   ├──< MedicationCourse (1) ──< MedicationLog
-  └──< TodoRule (0..1) ──< TodoInstance
-          │
-          └── 亦可為全域規則（reptileId = null）
+  ├──< TodoRule (0..1) ──< TodoInstance
+  │     │
+  │     └── 亦可為全域規則（reptileId = null）
+  └──< ClutchLog（作為父或母）
 ```
 
 ---
@@ -325,9 +326,10 @@ Reptile (1)
          HabitatLog / UvbLog / SubstrateLog
          MedicationCourse + MedicationLog
          TodoRule + TodoInstance
+         ClutchLog
 
 備份（Backup）
-  讀寫 → 全部 12 張資料表
+  讀寫 → 全部 13 張資料表
 ```
 
 ---
