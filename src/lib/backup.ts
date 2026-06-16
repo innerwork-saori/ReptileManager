@@ -14,6 +14,7 @@ export async function exportAllData(): Promise<void> {
     todo_rules,
     todo_instances,
     visit_logs,
+    clutch_logs,
     settings,
   ] = await Promise.all([
     db.reptiles.toArray(),
@@ -28,6 +29,7 @@ export async function exportAllData(): Promise<void> {
     db.todo_rules.toArray(),
     db.todo_instances.toArray(),
     db.visit_logs.toArray(),
+    db.clutch_logs.toArray(),
     db.settings.toArray(),
   ])
 
@@ -47,6 +49,7 @@ export async function exportAllData(): Promise<void> {
       todo_rules,
       todo_instances,
       visit_logs,
+      clutch_logs,
       settings,
     },
   }
@@ -90,7 +93,7 @@ export async function exportAllData(): Promise<void> {
 const ALL_TABLES = [
   'reptiles', 'weight_logs', 'feed_logs', 'medication_courses',
   'medication_logs', 'shed_logs', 'habitat_logs', 'uvb_logs',
-  'substrate_logs', 'todo_rules', 'todo_instances', 'visit_logs', 'settings',
+  'substrate_logs', 'todo_rules', 'todo_instances', 'visit_logs', 'clutch_logs', 'settings',
 ] as const
 
 export async function importAllData(file: File): Promise<void> {
