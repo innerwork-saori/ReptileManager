@@ -16,6 +16,7 @@ import { ClutchFormPage } from './pages/ClutchFormPage'
 import { BreedingPage } from './pages/BreedingPage'
 import { FeedQuickPage } from './pages/FeedQuickPage'
 import { ActivityLogPage } from './pages/ActivityLogPage'
+import { TodosPage } from './pages/TodosPage'
 
 function UpdatePrompt() {
   const { t } = useTranslation()
@@ -69,6 +70,7 @@ export default function App() {
         <Route path="/reptile/:id/clutch" element={<ClutchFormPage />} />
         <Route path="/feed" element={<FeedQuickPage />} />
         <Route path="/breeding" element={<BreedingPage />} />
+        <Route path="/todos" element={<TodosPage />} />
         <Route path="/backup" element={<BackupPage />} />
       </Routes>
     </HashRouter>

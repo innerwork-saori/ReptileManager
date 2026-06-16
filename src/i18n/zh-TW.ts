@@ -36,6 +36,7 @@ const zhTW = {
     log: '餵食',
     breeding: '繁殖',
     backup: '設定',
+    todos: '代辦管理',
   },
   pwa: {
     newVersion: '有新版本可用！',
@@ -268,7 +269,10 @@ const zhTW = {
     timeLabel: '時間',
     weekdaysLabel: '星期',
     intervalDaysLabel: '每幾天',
+    reptileLabel: '爬蟲',
     noRules: '尚無待辦規則',
+    noReptiles: '尚未新增任何爬蟲',
+    selectReptile: '選擇爬蟲以管理其代辦規則',
     globalRule: '全域規則',
     saveBtn: '新增規則',
     types: {

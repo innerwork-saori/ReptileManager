@@ -38,6 +38,7 @@ const en: Translation = {
     log: 'Feed',
     breeding: 'Breeding',
     backup: 'Settings',
+    todos: 'Tasks',
   },
   pwa: {
     newVersion: 'New version available!',
@@ -270,7 +271,10 @@ const en: Translation = {
     timeLabel: 'Time',
     weekdaysLabel: 'Days of Week',
     intervalDaysLabel: 'Every N days',
+    reptileLabel: 'Reptile',
     noRules: 'No todo rules yet',
+    noReptiles: 'No reptiles added yet',
+    selectReptile: 'Select a reptile to manage its todo rules',
     globalRule: 'Global rule',
     saveBtn: 'Add Rule',
     types: {
