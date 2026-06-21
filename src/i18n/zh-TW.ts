@@ -270,6 +270,7 @@ const zhTW = {
     weekdaysLabel: '星期',
     intervalDaysLabel: '每幾天',
     reptileLabel: '爬蟲',
+    noReptile: '不綁定爬蟲',
     noRules: '尚無待辦規則',
     noReptiles: '尚未新增任何爬蟲',
     selectReptile: '選擇爬蟲以管理其代辦規則',

@@ -60,9 +60,6 @@ export function TodosPage() {
       reptileName: rule.reptileId ? (reptileMap.get(rule.reptileId) ?? '?') : t('todo.globalRule'),
     }))
     setRules(enriched)
-    if (allReptiles.length > 0 && !form.reptileId) {
-      setForm((f) => ({ ...f, reptileId: allReptiles[0].id }))
-    }
     setLoading(false)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -100,7 +97,6 @@ export function TodosPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.reptileId) return
     setSaving(true)
 
     const config: Record<string, unknown> =
@@ -111,7 +107,7 @@ export function TodosPage() {
     const label = form.label.trim() || typeLabel(form.type)
 
     await todoRuleRepo.create({
-      reptileId: form.reptileId,
+      reptileId: form.reptileId || undefined,
       type: form.type,
       label,
       scheduleType: form.scheduleType,
@@ -133,7 +129,10 @@ export function TodosPage() {
     setSaving(false)
   }
 
-  const reptileOptions = reptiles.map((r) => ({ value: r.id, label: r.name }))
+  const reptileOptions = [
+    { value: '', label: t('todo.noReptile') },
+    ...reptiles.map((r) => ({ value: r.id, label: r.name })),
+  ]
 
   return (
     <Layout title={t('nav.todos')}>

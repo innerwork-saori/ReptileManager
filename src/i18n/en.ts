@@ -272,6 +272,7 @@ const en: Translation = {
     weekdaysLabel: 'Days of Week',
     intervalDaysLabel: 'Every N days',
     reptileLabel: 'Reptile',
+    noReptile: 'Not bound to reptile',
     noRules: 'No todo rules yet',
     noReptiles: 'No reptiles added yet',
     selectReptile: 'Select a reptile to manage its todo rules',
