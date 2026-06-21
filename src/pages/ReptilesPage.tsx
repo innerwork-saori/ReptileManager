@@ -254,9 +254,9 @@ export function ReptilesPage() {
       <button
         onClick={() => navigate('/reptile/new')}
         aria-label={t('reptile.new')}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary rounded-2xl shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform z-40"
+        className="fixed right-4 bottom-24 bg-primary text-on-primary p-4 rounded-full shadow-xl active:scale-95 transition-transform z-40"
       >
-        <Plus size={28} />
+        <Plus size={24} />
       </button>
     </Layout>
   )
