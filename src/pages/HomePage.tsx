@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ClipboardList, UtensilsCrossed, Check, ChevronRight, Plus, Bell, SkipForward } from 'lucide-react'
+import { ClipboardList, UtensilsCrossed, Check, ChevronRight, Plus, Bell } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
 import { reptileRepo, feedLogRepo, todoRuleRepo, todoInstanceRepo, medicationCourseRepo } from '../db/repos'
@@ -64,11 +64,6 @@ export function HomePage() {
 
   const handleTodoDone = async (id: string) => {
     await todoInstanceRepo.updateStatus(id, 'done')
-    void load()
-  }
-
-  const handleTodoSkip = async (id: string) => {
-    await todoInstanceRepo.updateStatus(id, 'skipped')
     void load()
   }
 
@@ -210,16 +205,7 @@ export function HomePage() {
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    onClick={() => handleTodoSkip(todo.id)}
-                    className="p-1.5 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors"
-                    aria-label={t('todoItem.skipped')}
-                  >
-                    <SkipForward size={16} />
-                  </button>
-                  <ChevronRight size={20} className="text-on-surface-variant" />
-                </div>
+                <ChevronRight size={20} className="text-on-surface-variant shrink-0" />
               </div>
             ))}
 
