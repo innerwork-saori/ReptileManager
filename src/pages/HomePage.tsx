@@ -48,8 +48,7 @@ export function HomePage() {
     const computed = computeTodayInstances(allRules, existingInstances)
     const newInstances = computed.filter((c) => !existingInstances.find((e) => e.id === c.id))
     if (newInstances.length > 0) await todoInstanceRepo.upsertMany(newInstances)
-    const allInstances = await todoInstanceRepo.getByDate(todayStr)
-    setTodos(allInstances.sort((a, b) => (a.dueAt ?? a.date).localeCompare(b.dueAt ?? b.date)))
+    setTodos(computed.sort((a, b) => (a.dueAt ?? a.date).localeCompare(b.dueAt ?? b.date)))
     setLoading(false)
   }, [])
 

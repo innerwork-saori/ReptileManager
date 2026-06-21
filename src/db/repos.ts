@@ -266,7 +266,12 @@ export const todoRuleRepo = {
     return updated
   },
 
-  delete: (id: string) => db.todo_rules.delete(id),
+  delete: async (id: string): Promise<void> => {
+    await db.transaction('rw', [db.todo_rules, db.todo_instances], async () => {
+      await db.todo_rules.delete(id)
+      await db.todo_instances.filter((instance) => instance.ruleId === id).delete()
+    })
+  },
 }
 
 // ─── TodoInstance ─────────────────────────────────────────────────────────────
@@ -294,6 +299,9 @@ export const todoInstanceRepo = {
   },
 
   delete: (id: string) => db.todo_instances.delete(id),
+
+  deleteByRuleId: (ruleId: string) =>
+    db.todo_instances.filter((instance) => instance.ruleId === ruleId).delete(),
 }
 
 // ─── VisitLog ─────────────────────────────────────────────────────────────────

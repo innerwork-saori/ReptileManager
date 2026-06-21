@@ -107,7 +107,7 @@ export function TodosPage() {
     const label = form.label.trim() || typeLabel(form.type)
 
     await todoRuleRepo.create({
-      reptileId: form.reptileId || undefined,
+      reptileId: form.reptileId || null,
       type: form.type,
       label,
       scheduleType: form.scheduleType,
