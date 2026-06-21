@@ -7,11 +7,12 @@ import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo, medicationCourseR
 import type { Reptile, FeedLog, WeightLog, ShedLog, MedicationCourse } from '../db/schema'
 import { formatRelativeTime, formatDate } from '../lib/todoEngine'
 
-type RecentWeight = WeightLog & { reptileName: string }
-type RecentShed = ShedLog & { reptileName: string }
+type RecentWeight = WeightLog & { reptileName: string; reptilePhotoUrl?: string }
+type RecentShed = ShedLog & { reptileName: string; reptilePhotoUrl?: string }
 type OverdueFeed = {
   reptileId: string
   reptileName: string
+  reptilePhotoUrl?: string
   lastFedAt?: string
 }
 
@@ -33,6 +34,7 @@ export function HomePage() {
   const load = useCallback(async () => {
     const reptiles = await reptileRepo.getAll()
     const rMap = new Map(reptiles.map((r) => [r.id, r.name]))
+    const rPhotoMap = new Map(reptiles.map((r) => [r.id, r.photoUrl]))
 
     const [cardData, weightLogs, shedLogs] = await Promise.all([
       Promise.all(
@@ -67,13 +69,14 @@ export function HomePage() {
       .map(({ reptile, lastFeed }) => ({
         reptileId: reptile.id,
         reptileName: reptile.name,
+        reptilePhotoUrl: reptile.photoUrl,
         lastFedAt: lastFeed?.fedAt,
       }))
 
     setCards(cardData)
     setOverdueFeeds(overdue)
-    setRecentWeights(weightLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown') })))
-    setRecentSheds(shedLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown') })))
+    setRecentWeights(weightLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown'), reptilePhotoUrl: rPhotoMap.get(log.reptileId) })))
+    setRecentSheds(shedLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown'), reptilePhotoUrl: rPhotoMap.get(log.reptileId) })))
     setLoading(false)
   }, [])
 
@@ -115,25 +118,38 @@ export function HomePage() {
               </div>
               <p className="text-xs text-on-surface-variant mb-3">{t('home.recentFeedingsSubtitle')}</p>
               <div className="space-y-2">
-                {overdueFeeds.length > 0 ? overdueFeeds.map((feed) => (
+                {overdueFeeds.length > 0 ? overdueFeeds.slice(0, 3).map((feed) => (
                   <button
                     key={feed.reptileId}
                     onClick={() => navigate(`/reptile/${feed.reptileId}/feed`)}
-                    className="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-3 text-left transition-transform active:scale-[0.99]"
+                    className="w-full rounded-xl bg-white px-3 py-2.5 text-left transition-transform active:scale-[0.99] shadow-sm"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="font-semibold text-sm text-on-surface max-w-[22ch] whitespace-normal break-words [overflow-wrap:anywhere] [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden">{feed.reptileName}</p>
-                        <p className="text-xs text-on-surface-variant truncate">{t('home.lastFed', { time: feed.lastFedAt ? formatRelativeTime(feed.lastFedAt) : t('common.notRecorded') })}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-surface-container shrink-0">
+                        {feed.reptilePhotoUrl
+                          ? <img src={feed.reptilePhotoUrl} alt={feed.reptileName} className="w-full h-full object-cover" />
+                          : <div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
                       </div>
-                      <ChevronRight size={18} className="text-on-surface-variant shrink-0 mt-0.5" />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-sm text-on-surface truncate">{feed.reptileName}</p>
+                        <p className="text-xs text-secondary font-medium">{t('home.lastFed', { time: feed.lastFedAt ? formatRelativeTime(feed.lastFedAt) : t('common.notRecorded') })}</p>
+                        <p className="text-xs text-on-surface-variant">{feed.lastFedAt ? formatDate(feed.lastFedAt) : t('home.neverFed')}</p>
+                      </div>
+                      <ChevronRight size={16} className="text-on-surface-variant shrink-0" />
                     </div>
-                    <p className="text-xs text-on-surface-variant mt-2">{feed.lastFedAt ? formatDate(feed.lastFedAt) : t('home.neverFed')}</p>
                   </button>
                 )) : (
                   <p className="py-6 text-center text-sm text-on-surface-variant">{t('common.noRecords')}</p>
                 )}
               </div>
+              {overdueFeeds.length > 3 && (
+                <button
+                  onClick={() => navigate('/reptiles')}
+                  className="mt-3 w-full bg-primary text-on-primary rounded-xl py-2.5 text-sm font-semibold text-center"
+                >
+                  {t('home.viewAll')} (View All) »
+                </button>
+              )}
             </div>
 
             <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant p-4">
@@ -143,25 +159,38 @@ export function HomePage() {
               </div>
               <p className="text-xs text-on-surface-variant mb-3">{t('home.weightInfoSubtitle')}</p>
               <div className="space-y-2">
-                {recentWeights.length > 0 ? recentWeights.map((weight) => (
+                {recentWeights.length > 0 ? recentWeights.slice(0, 3).map((weight) => (
                   <button
                     key={weight.id}
                     onClick={() => navigate(`/reptile/${weight.reptileId}/health`)}
-                    className="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-3 text-left transition-transform active:scale-[0.99]"
+                    className="w-full rounded-xl bg-white px-3 py-2.5 text-left transition-transform active:scale-[0.99] shadow-sm"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="font-semibold text-sm text-on-surface max-w-[22ch] whitespace-normal break-words [overflow-wrap:anywhere] [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden">{weight.reptileName}</p>
-                        <p className="text-xs text-on-surface-variant truncate">{weight.weight} g</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-surface-container shrink-0">
+                        {weight.reptilePhotoUrl
+                          ? <img src={weight.reptilePhotoUrl} alt={weight.reptileName} className="w-full h-full object-cover" />
+                          : <div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
                       </div>
-                      <ChevronRight size={18} className="text-on-surface-variant shrink-0 mt-0.5" />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-sm text-on-surface truncate">{weight.reptileName}</p>
+                        <p className="text-xs text-secondary font-medium">{weight.weight} g</p>
+                        <p className="text-xs text-on-surface-variant">{formatDate(weight.date)}</p>
+                      </div>
+                      <ChevronRight size={16} className="text-on-surface-variant shrink-0" />
                     </div>
-                    <p className="text-xs text-on-surface-variant mt-2">{formatDate(weight.date)}</p>
                   </button>
                 )) : (
                   <p className="py-6 text-center text-sm text-on-surface-variant">{t('common.noRecords')}</p>
                 )}
               </div>
+              {recentWeights.length > 3 && (
+                <button
+                  onClick={() => navigate('/reptiles')}
+                  className="mt-3 w-full bg-primary text-on-primary rounded-xl py-2.5 text-sm font-semibold text-center"
+                >
+                  {t('home.viewAll')} (View All) »
+                </button>
+              )}
             </div>
 
             <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant p-4">
@@ -171,25 +200,38 @@ export function HomePage() {
               </div>
               <p className="text-xs text-on-surface-variant mb-3">{t('home.shedInfoSubtitle')}</p>
               <div className="space-y-2">
-                {recentSheds.length > 0 ? recentSheds.map((shed) => (
+                {recentSheds.length > 0 ? recentSheds.slice(0, 3).map((shed) => (
                   <button
                     key={shed.id}
                     onClick={() => navigate(`/reptile/${shed.reptileId}/health`)}
-                    className="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-3 text-left transition-transform active:scale-[0.99]"
+                    className="w-full rounded-xl bg-white px-3 py-2.5 text-left transition-transform active:scale-[0.99] shadow-sm"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="font-semibold text-sm text-on-surface max-w-[22ch] whitespace-normal break-words [overflow-wrap:anywhere] [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden">{shed.reptileName}</p>
-                        <p className="text-xs text-on-surface-variant truncate">{t(`health.shed.${shed.status}`)}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-surface-container shrink-0">
+                        {shed.reptilePhotoUrl
+                          ? <img src={shed.reptilePhotoUrl} alt={shed.reptileName} className="w-full h-full object-cover" />
+                          : <div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
                       </div>
-                      <ChevronRight size={18} className="text-on-surface-variant shrink-0 mt-0.5" />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-sm text-on-surface truncate">{shed.reptileName}</p>
+                        <p className="text-xs text-secondary font-medium">{t(`health.shed.${shed.status}`)}</p>
+                        <p className="text-xs text-on-surface-variant">{formatDate(shed.date)}</p>
+                      </div>
+                      <ChevronRight size={16} className="text-on-surface-variant shrink-0" />
                     </div>
-                    <p className="text-xs text-on-surface-variant mt-2">{formatDate(shed.date)}</p>
                   </button>
                 )) : (
                   <p className="py-6 text-center text-sm text-on-surface-variant">{t('common.noRecords')}</p>
                 )}
               </div>
+              {recentSheds.length > 3 && (
+                <button
+                  onClick={() => navigate('/reptiles')}
+                  className="mt-3 w-full bg-primary text-on-primary rounded-xl py-2.5 text-sm font-semibold text-center"
+                >
+                  {t('home.viewAll')} (View All) »
+                </button>
+              )}
             </div>
           </section>
         )}
