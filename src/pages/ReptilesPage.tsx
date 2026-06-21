@@ -1,13 +1,19 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Search, CalendarDays, MapPin, SlidersHorizontal } from 'lucide-react'
+import { Plus, Search, CalendarDays, MapPin, SlidersHorizontal, Utensils, Scale, Layers3 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
-import { reptileRepo } from '../db/repos'
+import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo } from '../db/repos'
 import type { Reptile } from '../db/schema'
-import { calcAge } from '../lib/todoEngine'
+import { calcAge, formatRelativeTime } from '../lib/todoEngine'
 
 type FilterCategory = 'all' | 'snakes' | 'lizards' | 'turtles'
+
+type ReptileCardSummary = {
+  lastFedAt?: string
+  lastShedDate?: string
+  lastWeight?: number
+}
 
 function fuzzyMatch(reptile: Reptile, query: string): boolean {
   const q = query.trim().toLowerCase()
@@ -29,12 +35,37 @@ export function ReptilesPage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [reptiles, setReptiles] = useState<Reptile[]>([])
+  const [cardSummaryMap, setCardSummaryMap] = useState<Record<string, ReptileCardSummary>>({})
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<FilterCategory>('all')
 
   useEffect(() => {
-    reptileRepo.getAll().then((r) => { setReptiles(r); setLoading(false) })
+    const load = async () => {
+      const r = await reptileRepo.getAll()
+      setReptiles(r)
+      const summaryEntries = await Promise.all(
+        r.map(async (reptile) => {
+          const [lastFeed, lastWeight, lastShed] = await Promise.all([
+            feedLogRepo.getLatestByReptile(reptile.id),
+            weightLogRepo.getLatestByReptile(reptile.id),
+            shedLogRepo.getLatestByReptile(reptile.id),
+          ])
+          return [
+            reptile.id,
+            {
+              lastFedAt: lastFeed?.fedAt,
+              lastShedDate: lastShed?.date,
+              lastWeight: lastWeight?.weight,
+            } satisfies ReptileCardSummary,
+          ] as const
+        }),
+      )
+      setCardSummaryMap(Object.fromEntries(summaryEntries))
+      setLoading(false)
+    }
+
+    void load()
   }, [])
 
   const filtered = useMemo(
@@ -118,6 +149,31 @@ export function ReptilesPage() {
                     <p className="text-xs text-outline mt-0.5">
                       {r.species}{r.breed ? ` · ${r.breed}` : ''}
                     </p>
+
+                    <div className="mt-2 space-y-1">
+                      <div className="flex items-center gap-1.5 text-on-surface-variant">
+                        <Utensils size={13} />
+                        <span className="text-[11px] font-medium">
+                          {t('reptile.overview.lastFed')}：{formatRelativeTime(cardSummaryMap[r.id]?.lastFedAt)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-on-surface-variant">
+                        <Layers3 size={13} />
+                        <span className="text-[11px] font-medium">
+                          {t('reptile.overview.lastShed')}：{cardSummaryMap[r.id]?.lastShedDate
+                            ? formatRelativeTime(`${cardSummaryMap[r.id].lastShedDate}T12:00:00`)
+                            : t('common.notRecorded')}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-on-surface-variant">
+                        <Scale size={13} />
+                        <span className="text-[11px] font-medium">
+                          {t('reptile.overview.lastWeight')}：{cardSummaryMap[r.id]?.lastWeight != null
+                            ? `${cardSummaryMap[r.id].lastWeight}g`
+                            : t('common.notRecorded')}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
                     {r.birthDate && (

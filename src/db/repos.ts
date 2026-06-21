@@ -102,6 +102,16 @@ export const weightLogRepo = {
   getByReptile: (reptileId: string) =>
     db.weight_logs.where('reptileId').equals(reptileId).sortBy('date'),
 
+  getLatestByReptile: async (reptileId: string): Promise<WeightLog | undefined> => {
+    const logs = await db.weight_logs
+      .where('[reptileId+date]')
+      .between([reptileId, Dexie.minKey], [reptileId, Dexie.maxKey])
+      .reverse()
+      .limit(1)
+      .toArray()
+    return logs[0]
+  },
+
   create: async (input: Omit<WeightLog, 'id' | 'createdAt'>): Promise<WeightLog> => {
     const log: WeightLog = { ...input, id: uid(), createdAt: now() }
     await db.weight_logs.add(log)
@@ -160,6 +170,16 @@ export const medicationLogRepo = {
 export const shedLogRepo = {
   getByReptile: (reptileId: string) =>
     db.shed_logs.where('reptileId').equals(reptileId).reverse().sortBy('date'),
+
+  getLatestByReptile: async (reptileId: string): Promise<ShedLog | undefined> => {
+    const logs = await db.shed_logs
+      .where('[reptileId+date]')
+      .between([reptileId, Dexie.minKey], [reptileId, Dexie.maxKey])
+      .reverse()
+      .limit(1)
+      .toArray()
+    return logs[0]
+  },
 
   create: async (input: Omit<ShedLog, 'id' | 'createdAt'>): Promise<ShedLog> => {
     const log: ShedLog = { ...input, id: uid(), createdAt: now() }
