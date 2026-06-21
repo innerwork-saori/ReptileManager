@@ -146,6 +146,8 @@ const zhTW = {
       partial: '部分脫皮',
       stuck: '脫皮不完全',
     },
+    feedBtn: '餵食',
+    shedBtn: '脫皮',
   },
   feed: {
     title: '餵食',

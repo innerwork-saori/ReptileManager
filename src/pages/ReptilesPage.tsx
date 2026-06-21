@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Search, CalendarDays, MapPin, SlidersHorizontal, Utensils, Scale, Layers3 } from 'lucide-react'
+import { Plus, Search, CalendarDays, MapPin, SlidersHorizontal, Utensils, Scale, Layers3, RefreshCw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
 import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo } from '../db/repos'
@@ -197,6 +197,28 @@ export function ReptilesPage() {
                         <span className="text-xs font-semibold truncate">{r.enclosureName}</span>
                       </div>
                     )}
+                  </div>
+                  <div className="flex gap-2 mt-3">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        navigate(`/reptile/${r.id}/feed`)
+                      }}
+                      className="flex-1 px-3 py-2 border-2 border-error text-error rounded-lg text-xs font-semibold hover:bg-error-container transition-colors active:scale-95 flex items-center justify-center gap-1.5"
+                    >
+                      <Utensils size={14} />
+                      {t('reptile.feedBtn')}
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        navigate(`/reptile/${r.id}/health`)
+                      }}
+                      className="flex-1 px-3 py-2 border-2 border-error text-error rounded-lg text-xs font-semibold hover:bg-error-container transition-colors active:scale-95 flex items-center justify-center gap-1.5"
+                    >
+                      <RefreshCw size={14} />
+                      {t('reptile.shedBtn')}
+                    </button>
                   </div>
                 </div>
               </div>

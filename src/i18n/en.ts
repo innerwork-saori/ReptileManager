@@ -148,6 +148,8 @@ const en: Translation = {
       partial: 'Partial Shed',
       stuck: 'Stuck Shed',
     },
+    feedBtn: 'Feed',
+    shedBtn: 'Shed',
   },
   feed: {
     title: 'Feeding',
