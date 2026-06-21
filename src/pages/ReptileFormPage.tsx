@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
 import { InputField, SelectField, TextareaField } from '../components/FormField'
-import { reptileRepo } from '../db/repos'
-import type { Reptile, ReptileCategory } from '../db/schema'
+import { categoryRepo, reptileRepo } from '../db/repos'
+import type { Reptile } from '../db/schema'
 
 const SEX_LABEL: Record<string, string> = { male: '公', female: '母', unknown: '未知' }
 
@@ -26,18 +26,11 @@ export function ReptileFormPage() {
     { value: 'unknown', label: t('common.sex.unknown') },
   ]
 
-  const CATEGORY_OPTIONS = [
-    { value: 'snake',  label: t('reptile.filterSnakes') },
-    { value: 'lizard', label: t('reptile.filterLizards') },
-    { value: 'turtle', label: t('reptile.filterTurtles') },
-    { value: 'other',  label: t('reptile.filterOther') },
-  ]
-
   const [form, setForm] = useState({
     name: '',
     species: '',
     breed: '',
-    category: 'snake' as ReptileCategory,
+    category: '',
     sex: '' as '' | 'male' | 'female' | 'unknown',
     birthYear: '',
     birthMonth: '',
@@ -54,10 +47,25 @@ export function ReptileFormPage() {
   const [saving, setSaving] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
   const [allReptiles, setAllReptiles] = useState<Reptile[]>([])
+  const [categories, setCategories] = useState<string[]>([])
 
   useEffect(() => {
     reptileRepo.getAll().then(setAllReptiles)
+    categoryRepo.getAll().then((rows) => setCategories(rows.map((row) => row.name)))
   }, [])
+
+  useEffect(() => {
+    if (isEdit || categories.length === 0) return
+    setForm((f) => {
+      if (f.category) return f
+      const firstCategory = categories[0]
+      return {
+        ...f,
+        category: firstCategory,
+        species: f.species.trim() ? f.species : firstCategory,
+      }
+    })
+  }, [categories, isEdit])
 
   useEffect(() => {
     if (!isEdit) return
@@ -68,7 +76,7 @@ export function ReptileFormPage() {
         name: r.name,
         species: r.species,
         breed: r.breed,
-        category: r.category ?? 'snake',
+        category: r.category ?? '',
         sex: r.sex ?? '',
         birthYear: bdParts[0] ?? '',
         birthMonth: bdParts[1] ?? '',
@@ -89,6 +97,29 @@ export function ReptileFormPage() {
       setForm((f) => ({ ...f, [key]: e.target.value }))
       setErrors((e2) => ({ ...e2, [key]: '' }))
     }
+
+  const setCategory = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const nextCategory = e.target.value
+    setForm((f) => ({
+      ...f,
+      category: nextCategory,
+      species: f.species.trim() ? f.species : nextCategory,
+    }))
+  }
+
+  const categoryOptions = useMemo(() => {
+    const options = new Map<string, string>()
+    for (const name of categories) {
+      const key = name.trim().toLowerCase()
+      if (!key) continue
+      if (!options.has(key)) options.set(key, name)
+    }
+    if (form.category) {
+      const key = form.category.trim().toLowerCase()
+      if (key && !options.has(key)) options.set(key, form.category)
+    }
+    return [...options.values()].map((name) => ({ value: name, label: name }))
+  }, [categories, form.category])
 
   const buildBirthDate = (): string | undefined => {
     if (!form.birthYear) return undefined
@@ -118,7 +149,7 @@ export function ReptileFormPage() {
       name: form.name.trim(),
       species: form.species.trim(),
       breed: form.breed.trim(),
-      category: form.category,
+      category: form.category.trim() || undefined,
       sex: (form.sex || undefined) as Reptile['sex'],
       birthDate: buildBirthDate(),
       enclosureName: form.enclosureName.trim() || undefined,
@@ -167,9 +198,9 @@ export function ReptileFormPage() {
     >
       <form onSubmit={handleSubmit} className="px-4 pt-4 pb-8 space-y-4">
         <InputField label={t('common.name')} required value={form.name} onChange={set('name')} error={errors.name} placeholder={t('reptile.form.namePlaceholder')} />
+        <SelectField label={t('reptile.form.category')} value={form.category} onChange={setCategory} options={categoryOptions} />
         <InputField label={t('common.species')} required value={form.species} onChange={set('species')} error={errors.species} placeholder={t('reptile.form.speciesPlaceholder')} />
         <InputField label={t('common.breed')} value={form.breed} onChange={set('breed')} placeholder={t('reptile.form.breedPlaceholder')} />
-        <SelectField label={t('reptile.form.category')} value={form.category} onChange={set('category')} options={CATEGORY_OPTIONS} />
         <SelectField label={t('common.sex.label')} value={form.sex} onChange={set('sex')} options={SEX_OPTIONS} />
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">{t('reptile.form.birthDate')}</label>

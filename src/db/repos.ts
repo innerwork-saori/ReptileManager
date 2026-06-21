@@ -1,5 +1,7 @@
+import Dexie from 'dexie'
 import { db } from './schema'
 import type {
+  Category,
   Reptile,
   WeightLog,
   FeedLog,
@@ -22,6 +24,162 @@ function uid(): string {
 
 function now(): string {
   return new Date().toISOString()
+}
+
+function normalizeCategoryName(name: string): string {
+  return name.trim().toLowerCase()
+}
+
+function formatCategoryName(name: string): string {
+  const trimmed = name.trim()
+  if (!trimmed) return ''
+  return `${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1).toLowerCase()}`
+}
+
+const DEFAULT_CATEGORY_NAMES = [
+  'Ball python',
+  'Boa constrictor',
+  'Leopard gecko',
+  'African fat tail gecko',
+]
+
+async function seedDefaultCategoriesIfEmpty(): Promise<void> {
+  await db.transaction('rw', [db.categories, db.reptiles], async () => {
+    const [existingCategories, reptiles] = await Promise.all([
+      db.categories.toArray(),
+      db.reptiles.toArray(),
+    ])
+
+    const keepByNormalized = new Map<string, Category>()
+    const duplicateIds: string[] = []
+
+    for (const category of existingCategories) {
+      const normalized = normalizeCategoryName(category.name)
+      if (!normalized) {
+        duplicateIds.push(category.id)
+        continue
+      }
+      if (keepByNormalized.has(normalized)) {
+        duplicateIds.push(category.id)
+      } else {
+        keepByNormalized.set(normalized, category)
+      }
+    }
+
+    if (duplicateIds.length > 0) {
+      await db.categories.bulkDelete(duplicateIds)
+    }
+
+    const namesToAdd = new Set<string>()
+    const normalizedExisting = new Set(keepByNormalized.keys())
+
+    for (const defaultName of DEFAULT_CATEGORY_NAMES) {
+      const normalized = normalizeCategoryName(defaultName)
+      if (!normalizedExisting.has(normalized)) {
+        namesToAdd.add(defaultName)
+        normalizedExisting.add(normalized)
+      }
+    }
+
+    for (const reptile of reptiles) {
+      const raw = reptile.category?.trim()
+      if (!raw) continue
+      const normalized = normalizeCategoryName(raw)
+      if (!normalizedExisting.has(normalized)) {
+        namesToAdd.add(formatCategoryName(raw))
+        normalizedExisting.add(normalized)
+      }
+    }
+
+    if (namesToAdd.size === 0) return
+    const t = now()
+    await db.categories.bulkAdd(
+      [...namesToAdd].map((name) => ({
+        id: uid(),
+        name,
+        createdAt: t,
+        updatedAt: t,
+      })),
+    )
+  })
+}
+
+// ─── Category ───────────────────────────────────────────────────────────────
+
+export const categoryRepo = {
+  getAll: async () => {
+    await seedDefaultCategoriesIfEmpty()
+    return db.categories.orderBy('name').toArray()
+  },
+
+  inUseCount: async (name: string): Promise<number> => {
+    const normalized = normalizeCategoryName(name)
+    if (!normalized) return 0
+    const reptiles = await db.reptiles.toArray()
+    return reptiles.filter((r) => normalizeCategoryName(r.category ?? '') === normalized).length
+  },
+
+  create: async (name: string): Promise<Category> => {
+    const normalized = normalizeCategoryName(name)
+    if (!normalized) throw new Error('CATEGORY_NAME_REQUIRED')
+
+    const existing = await db.categories.toArray()
+    if (existing.some((c) => normalizeCategoryName(c.name) === normalized)) {
+      throw new Error('CATEGORY_DUPLICATE')
+    }
+
+    const nextName = formatCategoryName(name)
+    const t = now()
+    const category: Category = {
+      id: uid(),
+      name: nextName,
+      createdAt: t,
+      updatedAt: t,
+    }
+    await db.categories.add(category)
+    return category
+  },
+
+  update: async (id: string, name: string): Promise<Category> => {
+    const normalized = normalizeCategoryName(name)
+    if (!normalized) throw new Error('CATEGORY_NAME_REQUIRED')
+
+    const existing = await db.categories.get(id)
+    if (!existing) throw new Error('CATEGORY_NOT_FOUND')
+
+    const all = await db.categories.toArray()
+    if (all.some((c) => c.id !== id && normalizeCategoryName(c.name) === normalized)) {
+      throw new Error('CATEGORY_DUPLICATE')
+    }
+
+    const nextName = formatCategoryName(name)
+    const next: Category = {
+      ...existing,
+      name: nextName,
+      updatedAt: now(),
+    }
+
+    const oldNormalized = normalizeCategoryName(existing.name)
+    await db.transaction('rw', [db.categories, db.reptiles], async () => {
+      await db.categories.put(next)
+      await db.reptiles.toCollection().modify((reptile) => {
+        if (normalizeCategoryName(reptile.category ?? '') === oldNormalized) {
+          reptile.category = nextName
+        }
+      })
+    })
+    return next
+  },
+
+  delete: async (id: string): Promise<void> => {
+    const existing = await db.categories.get(id)
+    if (!existing) throw new Error('CATEGORY_NOT_FOUND')
+
+    const usage = await categoryRepo.inUseCount(existing.name)
+    if (usage > 0) throw new Error('CATEGORY_IN_USE')
+
+    await db.categories.delete(id)
+  },
 }
 
 // ─── Reptile ─────────────────────────────────────────────────────────────────
@@ -371,5 +529,3 @@ export const settingsRepo = {
     await db.settings.put({ key, value })
   },
 }
-
-import Dexie from 'dexie'

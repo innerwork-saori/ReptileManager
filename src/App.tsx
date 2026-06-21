@@ -17,6 +17,7 @@ import { BreedingPage } from './pages/BreedingPage'
 import { FeedQuickPage } from './pages/FeedQuickPage'
 import { ActivityLogPage } from './pages/ActivityLogPage'
 import { TodosPage } from './pages/TodosPage'
+import { CategoriesPage } from './pages/CategoriesPage'
 
 function UpdatePrompt() {
   const { t } = useTranslation()
@@ -71,6 +72,7 @@ export default function App() {
         <Route path="/feed" element={<FeedQuickPage />} />
         <Route path="/breeding" element={<BreedingPage />} />
         <Route path="/todos" element={<TodosPage />} />
+        <Route path="/categories" element={<CategoriesPage />} />
         <Route path="/backup" element={<BackupPage />} />
       </Routes>
     </HashRouter>

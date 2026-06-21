@@ -37,6 +37,7 @@ const zhTW = {
     breeding: '繁殖',
     backup: '設定',
     todos: '代辦管理',
+    categories: '分類管理',
   },
   pwa: {
     newVersion: '有新版本可用！',
@@ -302,6 +303,20 @@ const zhTW = {
     done: '已完成',
     skipped: '已略過',
   },
+  categories: {
+    title: '分類管理',
+    name: '分類名稱',
+    namePlaceholder: '例：ball python',
+    add: '新增分類',
+    saveEdit: '儲存分類',
+    noCategories: '尚無分類',
+    errors: {
+      nameRequired: '請輸入分類名稱',
+      duplicate: '分類名稱已存在',
+      inUse: '此分類仍被爬蟲使用中，請先修改爬蟲分類',
+      unknown: '操作失敗，請稍後再試',
+    },
+  },
   clutch: {
     title: '繁殖紀錄',
     addRecord: '新增繁殖紀錄',
@@ -365,7 +380,7 @@ const zhTW = {
     qrExporting: '準備中…',
     aboutSection: '關於',
     appName: 'ReptileManager',
-    version: '版本 0.2.7',
+    version: '版本 0.3.0',
     description: '爬蟲日常管理 PWA · 資料儲存於本機 IndexedDB',
     languageSection: '語言設定',
     languageLabel: '介面語言',

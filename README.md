@@ -1,6 +1,6 @@
 # ReptileManager — 功能架構書
 
-> 版本：0.2.8　　最後更新：2026-06-21
+> 版本：0.3.0　　最後更新：2026-06-21
 
 ---
 
@@ -61,18 +61,33 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 | 名稱 / 種類 / 品系（Morph） | 基本識別資訊 |
 | 性別 | 公 / 母 / 未知 |
 | 出生日期 | 自動計算年齡（年月日精度） |
+| 分類（Category） | 由使用者自訂維護，預設包含 4 個常用分類 |
 | 配對（Pairing：Sire / Dam） | 父母爬蟲選擇區塊 |
 | 照片 URL | 自定義大頭照 |
 | 健康資訊（Healthy Info） | 爬蟲健康摘要欄位 |
 | 飼育箱名稱 | 用於首頁快速識別 |
 | QR Code | 可設定自訂目標 URL，於詳細頁產生 QR Code |
 
+**新增 / 編輯表單行為**：
+
+- Category 欄位位於 Species 上方
+- 選擇 Category 時，若 Species 目前為空，會自動帶入同值，之後可由使用者自行修改
+
 **爬蟲清單 UI**：
 
 - 卡片式佈局，顯示照片縮圖（96×96）、名稱、種類、上次餵食時間、上次脫皮時間、最近體重、年齡、飼育箱位置
 - 頂部搜尋欄：模糊搜尋名稱 / 種類 / 品系
-- 分類篩選 Chip：全部 / 蛇類 / 蜥蜴 / 龜類（關鍵字自動匹配種類欄位）
+- 分類篩選 Chip：全部 + 使用者自訂分類（依 Category 欄位過濾）
 - 右下角 FAB 快速新增爬蟲
+
+### 3.9 分類管理（Category Management）
+
+提供全域分類維護頁，入口位於 burger menu。
+
+- 預設分類：`ball python`、`boa constrictor`、`leopard gecko`、`african fat tail gecko`
+- 支援新增、修改、刪除分類
+- 若分類已被爬蟲使用，會阻擋刪除並提示先調整爬蟲分類
+- 相容舊資料：既有 reptile 的歷史分類值會自動收編進分類清單
 
 ---
 
@@ -189,7 +204,7 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 | PWA 狀態 | 顯示目前連線狀態（online / offline） |
 | 語言切換 | 繁體中文 / English，偏好存於 localStorage |
 | 資料統計 | Bento Grid 顯示爬寵數量、餵食紀錄、健康紀錄、IndexedDB 佔用大小 |
-| 匯出備份 | 將所有資料表序列化為 JSON 下載，並自動排除已移除的舊 reptile 健康欄位 |
+| 匯出備份 | 將所有資料表（含 categories）序列化為 JSON 下載，並自動排除已移除的舊 reptile 健康欄位 |
 | 匯出 QR Code | 批次產生所有爬蟲 QR Code，支援列印 / PDF |
 | 匯入備份 | 上傳 JSON 檔，驗證後寫入 IndexedDB（覆蓋模式） |
 | 重設所有數據 | 危險區域操作，清除全部資料表並重新載入 |
@@ -198,11 +213,12 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 
 ## 4. 資料模型
 
-資料庫以 Dexie 定義，共 **14 張資料表**，全部儲存於瀏覽器 IndexedDB。
+資料庫以 Dexie 定義，共 **15 張資料表**，全部儲存於瀏覽器 IndexedDB。
 
 ```
 ReptileDB (Dexie)
 │
+├── categories           → 分類管理
 ├── reptiles             → 爬蟲基本資料
 ├── feed_logs            → 餵食記錄
 ├── weight_logs          → 體重記錄
@@ -259,6 +275,7 @@ Reptile (1)
 | `/reptile/:id/logs` | ActivityLogPage | 完整紀錄歷程（餵食 / 健康 / 投藥 / 環境，時間軸排列，支援篩選與關鍵字搜尋） |
 | `/feed` | FeedQuickPage | 快速餵食記錄（底部導覽第 3 項，跨爬蟲快速新增餵食） |
 | `/breeding` | BreedingPage | 全域繁殖管理（統計 + 列表 + 新增） |
+| `/categories` | CategoriesPage | 分類新增 / 編輯 / 刪除管理（burger menu 入口） |
 | `/backup` | BackupPage | 設定 + 備份匯出入 |
 
 ---
@@ -271,7 +288,7 @@ Reptile (1)
 | 語言偵測 | 優先讀取 localStorage，次為瀏覽器語系 |
 | 支援語言 | `zh-TW`（繁體中文，預設）、`en`（英文） |
 | 翻譯檔路徑 | `src/i18n/zh-TW.ts`、`src/i18n/en.ts` |
-| 命名空間 | common, nav, pwa, home, reptile, feed, medication, environment, health, todo, todoItem, clutch, activityLog, backup |
+| 命名空間 | common, nav, pwa, home, reptile, feed, medication, environment, health, todo, todoItem, categories, clutch, activityLog, backup |
 | 偏好儲存 | localStorage key: `reptileManager_lang` |
 
 ---
@@ -336,7 +353,7 @@ Reptile (1)
          ClutchLog
 
 備份（Backup）
-  讀寫 → 全部 14 張資料表
+  讀寫 → 全部 15 張資料表
 ```
 
 ---

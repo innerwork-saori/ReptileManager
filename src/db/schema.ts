@@ -1,6 +1,13 @@
 import Dexie, { type Table } from 'dexie'
 
-export type ReptileCategory = 'snake' | 'lizard' | 'turtle' | 'other'
+export type ReptileCategory = string
+
+export interface Category {
+  id: string
+  name: string
+  createdAt: string
+  updatedAt: string
+}
 
 export interface Reptile {
   id: string
@@ -173,6 +180,7 @@ export interface Setting {
 }
 
 export class ReptileManagerDb extends Dexie {
+  categories!: Table<Category, string>
   reptiles!: Table<Reptile, string>
   weight_logs!: Table<WeightLog, string>
   feed_logs!: Table<FeedLog, string>
@@ -192,6 +200,7 @@ export class ReptileManagerDb extends Dexie {
     super('reptileManagerDb')
 
     this.version(1).stores({
+      categories: 'id, name, createdAt',
       reptiles: 'id, name, species, createdAt',
       weight_logs: 'id, reptileId, date, [reptileId+date]',
       feed_logs: 'id, reptileId, fedAt, [reptileId+fedAt]',
@@ -208,6 +217,7 @@ export class ReptileManagerDb extends Dexie {
     })
 
     this.version(2).stores({
+      categories: 'id, name, createdAt',
       reptiles: 'id, name, species, createdAt',
       weight_logs: 'id, reptileId, date, [reptileId+date]',
       feed_logs: 'id, reptileId, fedAt, [reptileId+fedAt]',
@@ -225,6 +235,7 @@ export class ReptileManagerDb extends Dexie {
     })
 
     this.version(3).stores({
+      categories: 'id, name, createdAt',
       reptiles: 'id, name, species, createdAt',
       weight_logs: 'id, reptileId, date, [reptileId+date]',
       feed_logs: 'id, reptileId, fedAt, [reptileId+fedAt]',
@@ -242,6 +253,7 @@ export class ReptileManagerDb extends Dexie {
     })
 
     this.version(4).stores({
+      categories: 'id, name, createdAt',
       reptiles: 'id, name, species, createdAt',
       weight_logs: 'id, reptileId, date, [reptileId+date]',
       feed_logs: 'id, reptileId, fedAt, [reptileId+fedAt]',
@@ -260,6 +272,80 @@ export class ReptileManagerDb extends Dexie {
       await tx.table('reptiles').toCollection().modify((reptile) => {
         delete (reptile as { allergyInfo?: unknown }).allergyInfo
       })
+    })
+
+    this.version(5).stores({
+      categories: 'id, name, createdAt',
+      reptiles: 'id, name, species, createdAt',
+      weight_logs: 'id, reptileId, date, [reptileId+date]',
+      feed_logs: 'id, reptileId, fedAt, [reptileId+fedAt]',
+      medication_courses: 'id, reptileId, active, [reptileId+active]',
+      medication_logs: 'id, reptileId, takenAt, [reptileId+takenAt]',
+      shed_logs: 'id, reptileId, date, [reptileId+date]',
+      habitat_logs: 'id, reptileId, loggedAt, [reptileId+loggedAt]',
+      uvb_logs: 'id, reptileId, startedAt',
+      substrate_logs: 'id, reptileId, changedAt, [reptileId+changedAt]',
+      todo_rules: 'id, reptileId, type, enabled',
+      todo_instances: 'id, reptileId, date, status, [reptileId+date], [date+status]',
+      visit_logs: 'id, reptileId, date, [reptileId+date]',
+      clutch_logs: 'id, fatherReptileId, motherReptileId, date',
+      settings: 'key',
+    }).upgrade(async (tx) => {
+      const defaultCategoryNames = [
+        'Ball python',
+        'Boa constrictor',
+        'Leopard gecko',
+        'African fat tail gecko',
+      ]
+
+      const normalize = (value: string) => value.trim().toLowerCase()
+      const formatName = (value: string) => {
+        const trimmed = value.trim()
+        if (!trimmed) return ''
+        return `${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1).toLowerCase()}`
+      }
+      const now = new Date().toISOString()
+
+      const categoriesTable = tx.table('categories')
+      const reptilesTable = tx.table('reptiles')
+
+      const [existingCategories, reptiles] = await Promise.all([
+        categoriesTable.toArray() as Promise<Array<{ id: string; name?: string }>>,
+        reptilesTable.toArray() as Promise<Array<{ category?: string }>>,
+      ])
+
+      const existingNames = new Set(
+        existingCategories
+          .map((c) => (typeof c.name === 'string' ? normalize(c.name) : ''))
+          .filter(Boolean),
+      )
+
+      const namesToCreate = new Set<string>()
+      for (const name of defaultCategoryNames) {
+        const normalized = normalize(name)
+        if (!existingNames.has(normalized)) namesToCreate.add(name)
+      }
+
+      for (const reptile of reptiles) {
+        if (typeof reptile.category !== 'string') continue
+        const raw = reptile.category.trim()
+        if (!raw) continue
+        const normalized = normalize(raw)
+        if (existingNames.has(normalized)) continue
+        namesToCreate.add(formatName(raw))
+        existingNames.add(normalized)
+      }
+
+      if (namesToCreate.size > 0) {
+        await categoriesTable.bulkAdd(
+          [...namesToCreate].map((name) => ({
+            id: crypto.randomUUID(),
+            name,
+            createdAt: now,
+            updatedAt: now,
+          })),
+        )
+      }
     })
   }
 }

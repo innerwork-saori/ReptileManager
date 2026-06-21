@@ -8,6 +8,7 @@ function stripLegacyReptileFields(row: unknown): unknown {
 
 export async function exportAllData(): Promise<void> {
   const [
+    categories,
     reptiles,
     weight_logs,
     feed_logs,
@@ -23,6 +24,7 @@ export async function exportAllData(): Promise<void> {
     clutch_logs,
     settings,
   ] = await Promise.all([
+    db.categories.toArray(),
     db.reptiles.toArray(),
     db.weight_logs.toArray(),
     db.feed_logs.toArray(),
@@ -45,6 +47,7 @@ export async function exportAllData(): Promise<void> {
     version: 1,
     exportedAt: new Date().toISOString(),
     data: {
+      categories,
       reptiles: sanitizedReptiles,
       weight_logs,
       feed_logs,
@@ -99,7 +102,7 @@ export async function exportAllData(): Promise<void> {
 }
 
 const ALL_TABLES = [
-  'reptiles', 'weight_logs', 'feed_logs', 'medication_courses',
+  'categories', 'reptiles', 'weight_logs', 'feed_logs', 'medication_courses',
   'medication_logs', 'shed_logs', 'habitat_logs', 'uvb_logs',
   'substrate_logs', 'todo_rules', 'todo_instances', 'visit_logs', 'clutch_logs', 'settings',
 ] as const

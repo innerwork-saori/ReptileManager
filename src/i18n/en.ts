@@ -39,6 +39,7 @@ const en: Translation = {
     breeding: 'Breeding',
     backup: 'Settings',
     todos: 'Tasks',
+    categories: 'Categories',
   },
   pwa: {
     newVersion: 'New version available!',
@@ -304,6 +305,20 @@ const en: Translation = {
     done: 'Done',
     skipped: 'Skipped',
   },
+  categories: {
+    title: 'Category Management',
+    name: 'Category Name',
+    namePlaceholder: 'e.g. ball python',
+    add: 'Add Category',
+    saveEdit: 'Save Category',
+    noCategories: 'No categories yet',
+    errors: {
+      nameRequired: 'Please enter a category name',
+      duplicate: 'Category name already exists',
+      inUse: 'This category is still used by reptiles. Reassign them first.',
+      unknown: 'Operation failed. Please try again.',
+    },
+  },
   clutch: {
     title: 'Breeding Records',
     addRecord: 'Add Breeding Record',
@@ -367,7 +382,7 @@ const en: Translation = {
     qrExporting: 'Preparing…',
     aboutSection: 'About',
     appName: 'ReptileManager',
-    version: 'Version 0.2.7',
+    version: 'Version 0.3.0',
     description: 'Reptile daily management PWA · Data stored in IndexedDB',
     languageSection: 'Language',
     languageLabel: 'Interface language',

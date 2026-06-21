@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, List, ClipboardList, Egg, Settings, ArrowLeft, Menu, X, ListChecks } from 'lucide-react'
+import { Home, List, ClipboardList, Egg, Settings, ArrowLeft, Menu, X, ListChecks, Tags } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
@@ -154,6 +154,21 @@ export function Layout({ children, title, back, action }: Props) {
           >
             <ListChecks size={22} />
             <span>{t('nav.todos')}</span>
+          </NavLink>
+
+          <NavLink
+            to="/categories"
+            onClick={closeDrawer}
+            className={({ isActive }) =>
+              `flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-semibold transition-all active:scale-[0.98] duration-200 ${
+                isActive
+                  ? 'bg-secondary-container text-on-secondary-container'
+                  : 'text-on-surface-variant hover:bg-surface-container-high'
+              }`
+            }
+          >
+            <Tags size={22} />
+            <span>{t('nav.categories')}</span>
           </NavLink>
         </nav>
 

@@ -3,11 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { Plus, Search, CalendarDays, MapPin, SlidersHorizontal, Utensils, Scale, Layers3 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
-import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo } from '../db/repos'
+import { categoryRepo, reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo } from '../db/repos'
 import type { Reptile } from '../db/schema'
 import { calcAge, formatRelativeTime } from '../lib/todoEngine'
-
-type FilterCategory = 'all' | 'snakes' | 'lizards' | 'turtles'
 
 type ReptileCardSummary = {
   lastFedAt?: string
@@ -22,13 +20,9 @@ function fuzzyMatch(reptile: Reptile, query: string): boolean {
   return q.split(/\s+/).every((word) => haystack.includes(word))
 }
 
-function matchesCategory(reptile: Reptile, filter: FilterCategory): boolean {
+function matchesCategory(reptile: Reptile, filter: string): boolean {
   if (filter === 'all') return true
-  const cat = reptile.category ?? 'snake'
-  if (filter === 'snakes')  return cat === 'snake'
-  if (filter === 'lizards') return cat === 'lizard'
-  if (filter === 'turtles') return cat === 'turtle'
-  return false
+  return (reptile.category ?? '').trim().toLowerCase() === filter.trim().toLowerCase()
 }
 
 export function ReptilesPage() {
@@ -36,14 +30,19 @@ export function ReptilesPage() {
   const { t } = useTranslation()
   const [reptiles, setReptiles] = useState<Reptile[]>([])
   const [cardSummaryMap, setCardSummaryMap] = useState<Record<string, ReptileCardSummary>>({})
+  const [categories, setCategories] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [category, setCategory] = useState<FilterCategory>('all')
+  const [category, setCategory] = useState('all')
 
   useEffect(() => {
     const load = async () => {
-      const r = await reptileRepo.getAll()
+      const [r, categoryRows] = await Promise.all([
+        reptileRepo.getAll(),
+        categoryRepo.getAll(),
+      ])
       setReptiles(r)
+      setCategories(categoryRows.map((row) => row.name))
       const summaryEntries = await Promise.all(
         r.map(async (reptile) => {
           const [lastFeed, lastWeight, lastShed] = await Promise.all([
@@ -73,11 +72,9 @@ export function ReptilesPage() {
     [reptiles, search, category],
   )
 
-  const categories: { key: FilterCategory; label: string }[] = [
-    { key: 'all',     label: t('reptile.filterAll') },
-    { key: 'snakes',  label: t('reptile.filterSnakes') },
-    { key: 'lizards', label: t('reptile.filterLizards') },
-    { key: 'turtles', label: t('reptile.filterTurtles') },
+  const categoryFilters = [
+    { key: 'all', label: t('reptile.filterAll') },
+    ...categories.map((name) => ({ key: name, label: name })),
   ]
 
   return (
@@ -111,7 +108,7 @@ export function ReptilesPage() {
               />
             </div>
             <div className="flex gap-2 overflow-x-auto pb-1">
-              {categories.map(({ key, label }) => (
+              {categoryFilters.map(({ key, label }) => (
                 <button
                   key={key}
                   onClick={() => setCategory(key)}
