@@ -67,6 +67,11 @@ export function HomePage() {
     void load()
   }
 
+  const handleTodoRevert = async (id: string) => {
+    await todoInstanceRepo.updateStatus(id, 'pending')
+    void load()
+  }
+
   if (loading) {
     return (
       <Layout title={t('home.title')}>
@@ -233,15 +238,16 @@ export function HomePage() {
                   {t('home.handled')}
                 </div>
                 {doneTodos.map((todo) => (
-                  <div
+                  <button
                     key={todo.id}
-                    className="flex items-center gap-3 p-4 bg-surface-container rounded-2xl border border-outline-variant opacity-60"
+                    onClick={() => handleTodoRevert(todo.id)}
+                    className="w-full flex items-center gap-3 p-4 bg-surface-container rounded-2xl border border-outline-variant opacity-60 hover:opacity-80 active:scale-[0.98] transition-all text-left"
                   >
                     <div className="w-6 h-6 rounded bg-primary flex items-center justify-center shrink-0">
                       <Check size={14} className="text-on-primary" />
                     </div>
                     <p className="text-sm text-on-surface line-through truncate">{todo.label}</p>
-                  </div>
+                  </button>
                 ))}
               </>
             )}
