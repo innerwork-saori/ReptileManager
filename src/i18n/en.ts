@@ -18,6 +18,7 @@ const en: Translation = {
     name: 'Name/ID',
     species: 'Species',
     breed: 'Morph',
+    select: 'Please select',
     sex: {
       label: 'Sex',
       unset: 'Not set',
@@ -126,6 +127,7 @@ const en: Translation = {
       chronicInfo: 'Healthy Info',
       pairing: 'Pairing',
       category: 'Category',
+      categoryRequired: 'Please select a category',
       nameRequired: 'Name is required',
       speciesRequired: 'Species is required',
       saveChanges: 'Save Changes',

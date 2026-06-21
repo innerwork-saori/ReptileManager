@@ -13,6 +13,13 @@ function buildQrUrl(id: string): string {
   return `${window.location.origin}${window.location.pathname}#/reptile/${id}`
 }
 
+function focusFieldById(fieldId: string) {
+  const el = document.getElementById(fieldId) as (HTMLInputElement | HTMLSelectElement | null)
+  if (!el) return
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  el.focus()
+}
+
 export function ReptileFormPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -55,19 +62,6 @@ export function ReptileFormPage() {
   }, [])
 
   useEffect(() => {
-    if (isEdit || categories.length === 0) return
-    setForm((f) => {
-      if (f.category) return f
-      const firstCategory = categories[0]
-      return {
-        ...f,
-        category: firstCategory,
-        species: f.species.trim() ? f.species : firstCategory,
-      }
-    })
-  }, [categories, isEdit])
-
-  useEffect(() => {
     if (!isEdit) return
     reptileRepo.getById(id!).then((r) => {
       if (!r) { navigate('/reptiles'); return }
@@ -105,6 +99,7 @@ export function ReptileFormPage() {
       category: nextCategory,
       species: f.species.trim() ? f.species : nextCategory,
     }))
+    setErrors((e2) => ({ ...e2, category: '' }))
   }
 
   const categoryOptions = useMemo(() => {
@@ -118,8 +113,11 @@ export function ReptileFormPage() {
       const key = form.category.trim().toLowerCase()
       if (key && !options.has(key)) options.set(key, form.category)
     }
-    return [...options.values()].map((name) => ({ value: name, label: name }))
-  }, [categories, form.category])
+    return [
+      { value: '', label: t('common.select') },
+      ...[...options.values()].map((name) => ({ value: name, label: name })),
+    ]
+  }, [categories, form.category, t])
 
   const buildBirthDate = (): string | undefined => {
     if (!form.birthYear) return undefined
@@ -134,22 +132,45 @@ export function ReptileFormPage() {
   const validate = () => {
     const e: Record<string, string> = {}
     if (!form.name.trim()) e.name = t('reptile.form.nameRequired')
+    if (!form.category.trim()) e.category = t('reptile.form.categoryRequired')
     if (!form.species.trim()) e.species = t('reptile.form.speciesRequired')
     if ((form.birthMonth || form.birthDay) && !form.birthYear) e.birthYear = t('reptile.form.birthYearRequired')
     return e
   }
 
+  const focusFirstInvalidField = (errs: Record<string, string>) => {
+    if (errs.name) {
+      focusFieldById('reptile-form-name')
+      return
+    }
+    if (errs.category) {
+      focusFieldById('reptile-form-category')
+      return
+    }
+    if (errs.species) {
+      focusFieldById('reptile-form-species')
+      return
+    }
+    if (errs.birthYear) {
+      focusFieldById('reptile-form-birth-year')
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const errs = validate()
-    if (Object.keys(errs).length > 0) { setErrors(errs); return }
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs)
+      requestAnimationFrame(() => focusFirstInvalidField(errs))
+      return
+    }
     setSaving(true)
 
     const data: Omit<Reptile, 'id' | 'createdAt' | 'updatedAt'> = {
       name: form.name.trim(),
       species: form.species.trim(),
       breed: form.breed.trim(),
-      category: form.category.trim() || undefined,
+      category: form.category.trim(),
       sex: (form.sex || undefined) as Reptile['sex'],
       birthDate: buildBirthDate(),
       enclosureName: form.enclosureName.trim() || undefined,
@@ -197,15 +218,16 @@ export function ReptileFormPage() {
       }
     >
       <form onSubmit={handleSubmit} className="px-4 pt-4 pb-8 space-y-4">
-        <InputField label={t('common.name')} required value={form.name} onChange={set('name')} error={errors.name} placeholder={t('reptile.form.namePlaceholder')} />
-        <SelectField label={t('reptile.form.category')} value={form.category} onChange={setCategory} options={categoryOptions} />
-        <InputField label={t('common.species')} required value={form.species} onChange={set('species')} error={errors.species} placeholder={t('reptile.form.speciesPlaceholder')} />
+        <InputField id="reptile-form-name" label={t('common.name')} required value={form.name} onChange={set('name')} error={errors.name} placeholder={t('reptile.form.namePlaceholder')} />
+        <SelectField id="reptile-form-category" label={t('reptile.form.category')} required value={form.category} onChange={setCategory} options={categoryOptions} error={errors.category} />
+        <InputField id="reptile-form-species" label={t('common.species')} required value={form.species} onChange={set('species')} error={errors.species} placeholder={t('reptile.form.speciesPlaceholder')} />
         <InputField label={t('common.breed')} value={form.breed} onChange={set('breed')} placeholder={t('reptile.form.breedPlaceholder')} />
         <SelectField label={t('common.sex.label')} value={form.sex} onChange={set('sex')} options={SEX_OPTIONS} />
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">{t('reptile.form.birthDate')}</label>
           <div className="flex gap-2 items-center">
             <input
+              id="reptile-form-birth-year"
               type="number" placeholder={t('reptile.form.birthYearPlaceholder')} min="1900" max={new Date().getFullYear()}
               value={form.birthYear}
               onChange={(e) => { setForm((f) => ({ ...f, birthYear: e.target.value })); setErrors((er) => ({ ...er, birthYear: '' })) }}

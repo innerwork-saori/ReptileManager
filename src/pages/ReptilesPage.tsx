@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Plus, Search, CalendarDays, MapPin, SlidersHorizontal, Utensils, Scale, Layers3 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
-import { categoryRepo, reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo } from '../db/repos'
+import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo } from '../db/repos'
 import type { Reptile } from '../db/schema'
 import { calcAge, formatRelativeTime, formatRelativeTimeInDays } from '../lib/todoEngine'
 
@@ -25,6 +25,21 @@ function matchesCategory(reptile: Reptile, filter: string): boolean {
   return (reptile.category ?? '').trim().toLowerCase() === filter.trim().toLowerCase()
 }
 
+function getUsedCategories(reptiles: Reptile[]): string[] {
+  const seen = new Set<string>()
+  const used: string[] = []
+
+  for (const reptile of reptiles) {
+    const category = (reptile.category ?? '').trim()
+    const normalized = category.toLowerCase()
+    if (!normalized || seen.has(normalized)) continue
+    seen.add(normalized)
+    used.push(category)
+  }
+
+  return used.sort((a, b) => a.localeCompare(b))
+}
+
 export function ReptilesPage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
@@ -37,12 +52,9 @@ export function ReptilesPage() {
 
   useEffect(() => {
     const load = async () => {
-      const [r, categoryRows] = await Promise.all([
-        reptileRepo.getAll(),
-        categoryRepo.getAll(),
-      ])
+      const r = await reptileRepo.getAll()
       setReptiles(r)
-      setCategories(categoryRows.map((row) => row.name))
+      setCategories(getUsedCategories(r))
       const summaryEntries = await Promise.all(
         r.map(async (reptile) => {
           const [lastFeed, lastWeight, lastShed] = await Promise.all([

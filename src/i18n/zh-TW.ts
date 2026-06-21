@@ -16,6 +16,7 @@ const zhTW = {
     name: '名稱/ID',
     species: '物種',
     breed: '花色',
+    select: '請選擇',
     sex: {
       label: '性別',
       unset: '未設定',
@@ -124,6 +125,7 @@ const zhTW = {
       chronicInfo: '健康資訊',
       pairing: '配對',
       category: '分類',
+      categoryRequired: '請選擇分類',
       nameRequired: '請填寫名稱',
       speciesRequired: '請填寫物種',
       saveChanges: '儲存變更',
