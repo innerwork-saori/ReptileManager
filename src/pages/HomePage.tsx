@@ -7,11 +7,12 @@ import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo, medicationCourseR
 import type { Reptile, FeedLog, WeightLog, ShedLog, MedicationCourse } from '../db/schema'
 import { formatRelativeTime, formatDate } from '../lib/todoEngine'
 
-type RecentWeight = WeightLog & { reptileName: string; reptilePhotoUrl?: string }
-type RecentShed = ShedLog & { reptileName: string; reptilePhotoUrl?: string }
+type RecentWeight = WeightLog & { reptileName: string; reptileBreed: string; reptilePhotoUrl?: string }
+type RecentShed = ShedLog & { reptileName: string; reptileBreed: string; reptilePhotoUrl?: string }
 type OverdueFeed = {
   reptileId: string
   reptileName: string
+  reptileBreed: string
   reptilePhotoUrl?: string
   lastFedAt?: string
 }
@@ -35,6 +36,7 @@ export function HomePage() {
     const reptiles = await reptileRepo.getAll()
     const rMap = new Map(reptiles.map((r) => [r.id, r.name]))
     const rPhotoMap = new Map(reptiles.map((r) => [r.id, r.photoUrl]))
+    const rBreedMap = new Map(reptiles.map((r) => [r.id, r.breed]))
 
     const [cardData, weightLogs, shedLogs] = await Promise.all([
       Promise.all(
@@ -69,14 +71,15 @@ export function HomePage() {
       .map(({ reptile, lastFeed }) => ({
         reptileId: reptile.id,
         reptileName: reptile.name,
+        reptileBreed: reptile.breed,
         reptilePhotoUrl: reptile.photoUrl,
         lastFedAt: lastFeed?.fedAt,
       }))
 
     setCards(cardData)
     setOverdueFeeds(overdue)
-    setRecentWeights(weightLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown'), reptilePhotoUrl: rPhotoMap.get(log.reptileId) })))
-    setRecentSheds(shedLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown'), reptilePhotoUrl: rPhotoMap.get(log.reptileId) })))
+    setRecentWeights(weightLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown'), reptileBreed: rBreedMap.get(log.reptileId) ?? '', reptilePhotoUrl: rPhotoMap.get(log.reptileId) })))
+    setRecentSheds(shedLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown'), reptileBreed: rBreedMap.get(log.reptileId) ?? '', reptilePhotoUrl: rPhotoMap.get(log.reptileId) })))
     setLoading(false)
   }, [])
 
@@ -131,7 +134,8 @@ export function HomePage() {
                           : <div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-sm text-on-surface truncate">{feed.reptileName}</p>
+                        <p className="font-semibold text-sm text-on-surface leading-snug">{feed.reptileBreed || feed.reptileName}</p>
+                        {feed.reptileBreed && <p className="text-xs text-on-surface-variant">{feed.reptileName}</p>}
                         <p className="text-xs text-secondary font-medium">{t('home.lastFed', { time: feed.lastFedAt ? formatRelativeTime(feed.lastFedAt) : t('common.notRecorded') })}</p>
                         <p className="text-xs text-on-surface-variant">{feed.lastFedAt ? formatDate(feed.lastFedAt) : t('home.neverFed')}</p>
                       </div>
@@ -172,7 +176,8 @@ export function HomePage() {
                           : <div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-sm text-on-surface truncate">{weight.reptileName}</p>
+                        <p className="font-semibold text-sm text-on-surface leading-snug">{weight.reptileBreed || weight.reptileName}</p>
+                        {weight.reptileBreed && <p className="text-xs text-on-surface-variant">{weight.reptileName}</p>}
                         <p className="text-xs text-secondary font-medium">{weight.weight} g</p>
                         <p className="text-xs text-on-surface-variant">{formatDate(weight.date)}</p>
                       </div>
@@ -213,7 +218,8 @@ export function HomePage() {
                           : <div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-sm text-on-surface truncate">{shed.reptileName}</p>
+                        <p className="font-semibold text-sm text-on-surface leading-snug">{shed.reptileBreed || shed.reptileName}</p>
+                        {shed.reptileBreed && <p className="text-xs text-on-surface-variant">{shed.reptileName}</p>}
                         <p className="text-xs text-secondary font-medium">{t(`health.shed.${shed.status}`)}</p>
                         <p className="text-xs text-on-surface-variant">{formatDate(shed.date)}</p>
                       </div>
@@ -272,9 +278,9 @@ export function HomePage() {
                     )}
                   </div>
                   <div className="p-3">
-                    <h3 className="font-semibold text-sm text-on-surface truncate">{reptile.name}</h3>
+                    <h3 className="font-semibold text-sm text-on-surface leading-snug">{reptile.breed || reptile.name}</h3>
                     <p className="text-xs text-on-surface-variant truncate">
-                      {reptile.species}{reptile.breed && ` · ${reptile.breed}`}
+                      {reptile.breed ? reptile.name : reptile.species}
                     </p>
                     <div className="flex items-center gap-1 mt-1.5">
                       <UtensilsCrossed size={11} className="text-primary shrink-0" />
