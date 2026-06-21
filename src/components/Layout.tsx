@@ -61,9 +61,9 @@ export function Layout({ children, title, back, action }: Props) {
         </header>
       )}
 
-      <main className="flex-1 pb-24">{children}</main>
+      <main className="flex-1 pb-24 overflow-y-auto">{children}</main>
 
-      <nav className="fixed bottom-0 inset-x-0 bg-surface border-t border-outline-variant flex justify-around items-center px-4 py-2 rounded-t-xl shadow-lg z-40 safe-bottom">
+      <nav className="fixed bottom-0 left-0 right-0 bg-surface border-t border-outline-variant flex justify-around items-center px-4 py-2 rounded-t-xl shadow-lg z-40 safe-bottom will-change-transform" style={{ top: 'auto' }}>
         {navItems.map(({ to, end, icon: Icon, label }) => (
           <NavLink
             key={to + label}
