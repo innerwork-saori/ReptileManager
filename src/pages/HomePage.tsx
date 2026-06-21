@@ -1,11 +1,19 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ClipboardList, UtensilsCrossed, Check, ChevronRight, Plus, Bell } from 'lucide-react'
+import { UtensilsCrossed, Scale, RefreshCw, ChevronRight, Plus, Bell } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
-import { reptileRepo, feedLogRepo, todoRuleRepo, todoInstanceRepo, medicationCourseRepo } from '../db/repos'
-import type { Reptile, FeedLog, TodoInstance, MedicationCourse } from '../db/schema'
-import { computeTodayInstances, formatRelativeTime } from '../lib/todoEngine'
+import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo, medicationCourseRepo } from '../db/repos'
+import type { Reptile, FeedLog, WeightLog, ShedLog, MedicationCourse } from '../db/schema'
+import { formatRelativeTime, formatDate } from '../lib/todoEngine'
+
+type RecentWeight = WeightLog & { reptileName: string }
+type RecentShed = ShedLog & { reptileName: string }
+type OverdueFeed = {
+  reptileId: string
+  reptileName: string
+  lastFedAt?: string
+}
 
 interface ReptileCard {
   reptile: Reptile
@@ -17,59 +25,63 @@ export function HomePage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [cards, setCards] = useState<ReptileCard[]>([])
-  const [todos, setTodos] = useState<TodoInstance[]>([])
-  const [reptileMap, setReptileMap] = useState<Map<string, string>>(new Map())
+  const [overdueFeeds, setOverdueFeeds] = useState<OverdueFeed[]>([])
+  const [recentWeights, setRecentWeights] = useState<RecentWeight[]>([])
+  const [recentSheds, setRecentSheds] = useState<RecentShed[]>([])
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
     const reptiles = await reptileRepo.getAll()
     const rMap = new Map(reptiles.map((r) => [r.id, r.name]))
-    setReptileMap(rMap)
 
-    const cardData = await Promise.all(
-      reptiles.map(async (r) => {
-        const [lastFeed, activeCourses] = await Promise.all([
-          feedLogRepo.getLatestByReptile(r.id),
-          medicationCourseRepo.getActiveByReptile(r.id),
-        ])
-        const today = new Date()
-        const pendingMeds = activeCourses.filter((c) => {
-          if (!c.endDate) return true
-          return new Date(c.endDate) >= today
-        })
-        return { reptile: r, lastFeed, pendingMeds }
-      }),
-    )
+    const [cardData, weightLogs, shedLogs] = await Promise.all([
+      Promise.all(
+        reptiles.map(async (r) => {
+          const [lastFeed, activeCourses] = await Promise.all([
+            feedLogRepo.getLatestByReptile(r.id),
+            medicationCourseRepo.getActiveByReptile(r.id),
+          ])
+          const today = new Date()
+          const pendingMeds = activeCourses.filter((c) => {
+            if (!c.endDate) return true
+            return new Date(c.endDate) >= today
+          })
+          return { reptile: r, lastFeed, pendingMeds }
+        }),
+      ),
+      weightLogRepo.getRecent(5),
+      shedLogRepo.getRecent(5),
+    ])
+
+    const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
+    const overdue = cardData
+      .filter(({ lastFeed }) => !lastFeed || new Date(lastFeed.fedAt) < tenDaysAgo)
+      .sort((a, b) => {
+        if (!a.lastFeed && !b.lastFeed) {
+          return a.reptile.name.localeCompare(b.reptile.name)
+        }
+        if (!a.lastFeed) return -1
+        if (!b.lastFeed) return 1
+        return new Date(a.lastFeed.fedAt).getTime() - new Date(b.lastFeed.fedAt).getTime()
+      })
+      .map(({ reptile, lastFeed }) => ({
+        reptileId: reptile.id,
+        reptileName: reptile.name,
+        lastFedAt: lastFeed?.fedAt,
+      }))
+
     setCards(cardData)
-
-    const allRules = await todoRuleRepo.getAll()
-    const todayStr = new Date().toISOString().slice(0, 10)
-    const existingInstances = await todoInstanceRepo.getByDate(todayStr)
-    const computed = computeTodayInstances(allRules, existingInstances)
-    const newInstances = computed.filter((c) => !existingInstances.find((e) => e.id === c.id))
-    if (newInstances.length > 0) await todoInstanceRepo.upsertMany(newInstances)
-    setTodos(computed.sort((a, b) => (a.dueAt ?? a.date).localeCompare(b.dueAt ?? b.date)))
+    setOverdueFeeds(overdue)
+    setRecentWeights(weightLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown') })))
+    setRecentSheds(shedLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown') })))
     setLoading(false)
   }, [])
 
   useEffect(() => { void load() }, [load])
 
-  const pendingTodos = todos.filter((t) => t.status === 'pending')
-  const doneTodos = todos.filter((t) => t.status !== 'pending')
-
   const allPendingMeds = cards.flatMap(({ reptile, pendingMeds }) =>
     pendingMeds.map((med) => ({ ...med, reptileName: reptile.name }))
   )
-
-  const handleTodoDone = async (id: string) => {
-    await todoInstanceRepo.updateStatus(id, 'done')
-    void load()
-  }
-
-  const handleTodoRevert = async (id: string) => {
-    await todoInstanceRepo.updateStatus(id, 'pending')
-    void load()
-  }
 
   if (loading) {
     return (
@@ -93,27 +105,90 @@ export function HomePage() {
     >
       <div className="py-4 space-y-6">
 
-        {/* Dashboard Overview Card */}
+        {/* Recent high-frequency info */}
         {cards.length > 0 && (
-          <section className="mx-4 bg-surface-container-lowest p-4 rounded-2xl shadow-sm border border-outline-variant">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h2 className="font-bold text-lg text-on-surface">{t('home.dashboardTitle')}</h2>
-                {t('home.dashboardSubtitle') && <p className="text-xs text-on-surface-variant">{t('home.dashboardSubtitle')}</p>}
+          <section className="px-4 grid gap-4 lg:grid-cols-3">
+            <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <UtensilsCrossed size={18} className="text-primary shrink-0" />
+                <h2 className="font-bold text-lg text-on-surface">{t('home.recentFeedings')}</h2>
               </div>
-              <span className="bg-primary-container text-on-primary-container text-xs font-semibold px-3 py-1 rounded-full">
-                {t('home.todayActive')}
-              </span>
+              <p className="text-xs text-on-surface-variant mb-3">{t('home.recentFeedingsSubtitle')}</p>
+              <div className="space-y-2">
+                {overdueFeeds.length > 0 ? overdueFeeds.map((feed) => (
+                  <button
+                    key={feed.reptileId}
+                    onClick={() => navigate(`/reptile/${feed.reptileId}/feed`)}
+                    className="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-3 text-left transition-transform active:scale-[0.99]"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm text-on-surface max-w-[22ch] whitespace-normal break-words [overflow-wrap:anywhere] [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden">{feed.reptileName}</p>
+                        <p className="text-xs text-on-surface-variant truncate">{t('home.lastFed', { time: feed.lastFedAt ? formatRelativeTime(feed.lastFedAt) : t('common.notRecorded') })}</p>
+                      </div>
+                      <ChevronRight size={18} className="text-on-surface-variant shrink-0 mt-0.5" />
+                    </div>
+                    <p className="text-xs text-on-surface-variant mt-2">{feed.lastFedAt ? formatDate(feed.lastFedAt) : t('home.neverFed')}</p>
+                  </button>
+                )) : (
+                  <p className="py-6 text-center text-sm text-on-surface-variant">{t('common.noRecords')}</p>
+                )}
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-primary rounded-full">
-                <ClipboardList size={22} className="text-on-primary" />
+
+            <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Scale size={18} className="text-secondary shrink-0" />
+                <h2 className="font-bold text-lg text-on-surface">{t('home.weightInfo')}</h2>
               </div>
-              <div>
-                <p className="font-bold text-primary">
-                  {t('home.todayTodosCount', { count: pendingTodos.length })}
-                </p>
-                <p className="text-xs text-on-surface-variant">{t('home.tasksPending', { count: pendingTodos.length })}</p>
+              <p className="text-xs text-on-surface-variant mb-3">{t('home.weightInfoSubtitle')}</p>
+              <div className="space-y-2">
+                {recentWeights.length > 0 ? recentWeights.map((weight) => (
+                  <button
+                    key={weight.id}
+                    onClick={() => navigate(`/reptile/${weight.reptileId}/health`)}
+                    className="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-3 text-left transition-transform active:scale-[0.99]"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm text-on-surface max-w-[22ch] whitespace-normal break-words [overflow-wrap:anywhere] [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden">{weight.reptileName}</p>
+                        <p className="text-xs text-on-surface-variant truncate">{weight.weight} g</p>
+                      </div>
+                      <ChevronRight size={18} className="text-on-surface-variant shrink-0 mt-0.5" />
+                    </div>
+                    <p className="text-xs text-on-surface-variant mt-2">{formatDate(weight.date)}</p>
+                  </button>
+                )) : (
+                  <p className="py-6 text-center text-sm text-on-surface-variant">{t('common.noRecords')}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <RefreshCw size={18} className="text-tertiary shrink-0" />
+                <h2 className="font-bold text-lg text-on-surface">{t('home.shedInfo')}</h2>
+              </div>
+              <p className="text-xs text-on-surface-variant mb-3">{t('home.shedInfoSubtitle')}</p>
+              <div className="space-y-2">
+                {recentSheds.length > 0 ? recentSheds.map((shed) => (
+                  <button
+                    key={shed.id}
+                    onClick={() => navigate(`/reptile/${shed.reptileId}/health`)}
+                    className="w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-3 text-left transition-transform active:scale-[0.99]"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm text-on-surface max-w-[22ch] whitespace-normal break-words [overflow-wrap:anywhere] [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden">{shed.reptileName}</p>
+                        <p className="text-xs text-on-surface-variant truncate">{t(`health.shed.${shed.status}`)}</p>
+                      </div>
+                      <ChevronRight size={18} className="text-on-surface-variant shrink-0 mt-0.5" />
+                    </div>
+                    <p className="text-xs text-on-surface-variant mt-2">{formatDate(shed.date)}</p>
+                  </button>
+                )) : (
+                  <p className="py-6 text-center text-sm text-on-surface-variant">{t('common.noRecords')}</p>
+                )}
               </div>
             </div>
           </section>
@@ -125,7 +200,7 @@ export function HomePage() {
             <div className="flex justify-between items-end mb-3">
               <div>
                 <h2 className="font-bold text-lg text-on-surface">{t('home.myReptiles')}</h2>
-                {t('home.myReptilesSubtitle') && <p className="text-xs text-on-surface-variant">{t('home.myReptilesSubtitle')}</p>}
+                <p className="text-xs text-on-surface-variant">{t('home.myReptilesSubtitle')}</p>
               </div>
               <button
                 onClick={() => navigate('/reptiles')}
@@ -181,76 +256,6 @@ export function HomePage() {
               {t('home.addFirst')}
             </button>
           </div>
-        )}
-
-        {/* Today's Tasks */}
-        {todos.length > 0 && (
-          <section className="mx-4 space-y-2">
-            <div className="mb-3">
-              <h2 className="font-bold text-lg text-on-surface">{t('home.todayTasks')}</h2>
-              {t('home.todayTasksSubtitle') && <p className="text-xs text-on-surface-variant">{t('home.todayTasksSubtitle')}</p>}
-            </div>
-
-            {pendingTodos.map((todo) => (
-              <div
-                key={todo.id}
-                className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant"
-              >
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <button
-                    onClick={() => handleTodoDone(todo.id)}
-                    className="w-6 h-6 rounded border-2 border-primary flex items-center justify-center shrink-0 active:scale-90 transition-transform"
-                    aria-label={t('todoItem.done')}
-                  />
-                  <div className="min-w-0">
-                    <p className="font-semibold text-sm text-on-surface truncate">{todo.label}</p>
-                    {todo.reptileId && reptileMap.get(todo.reptileId) && (
-                      <p className="text-xs text-on-surface-variant">{reptileMap.get(todo.reptileId)}</p>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    if (todo.reptileId) {
-                      navigate(`/reptile/${todo.reptileId}/todos`)
-                    } else {
-                      navigate('/todos')
-                    }
-                  }}
-                  className="p-1 rounded-full hover:bg-surface-container transition-colors"
-                  aria-label={t('common.view')}
-                >
-                  <ChevronRight size={20} className="text-on-surface-variant" />
-                </button>
-              </div>
-            ))}
-
-            {pendingTodos.length === 0 && (
-              <div className="flex items-center justify-center p-4 bg-primary-container/30 rounded-2xl">
-                <p className="text-sm text-primary font-semibold">{t('home.allDone')}</p>
-              </div>
-            )}
-
-            {doneTodos.length > 0 && (
-              <>
-                <div className="px-1 pt-2 pb-1 text-xs text-on-surface-variant font-semibold">
-                  {t('home.handled')}
-                </div>
-                {doneTodos.map((todo) => (
-                  <button
-                    key={todo.id}
-                    onClick={() => handleTodoRevert(todo.id)}
-                    className="w-full flex items-center gap-3 p-4 bg-surface-container rounded-2xl border border-outline-variant opacity-60 hover:opacity-80 active:scale-[0.98] transition-all text-left"
-                  >
-                    <div className="w-6 h-6 rounded bg-primary flex items-center justify-center shrink-0">
-                      <Check size={14} className="text-on-primary" />
-                    </div>
-                    <p className="text-sm text-on-surface line-through truncate">{todo.label}</p>
-                  </button>
-                ))}
-              </>
-            )}
-          </section>
         )}
 
         {/* Medication Reminders */}

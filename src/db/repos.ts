@@ -77,6 +77,9 @@ export const feedLogRepo = {
   getByReptile: (reptileId: string) =>
     db.feed_logs.where('reptileId').equals(reptileId).reverse().sortBy('fedAt'),
 
+  getRecent: (limit = 5) =>
+    db.feed_logs.orderBy('fedAt').reverse().limit(limit).toArray(),
+
   getLatestByReptile: async (reptileId: string): Promise<FeedLog | undefined> => {
     const logs = await db.feed_logs
       .where('[reptileId+fedAt]')
@@ -101,6 +104,9 @@ export const feedLogRepo = {
 export const weightLogRepo = {
   getByReptile: (reptileId: string) =>
     db.weight_logs.where('reptileId').equals(reptileId).sortBy('date'),
+
+  getRecent: (limit = 5) =>
+    db.weight_logs.orderBy('date').reverse().limit(limit).toArray(),
 
   getLatestByReptile: async (reptileId: string): Promise<WeightLog | undefined> => {
     const logs = await db.weight_logs
@@ -170,6 +176,9 @@ export const medicationLogRepo = {
 export const shedLogRepo = {
   getByReptile: (reptileId: string) =>
     db.shed_logs.where('reptileId').equals(reptileId).reverse().sortBy('date'),
+
+  getRecent: (limit = 5) =>
+    db.shed_logs.orderBy('date').reverse().limit(limit).toArray(),
 
   getLatestByReptile: async (reptileId: string): Promise<ShedLog | undefined> => {
     const logs = await db.shed_logs
