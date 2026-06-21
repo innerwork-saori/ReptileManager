@@ -1,4 +1,4 @@
-import { Check, SkipForward } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { TodoInstance } from '../db/schema'
 import { todoInstanceRepo } from '../db/repos'
@@ -13,22 +13,16 @@ interface Props {
 export function TodoItem({ item, reptileName, onUpdate }: Props) {
   const { t } = useTranslation()
   const isDone = item.status === 'done'
-  const isSkipped = item.status === 'skipped'
 
   const markDone = async () => {
     await todoInstanceRepo.updateStatus(item.id, 'done')
     onUpdate()
   }
 
-  const markSkipped = async () => {
-    await todoInstanceRepo.updateStatus(item.id, 'skipped')
-    onUpdate()
-  }
-
   return (
     <div
       className={`flex items-center gap-3 px-4 py-3 border-b border-gray-100 last:border-0 ${
-        isDone || isSkipped ? 'opacity-50' : ''
+        isDone ? 'opacity-50' : ''
       }`}
     >
       <div className="flex-1 min-w-0">
@@ -45,7 +39,7 @@ export function TodoItem({ item, reptileName, onUpdate }: Props) {
         </div>
       </div>
 
-      {!isDone && !isSkipped && (
+      {!isDone && (
         <div className="flex gap-1 shrink-0">
           <button
             onClick={markDone}
@@ -53,20 +47,11 @@ export function TodoItem({ item, reptileName, onUpdate }: Props) {
           >
             <Check size={16} />
           </button>
-          <button
-            onClick={markSkipped}
-            className="p-2 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
-          >
-            <SkipForward size={16} />
-          </button>
         </div>
       )}
 
       {isDone && (
         <span className="text-xs text-green-600 font-medium shrink-0">{t('todoItem.done')}</span>
-      )}
-      {isSkipped && (
-        <span className="text-xs text-gray-400 font-medium shrink-0">{t('todoItem.skipped')}</span>
       )}
     </div>
   )
