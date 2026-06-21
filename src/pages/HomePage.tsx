@@ -205,7 +205,19 @@ export function HomePage() {
                     )}
                   </div>
                 </div>
-                <ChevronRight size={20} className="text-on-surface-variant shrink-0" />
+                <button
+                  onClick={() => {
+                    if (todo.reptileId) {
+                      navigate(`/reptile/${todo.reptileId}/todos`)
+                    } else {
+                      navigate('/todos')
+                    }
+                  }}
+                  className="p-1 rounded-full hover:bg-surface-container transition-colors"
+                  aria-label={t('common.view')}
+                >
+                  <ChevronRight size={20} className="text-on-surface-variant" />
+                </button>
               </div>
             ))}
 
