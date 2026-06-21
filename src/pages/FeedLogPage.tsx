@@ -63,6 +63,9 @@ export function FeedLogPage() {
     setForm({ fedAt: new Date().toISOString().slice(0, 16), foodType: '', amount: '', notes: '' })
     await load()
     setSaving(false)
+    setTimeout(() => {
+      navigate('/reptiles')
+    }, 1000)
   }
 
   return (

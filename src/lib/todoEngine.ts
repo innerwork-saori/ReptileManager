@@ -98,6 +98,14 @@ export function formatRelativeTime(isoString: string | undefined): string {
   return t('common.justNow')
 }
 
+export function formatRelativeTimeInDays(isoString: string | undefined): string {
+  const t = i18n.t.bind(i18n)
+  if (!isoString) return t('common.notRecorded')
+  const diff = Date.now() - new Date(isoString).getTime()
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  return t('common.daysAgo', { count: days })
+}
+
 export function formatDate(iso: string | undefined): string {
   if (!iso) return '—'
   return new Date(iso).toLocaleDateString('zh-TW', {

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
 import { categoryRepo, reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo } from '../db/repos'
 import type { Reptile } from '../db/schema'
-import { calcAge, formatRelativeTime } from '../lib/todoEngine'
+import { calcAge, formatRelativeTime, formatRelativeTimeInDays } from '../lib/todoEngine'
 
 type ReptileCardSummary = {
   lastFedAt?: string
@@ -158,7 +158,7 @@ export function ReptilesPage() {
                         <Layers3 size={13} />
                         <span className="text-[11px] font-medium">
                           {t('reptile.overview.lastShed')}：{cardSummaryMap[r.id]?.lastShedDate
-                            ? formatRelativeTime(`${cardSummaryMap[r.id].lastShedDate}T12:00:00`)
+                            ? formatRelativeTimeInDays(`${cardSummaryMap[r.id].lastShedDate}T12:00:00`)
                             : t('common.notRecorded')}
                         </span>
                       </div>

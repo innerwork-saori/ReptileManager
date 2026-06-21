@@ -61,7 +61,10 @@ export function ClutchFormPage() {
       eggCount: Number(form.eggCount),
       notes: form.notes.trim() || undefined,
     })
-    navigate(`/reptile/${id}`)
+    setSaving(false)
+    setTimeout(() => {
+      navigate('/reptiles')
+    }, 1000)
   }
 
   return (

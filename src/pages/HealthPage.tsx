@@ -77,6 +77,9 @@ export function HealthPage() {
     setWeightForm({ date: new Date().toISOString().slice(0, 10), weight: '', notes: '' })
     await load()
     setSaving(false)
+    setTimeout(() => {
+      navigate('/reptiles')
+    }, 1000)
   }
 
   const saveShed = async (e: React.FormEvent) => {
@@ -87,6 +90,9 @@ export function HealthPage() {
     setShedForm({ date: new Date().toISOString().slice(0, 10), status: 'complete', notes: '' })
     await load()
     setSaving(false)
+    setTimeout(() => {
+      navigate('/reptiles')
+    }, 1000)
   }
 
   const saveVisit = async (e: React.FormEvent) => {
@@ -97,6 +103,9 @@ export function HealthPage() {
     setVisitForm({ date: new Date().toISOString().slice(0, 10), summary: '', notes: '' })
     await load()
     setSaving(false)
+    setTimeout(() => {
+      navigate('/reptiles')
+    }, 1000)
   }
 
   const TABS: { key: HealthTab; label: string }[] = [

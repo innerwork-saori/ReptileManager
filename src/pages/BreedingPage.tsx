@@ -119,9 +119,11 @@ export function BreedingPage() {
       fertileCount: '',
       notes: '',
     })
-    setModalOpen(false)
-    setSaving(false)
     await load()
+    setSaving(false)
+    setTimeout(() => {
+      setModalOpen(false)
+    }, 1000)
   }
 
   const handleDelete = async (id: string) => {

@@ -9,7 +9,7 @@ import {
   shedLogRepo, habitatLogRepo, visitLogRepo,
 } from '../db/repos'
 import type { Reptile, FeedLog, WeightLog, ShedLog, HabitatLog, VisitLog } from '../db/schema'
-import { formatRelativeTime, calcAge } from '../lib/todoEngine'
+import { formatRelativeTime, formatRelativeTimeInDays, calcAge } from '../lib/todoEngine'
 
 export function ReptileDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -263,7 +263,7 @@ export function ReptileDetailPage() {
                 <span className="text-[11px] font-semibold tracking-wide">{t('reptile.overview.lastShed')}</span>
               </div>
               <p className="text-lg font-semibold text-secondary leading-tight">
-                {lastShed ? formatRelativeTime(lastShed.date + 'T12:00:00') : t('common.notRecorded')}
+                {lastShed ? formatRelativeTimeInDays(lastShed.date + 'T12:00:00') : t('common.notRecorded')}
               </p>
               {lastShed && (
                 <p className="text-[10px] text-on-surface-variant mt-0.5">

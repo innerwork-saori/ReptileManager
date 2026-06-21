@@ -70,6 +70,9 @@ export function EnvironmentPage() {
     setHabitatForm({ loggedAt: new Date().toISOString().slice(0, 16), temperature: '', humidity: '', notes: '' })
     await load()
     setSaving(false)
+    setTimeout(() => {
+      navigate('/reptiles')
+    }, 1000)
   }
 
   const saveUvb = async (e: React.FormEvent) => {
@@ -86,6 +89,9 @@ export function EnvironmentPage() {
     setUvbForm({ lampName: '', startedAt: new Date().toISOString().slice(0, 10), expectedReplaceAt: '', notes: '' })
     await load()
     setSaving(false)
+    setTimeout(() => {
+      navigate('/reptiles')
+    }, 1000)
   }
 
   const saveSubstrate = async (e: React.FormEvent) => {
@@ -101,6 +107,9 @@ export function EnvironmentPage() {
     setSubstrateForm({ changedAt: new Date().toISOString().slice(0, 16), substrateType: '', notes: '' })
     await load()
     setSaving(false)
+    setTimeout(() => {
+      navigate('/reptiles')
+    }, 1000)
   }
 
   const TABS: { key: EnvTab; label: string }[] = [

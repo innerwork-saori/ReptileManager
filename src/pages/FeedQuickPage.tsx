@@ -52,11 +52,13 @@ export function FeedQuickPage() {
       amount: form.amount.trim(),
       notes: form.notes.trim() || undefined,
     })
-    setSelectedId('')
     setForm({ fedAt: new Date().toISOString().slice(0, 10), foodType: '', amount: '', notes: '' })
     setSaving(false)
     setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    setTimeout(() => {
+      setSelectedId('')
+      setSaved(false)
+    }, 1000)
   }
 
   return (

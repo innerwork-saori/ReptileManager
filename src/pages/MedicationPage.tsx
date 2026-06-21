@@ -81,6 +81,9 @@ export function MedicationPage() {
     setShowCourseForm(false)
     await load()
     setSaving(false)
+    setTimeout(() => {
+      navigate('/reptiles')
+    }, 1000)
   }
 
   const handleSaveLog = async (e: React.FormEvent) => {
@@ -99,6 +102,9 @@ export function MedicationPage() {
     setShowLogForm(false)
     await load()
     setSaving(false)
+    setTimeout(() => {
+      navigate('/reptiles')
+    }, 1000)
   }
 
   const toggleCourseActive = async (course: MedicationCourse) => {
