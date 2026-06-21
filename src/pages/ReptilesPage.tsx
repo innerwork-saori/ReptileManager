@@ -154,7 +154,8 @@ export function ReptilesPage() {
                 </div>
                 <div className="flex flex-col justify-between py-1 flex-1 min-w-0">
                   <div>
-                    <h2 className="text-base font-semibold text-on-surface truncate">{r.name}</h2>
+                    <h2 className="text-base font-semibold text-on-surface truncate">{r.breed.trim() || `${r.name} / ${r.id}`}</h2>
+                    <h4 className="text-sm font-medium text-on-surface truncate mt-0.5">{r.name}</h4>
                     <p className="text-xs text-outline mt-0.5">
                       {r.species}{r.breed ? ` · ${r.breed}` : ''}
                     </p>
