@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { Edit, Utensils, Pill, Stethoscope, Scale, Calendar, Layers, ChevronRight, Thermometer } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
@@ -21,14 +21,23 @@ export function ReptileDetailPage() {
   const [shedLogs, setShedLogs] = useState<ShedLog[]>([])
   const [habitatLogs, setHabitatLogs] = useState<HabitatLog[]>([])
   const [visitLogs, setVisitLogs] = useState<VisitLog[]>([])
+  const [sortedReptileIds, setSortedReptileIds] = useState<string[]>([])
   const [showQr, setShowQr] = useState(false)
   const [showPhoto, setShowPhoto] = useState(false)
+  const [swipeOffsetX, setSwipeOffsetX] = useState(0)
+  const [swipeTransition, setSwipeTransition] = useState('transform 180ms ease-out, opacity 180ms ease-out')
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null)
+  const swipeNavigateTimerRef = useRef<number | null>(null)
 
   const load = useCallback(async () => {
     if (!id) return
-    const r = await reptileRepo.getById(id)
+    const [r, reptilesByName] = await Promise.all([
+      reptileRepo.getById(id),
+      reptileRepo.getAll(),
+    ])
     if (!r) { navigate('/reptiles'); return }
     setReptile(r)
+    setSortedReptileIds(reptilesByName.map((item) => item.id))
     const [feeds, weights, sheds, habitats, visits] = await Promise.all([
       feedLogRepo.getByReptile(id),
       weightLogRepo.getByReptile(id),
@@ -44,6 +53,94 @@ export function ReptileDetailPage() {
   }, [id, navigate])
 
   useEffect(() => { void load() }, [load])
+
+  useEffect(() => {
+    setSwipeOffsetX(0)
+    setSwipeTransition('none')
+    requestAnimationFrame(() => {
+      setSwipeTransition('transform 180ms ease-out, opacity 180ms ease-out')
+    })
+  }, [id])
+
+  useEffect(() => {
+    return () => {
+      if (swipeNavigateTimerRef.current != null) {
+        window.clearTimeout(swipeNavigateTimerRef.current)
+      }
+    }
+  }, [])
+
+  const navigateAdjacentReptile = useCallback((direction: 'next' | 'prev') => {
+    if (!id || sortedReptileIds.length < 2) return
+    const currentIndex = sortedReptileIds.indexOf(id)
+    if (currentIndex < 0) return
+
+    const offset = direction === 'next' ? 1 : -1
+    const nextIndex = (currentIndex + offset + sortedReptileIds.length) % sortedReptileIds.length
+    const nextId = sortedReptileIds[nextIndex]
+    if (nextId && nextId !== id) {
+      navigate(`/reptile/${nextId}`)
+    }
+  }, [id, navigate, sortedReptileIds])
+
+  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (showQr || showPhoto) return
+    const touch = e.touches[0]
+    if (!touch) return
+    if (swipeNavigateTimerRef.current != null) {
+      window.clearTimeout(swipeNavigateTimerRef.current)
+      swipeNavigateTimerRef.current = null
+    }
+    setSwipeTransition('none')
+    setSwipeOffsetX(0)
+    swipeStartRef.current = { x: touch.clientX, y: touch.clientY }
+  }, [showPhoto, showQr])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (showQr || showPhoto) return
+    const start = swipeStartRef.current
+    const touch = e.touches[0]
+    if (!start || !touch) return
+
+    const deltaX = touch.clientX - start.x
+    const deltaY = touch.clientY - start.y
+    const horizontalDistance = Math.abs(deltaX)
+    const verticalDistance = Math.abs(deltaY)
+
+    if (horizontalDistance < 8) return
+    if (horizontalDistance <= verticalDistance) return
+
+    setSwipeOffsetX(Math.max(-120, Math.min(120, deltaX * 0.35)))
+  }, [showPhoto, showQr])
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (showQr || showPhoto) return
+    const start = swipeStartRef.current
+    swipeStartRef.current = null
+    if (!start) return
+
+    const touch = e.changedTouches[0]
+    if (!touch) return
+    const deltaX = touch.clientX - start.x
+    const deltaY = touch.clientY - start.y
+
+    const horizontalDistance = Math.abs(deltaX)
+    const verticalDistance = Math.abs(deltaY)
+    setSwipeTransition('transform 180ms ease-out, opacity 180ms ease-out')
+
+    if (horizontalDistance < 70 || horizontalDistance <= verticalDistance * 1.2) {
+      setSwipeOffsetX(0)
+      return
+    }
+
+    const direction = deltaX < 0 ? 'next' : 'prev'
+    setSwipeOffsetX(direction === 'next' ? -180 : 180)
+
+    swipeNavigateTimerRef.current = window.setTimeout(() => {
+      navigateAdjacentReptile(direction)
+      swipeNavigateTimerRef.current = null
+    }, 130)
+  }, [navigateAdjacentReptile, showPhoto, showQr])
 
   const sexLabel = (sex: Reptile['sex']) => {
     if (sex === 'male') return t('common.sex.male')
@@ -152,6 +249,18 @@ export function ReptileDetailPage() {
         </Link>
       }
     >
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          touchAction: 'pan-y',
+          transform: `translateX(${swipeOffsetX}px)`,
+          opacity: 1 - Math.min(Math.abs(swipeOffsetX) / 260, 0.28),
+          transition: swipeTransition,
+          willChange: 'transform, opacity',
+        }}
+      >
       {/* Hero Section */}
       <section className="relative w-full aspect-[4/3] overflow-hidden">
         {reptile.photoUrl ? (
@@ -380,6 +489,7 @@ export function ReptileDetailPage() {
           </div>
         </div>
       )}
+      </div>
     </Layout>
   )
 }

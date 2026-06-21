@@ -1,6 +1,6 @@
 # ReptileManager — 功能架構書
 
-> 版本：0.3.0　　最後更新：2026-06-21
+> 版本：0.3.2　　最後更新：2026-06-21
 
 ---
 
@@ -81,6 +81,12 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 - 頂部搜尋欄：模糊搜尋名稱 / 種類 / 品系
 - 分類篩選 Chip：全部 + 目前已有爬蟲資料使用中的分類（依 Category 欄位過濾）
 - 右下角 FAB 快速新增爬蟲
+
+**爬蟲詳細頁 UI**：
+
+- 左右滑動可切換上一隻 / 下一隻爬蟲（依名稱排序）
+- 詳細頁切換採循環模式，滑到最前或最後一隻時會自動接續到另一端
+- 滑動時提供跟手位移、放手回彈與切換滑出動畫，減少誤觸感與跳頁突兀感
 
 ### 3.9 分類管理（Category Management）
 
@@ -266,7 +272,7 @@ Reptile (1)
 | `/` | HomePage | 儀表板：最近餵食 / 體重 / 脫皮摘要、橫向爬寵卡片、藥物提醒 |
 | `/reptiles` | ReptilesPage | 爬蟲清單（種類 / 性別 / 年齡 / 飼育箱） |
 | `/reptile/new` | ReptileFormPage | 新增爬蟲 |
-| `/reptile/:id` | ReptileDetailPage | 爬蟲詳細檔案 + QR Code |
+| `/reptile/:id` | ReptileDetailPage | 爬蟲詳細檔案 + QR Code + 左右滑動切換上一隻/下一隻（名稱排序、循環、跟手/回彈/滑出動效） |
 | `/reptile/:id/edit` | ReptileFormPage | 編輯爬蟲資料 |
 | `/reptile/:id/feed` | FeedLogPage | 餵食記錄管理 |
 | `/reptile/:id/medication` | MedicationPage | 療程 + 投藥記錄管理 |

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Egg, Trash2, ChevronLeft, Pencil } from 'lucide-react'
+import { Egg, Trash2, Pencil } from 'lucide-react'
 import { Layout } from '../components/Layout'
 import { InputField, TextareaField } from '../components/FormField'
 import { clutchLogRepo, reptileRepo } from '../db/repos'
@@ -82,7 +82,6 @@ export function ClutchDetailPage() {
 
   if (!clutch) return null
 
-  const today = new Date().toISOString().slice(0, 10)
   const milestones = [
     { label: t('clutch.candlingDay'), date: addDays(clutch.date, 14) },
     { label: t('clutch.hydrationDay'), date: addDays(clutch.date, 30) },
@@ -93,14 +92,7 @@ export function ClutchDetailPage() {
   return (
     <Layout
       title={t('clutch.detail')}
-      headerLeft={
-        <button
-          onClick={() => navigate('/breeding')}
-          className="p-1 -ml-1 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors"
-        >
-          <ChevronLeft size={24} />
-        </button>
-      }
+      back="/breeding"
     >
       <div className="px-4 pt-4 pb-8 space-y-4">
 

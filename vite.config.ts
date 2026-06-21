@@ -15,7 +15,7 @@ export default defineConfig({
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,svg,png,jpg,woff2}'],
       },
-      includeAssets: ['icon.svg', 'icon-192.png', 'icon-512.png'],
+      includeAssets: ['icon.svg', 'icon-192-v20260621.png', 'icon-512-v20260621.png'],
       manifest: {
         name: 'ReptileManager',
         short_name: 'ReptileManager',
@@ -28,13 +28,13 @@ export default defineConfig({
         scope: '/',
         icons: [
           {
-            src: 'icon-192.png',
+            src: 'icon-192-v20260621.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: 'icon-512.png',
+            src: 'icon-512-v20260621.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable',
