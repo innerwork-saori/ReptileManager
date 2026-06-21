@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Search, CalendarDays, MapPin, SlidersHorizontal, Utensils, Scale, Layers3, RefreshCw } from 'lucide-react'
+import { Plus, Search, SlidersHorizontal, Utensils, Scale, Layers3, RefreshCw, Pencil } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
 import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo } from '../db/repos'
@@ -106,7 +106,7 @@ export function ReptilesPage() {
           </button>
         </div>
       ) : (
-        <div className="max-w-md mx-auto px-4 pt-4">
+        <div className="max-w-3xl mx-auto px-4 pt-4">
           {/* Search & filter chips */}
           <div className="flex flex-col gap-2 mb-6">
             <div className="relative flex items-center">
@@ -139,91 +139,110 @@ export function ReptilesPage() {
 
           {/* Reptile cards */}
           <div className="flex flex-col gap-4">
-            {filtered.map((r) => (
-              <div
-                key={r.id}
-                onClick={() => navigate(`/reptile/${r.id}`)}
-                className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-4 flex gap-4 cursor-pointer active:scale-[0.98] transition-transform"
-              >
-                <div className="w-24 h-24 rounded-lg overflow-hidden shrink-0 border border-outline-variant bg-surface-container">
-                  {r.photoUrl ? (
-                    <img src={r.photoUrl} alt={r.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-4xl select-none">🦎</div>
-                  )}
-                </div>
-                <div className="flex flex-col justify-between py-1 flex-1 min-w-0">
-                  <div>
-                    <h2 className="text-base font-semibold text-on-surface truncate">{r.breed.trim() || `${r.name} / ${r.id}`}</h2>
-                    <h4 className="text-sm font-medium text-on-surface truncate mt-0.5">{r.name}</h4>
-                    <p className="text-xs text-outline mt-0.5">
-                      {r.species}{r.breed ? ` · ${r.breed}` : ''}
-                    </p>
+            {filtered.map((r) => {
+              const summary = cardSummaryMap[r.id]
+              const title = r.breed.trim() || `${r.name} / ${r.id}`
+              const lastFed = formatRelativeTime(summary?.lastFedAt)
+              const lastShed = summary?.lastShedDate
+                ? formatRelativeTimeInDays(`${summary.lastShedDate}T12:00:00`)
+                : t('common.notRecorded')
+              const lastWeight = summary?.lastWeight != null ? `${summary.lastWeight}g` : t('common.notRecorded')
 
-                    <div className="mt-2 space-y-1">
-                      <div className="flex items-center gap-1.5 text-on-surface-variant">
-                        <Utensils size={13} />
-                        <span className="text-[11px] font-medium">
-                          {t('reptile.overview.lastFed')}：{formatRelativeTime(cardSummaryMap[r.id]?.lastFedAt)}
-                        </span>
+              return (
+                <article
+                  key={r.id}
+                  onClick={() => navigate(`/reptile/${r.id}`)}
+                  className="bg-surface-container-lowest border border-outline-variant rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.04)] overflow-hidden p-4 md:p-5 cursor-pointer transition-transform active:scale-[0.99]"
+                >
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-start gap-4 md:gap-5">
+                      <div className="w-28 md:w-36 shrink-0 flex md:flex-col gap-3">
+                        <div className="relative">
+                          <div className="w-28 h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden border border-outline-variant bg-surface-container shadow-sm">
+                            {r.photoUrl ? (
+                              <img src={r.photoUrl} alt={r.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-4xl select-none">🦎</div>
+                            )}
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              navigate(`/reptile/${r.id}/edit`)
+                            }}
+                            aria-label={t('common.edit')}
+                            className="absolute -bottom-2 -right-2 bg-surface-container-lowest text-on-surface border border-outline-variant rounded-full p-1.5 shadow-sm hover:text-primary transition-colors"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate(`/reptile/${r.id}/edit`)
+                          }}
+                          className="hidden md:flex w-full px-3 py-2 rounded-xl border border-outline-variant text-on-surface text-sm font-semibold hover:bg-surface-container transition-colors items-center justify-center gap-1.5"
+                        >
+                          <Pencil size={14} />
+                          {t('common.edit')}
+                        </button>
                       </div>
-                      <div className="flex items-center gap-1.5 text-on-surface-variant">
-                        <Layers3 size={13} />
-                        <span className="text-[11px] font-medium">
-                          {t('reptile.overview.lastShed')}：{cardSummaryMap[r.id]?.lastShedDate
-                            ? formatRelativeTimeInDays(`${cardSummaryMap[r.id].lastShedDate}T12:00:00`)
-                            : t('common.notRecorded')}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-on-surface-variant">
-                        <Scale size={13} />
-                        <span className="text-[11px] font-medium">
-                          {t('reptile.overview.lastWeight')}：{cardSummaryMap[r.id]?.lastWeight != null
-                            ? `${cardSummaryMap[r.id].lastWeight}g`
-                            : t('common.notRecorded')}
-                        </span>
+
+                      <div className="min-w-0 flex-1">
+                        <h2 className="text-2xl md:text-3xl leading-tight font-semibold text-on-surface truncate">{title}</h2>
+                        <h4 className="text-xl font-semibold text-on-surface truncate mt-1">{r.name}</h4>
+                        <p className="text-lg italic text-secondary truncate mt-1">{r.species}</p>
+                        <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-on-surface-variant">
+                          {r.birthDate && <span>{calcAge(r.birthDate)}</span>}
+                          {r.enclosureName && <span>{r.enclosureName}</span>}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
-                    {r.birthDate && (
-                      <div className="flex items-center gap-1 text-on-surface-variant">
-                        <CalendarDays size={14} />
-                        <span className="text-xs font-semibold">{calcAge(r.birthDate)}</span>
+
+                    <div className="grid grid-cols-3 gap-2 bg-surface-container-low border border-outline-variant/40 rounded-2xl p-2.5">
+                      <div className="flex flex-col items-center justify-center gap-1.5 px-1.5 border-r border-outline-variant/35">
+                        <Utensils size={16} className="text-primary" />
+                        <span className="text-[10px] md:text-[11px] font-semibold uppercase tracking-wide text-on-surface-variant">{t('reptile.overview.lastFed')}</span>
+                        <span className="text-xs md:text-sm font-semibold text-on-surface text-center leading-tight">{lastFed}</span>
                       </div>
-                    )}
-                    {r.enclosureName && (
-                      <div className="flex items-center gap-1 text-on-surface-variant">
-                        <MapPin size={14} />
-                        <span className="text-xs font-semibold truncate">{r.enclosureName}</span>
+                      <div className="flex flex-col items-center justify-center gap-1.5 px-1.5 border-r border-outline-variant/35">
+                        <Layers3 size={16} className="text-secondary" />
+                        <span className="text-[10px] md:text-[11px] font-semibold uppercase tracking-wide text-on-surface-variant">{t('reptile.overview.lastShed')}</span>
+                        <span className="text-xs md:text-sm font-semibold text-on-surface text-center leading-tight">{lastShed}</span>
                       </div>
-                    )}
+                      <div className="flex flex-col items-center justify-center gap-1.5 px-1.5">
+                        <Scale size={16} className="text-on-surface-variant" />
+                        <span className="text-[10px] md:text-[11px] font-semibold uppercase tracking-wide text-on-surface-variant">{t('reptile.overview.lastWeight')}</span>
+                        <span className="text-xs md:text-sm font-semibold text-on-surface text-center leading-tight">{lastWeight}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2.5">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          navigate(`/reptile/${r.id}/feed`)
+                        }}
+                        className="flex-1 bg-primary text-on-primary px-3 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity active:scale-95 flex items-center justify-center gap-1.5"
+                      >
+                        <Utensils size={15} />
+                        {t('reptile.feedBtn')}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          navigate(`/reptile/${r.id}/health`)
+                        }}
+                        className="flex-1 bg-surface-container-high text-on-surface px-3 py-2.5 rounded-xl text-sm font-semibold border border-outline-variant hover:bg-surface-container transition-colors active:scale-95 flex items-center justify-center gap-1.5"
+                      >
+                        <RefreshCw size={15} />
+                        {t('reptile.shedBtn')}
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-2 mt-3">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        navigate(`/reptile/${r.id}/feed`)
-                      }}
-                      className="flex-1 px-3 py-2 border-2 border-error text-error rounded-lg text-xs font-semibold hover:bg-error-container transition-colors active:scale-95 flex items-center justify-center gap-1.5"
-                    >
-                      <Utensils size={14} />
-                      {t('reptile.feedBtn')}
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        navigate(`/reptile/${r.id}/health`)
-                      }}
-                      className="flex-1 px-3 py-2 border-2 border-error text-error rounded-lg text-xs font-semibold hover:bg-error-container transition-colors active:scale-95 flex items-center justify-center gap-1.5"
-                    >
-                      <RefreshCw size={14} />
-                      {t('reptile.shedBtn')}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+                </article>
+              )
+            })}
             {filtered.length === 0 && (
               <p className="text-center text-on-surface-variant text-sm py-8">{t('common.noRecords')}</p>
             )}
