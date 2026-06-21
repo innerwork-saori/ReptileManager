@@ -18,6 +18,7 @@ import { BreedingPage } from './pages/BreedingPage'
 import { FeedQuickPage } from './pages/FeedQuickPage'
 import { ActivityLogPage } from './pages/ActivityLogPage'
 import { TodosPage } from './pages/TodosPage'
+import { TasksPage } from './pages/TasksPage'
 import { CategoriesPage } from './pages/CategoriesPage'
 
 function ScrollToTop() {
@@ -83,6 +84,7 @@ export default function App() {
         <Route path="/breeding" element={<BreedingPage />} />
         <Route path="/breeding/:id" element={<ClutchDetailPage />} />
         <Route path="/todos" element={<TodosPage />} />
+        <Route path="/tasks" element={<TasksPage />} />
         <Route path="/categories" element={<CategoriesPage />} />
         <Route path="/backup" element={<BackupPage />} />
       </Routes>

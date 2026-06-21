@@ -166,7 +166,7 @@ export function TodoRulesPage() {
             <InputField label={t('todo.intervalDaysLabel')} type="number" min="1" value={form.intervalDays}
               onChange={(e) => setForm((f) => ({ ...f, intervalDays: e.target.value }))} />
           )}
-          <button type="submit" disabled={saving}
+          <button type="submit" disabled={saving || (form.scheduleType === 'fixed_weekly' && form.weekDays.length === 0)}
             className="w-full bg-green-600 text-white py-2 rounded-lg text-sm font-medium disabled:opacity-60">
             {saving ? t('common.saving') : t('todo.saveBtn')}
           </button>

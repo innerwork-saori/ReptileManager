@@ -214,7 +214,7 @@ export function TodosPage() {
           )}
           <button
             type="submit"
-            disabled={saving || !form.reptileId}
+            disabled={saving || (form.scheduleType === 'fixed_weekly' && form.weekDays.length === 0)}
             className="w-full bg-primary text-on-primary py-2 rounded-lg text-sm font-semibold disabled:opacity-60"
           >
             {saving ? t('common.saving') : t('todo.saveBtn')}

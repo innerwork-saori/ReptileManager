@@ -1,11 +1,15 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { UtensilsCrossed, Scale, RefreshCw, ChevronRight, Plus, Bell } from 'lucide-react'
+import { UtensilsCrossed, Scale, RefreshCw, ChevronRight, Plus, Bell, CheckCircle2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
-import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo, medicationCourseRepo } from '../db/repos'
+import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo, medicationCourseRepo, todoRuleRepo, todoInstanceRepo } from '../db/repos'
 import type { Reptile, FeedLog, WeightLog, ShedLog, MedicationCourse } from '../db/schema'
-import { formatRelativeTime, formatDate } from '../lib/todoEngine'
+import { formatRelativeTime, formatDate, computeTodayInstances } from '../lib/todoEngine'
+
+function todayStr(): string {
+  return new Date().toISOString().slice(0, 10)
+}
 
 type RecentWeight = WeightLog & { reptileName: string; reptileBreed: string; reptilePhotoUrl?: string }
 type RecentShed = ShedLog & { reptileName: string; reptileBreed: string; reptilePhotoUrl?: string }
@@ -30,6 +34,7 @@ export function HomePage() {
   const [overdueFeeds, setOverdueFeeds] = useState<OverdueFeed[]>([])
   const [recentWeights, setRecentWeights] = useState<RecentWeight[]>([])
   const [recentSheds, setRecentSheds] = useState<RecentShed[]>([])
+  const [pendingTodoCount, setPendingTodoCount] = useState(0)
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
@@ -80,6 +85,16 @@ export function HomePage() {
     setOverdueFeeds(overdue)
     setRecentWeights(weightLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown'), reptileBreed: rBreedMap.get(log.reptileId) ?? '', reptilePhotoUrl: rPhotoMap.get(log.reptileId) })))
     setRecentSheds(shedLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown'), reptileBreed: rBreedMap.get(log.reptileId) ?? '', reptilePhotoUrl: rPhotoMap.get(log.reptileId) })))
+
+    // Load today's pending todos
+    const [todoRules, existingInstances] = await Promise.all([
+      todoRuleRepo.getAll(),
+      todoInstanceRepo.getByDate(todayStr()),
+    ])
+    const todayInstances = computeTodayInstances(todoRules, existingInstances)
+    await todoInstanceRepo.upsertMany(todayInstances)
+    setPendingTodoCount(todayInstances.filter((i) => i.status === 'pending').length)
+
     setLoading(false)
   }, [])
 
@@ -110,6 +125,22 @@ export function HomePage() {
       }
     >
       <div className="py-4 space-y-6">
+
+        {/* Todo banner */}
+        {pendingTodoCount > 0 && (
+          <div className="mx-4 flex items-center justify-between bg-primary-container/60 border border-primary-container rounded-xl px-4 py-3">
+            <div className="flex items-center gap-2 text-sm text-on-surface font-medium">
+              <CheckCircle2 size={16} className="text-primary shrink-0" />
+              {t('home.todoBanner', { count: pendingTodoCount })}
+            </div>
+            <button
+              onClick={() => navigate('/tasks')}
+              className="text-primary text-sm font-bold shrink-0 ml-3"
+            >
+              {t('home.todoView')}
+            </button>
+          </div>
+        )}
 
         {/* Recent high-frequency info */}
         {cards.length > 0 && (

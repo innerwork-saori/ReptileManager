@@ -233,7 +233,7 @@ export function ReptilesPage() {
                           e.stopPropagation()
                           navigate(`/reptile/${r.id}/health`)
                         }}
-                        className="flex-1 bg-surface-container-high text-on-surface px-3 py-2.5 rounded-xl text-sm font-semibold border border-outline-variant hover:bg-surface-container transition-colors active:scale-95 flex items-center justify-center gap-1.5"
+                        className="flex-1 bg-primary text-on-primary px-3 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity active:scale-95 flex items-center justify-center gap-1.5"
                       >
                         <RefreshCw size={15} />
                         {t('reptile.shedBtn')}
