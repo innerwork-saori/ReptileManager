@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Egg, Plus, Trash2, X, ChevronRight } from 'lucide-react'
 import { Layout } from '../components/Layout'
@@ -23,6 +24,7 @@ function daysFromNow(dateStr: string): number {
 
 export function BreedingPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [clutches, setClutches] = useState<ClutchLog[]>([])
   const [reptiles, setReptiles] = useState<Reptile[]>([])
   const [modalOpen, setModalOpen] = useState(false)
@@ -57,8 +59,9 @@ export function BreedingPage() {
     })),
   ]
 
-  const totalEggs = clutches.reduce((s, c) => s + c.eggCount, 0)
-  const totalHatched = clutches.reduce((s, c) => s + (c.hatchedCount ?? 0), 0)
+  const completedClutches = clutches.filter((c) => c.hatchedCount != null && c.hatchedCount > 0)
+  const totalEggs = completedClutches.reduce((s, c) => s + c.eggCount, 0)
+  const totalHatched = completedClutches.reduce((s, c) => s + (c.hatchedCount ?? 0), 0)
   const hatchRate = totalEggs > 0 ? Math.round((totalHatched / totalEggs) * 100) : 0
 
   const today = new Date().toISOString().slice(0, 10)
@@ -255,7 +258,10 @@ export function BreedingPage() {
                         </button>
                       </div>
 
-                      <div className="flex items-center gap-3 pt-3 border-t border-outline-variant/30">
+                      <div
+                        className="flex items-center gap-3 pt-3 border-t border-outline-variant/30 cursor-pointer active:bg-surface-container/50 transition-colors rounded-b-lg -mx-1 px-1"
+                        onClick={() => navigate(`/breeding/${c.id}`)}
+                      >
                         <div className="flex -space-x-2">
                           {father?.photoUrl && (
                             <img

@@ -13,6 +13,7 @@ import { HealthPage } from './pages/HealthPage'
 import { TodoRulesPage } from './pages/TodoRulesPage'
 import { BackupPage } from './pages/BackupPage'
 import { ClutchFormPage } from './pages/ClutchFormPage'
+import { ClutchDetailPage } from './pages/ClutchDetailPage'
 import { BreedingPage } from './pages/BreedingPage'
 import { FeedQuickPage } from './pages/FeedQuickPage'
 import { ActivityLogPage } from './pages/ActivityLogPage'
@@ -80,6 +81,7 @@ export default function App() {
         <Route path="/reptile/:id/clutch" element={<ClutchFormPage />} />
         <Route path="/feed" element={<FeedQuickPage />} />
         <Route path="/breeding" element={<BreedingPage />} />
+        <Route path="/breeding/:id" element={<ClutchDetailPage />} />
         <Route path="/todos" element={<TodosPage />} />
         <Route path="/categories" element={<CategoriesPage />} />
         <Route path="/backup" element={<BackupPage />} />

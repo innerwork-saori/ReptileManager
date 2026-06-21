@@ -341,6 +341,11 @@ const zhTW = {
     hydrationDay: '補充水分（Day 30）',
     expectedHatchDay: '預計孵化',
     noInProgress: '目前無進行中的孵化',
+    detail: '繁殖詳情',
+    deleteConfirm: '確定要刪除此繁殖紀錄嗎？此操作無法復原。',
+    updateOutcome: '更新孵化結果',
+    notes: '備註',
+    notesLabel: '備註',
   },
   activityLog: {
     title: '紀錄歷程',

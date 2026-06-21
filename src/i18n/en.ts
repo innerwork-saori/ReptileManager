@@ -343,6 +343,11 @@ const en: Translation = {
     hydrationDay: 'Hydration (Day 30)',
     expectedHatchDay: 'Expected Hatch',
     noInProgress: 'No active incubations',
+    detail: 'Clutch Detail',
+    deleteConfirm: 'Delete this breeding record? This cannot be undone.',
+    updateOutcome: 'Update Hatch Outcome',
+    notes: 'Notes',
+    notesLabel: 'Notes',
   },
   activityLog: {
     title: 'Activity Log',
