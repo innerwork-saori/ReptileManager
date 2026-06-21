@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRegisterSW } from 'virtual:pwa-register/react'
@@ -18,6 +18,14 @@ import { FeedQuickPage } from './pages/FeedQuickPage'
 import { ActivityLogPage } from './pages/ActivityLogPage'
 import { TodosPage } from './pages/TodosPage'
 import { CategoriesPage } from './pages/CategoriesPage'
+
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
+}
 
 function UpdatePrompt() {
   const { t } = useTranslation()
@@ -55,6 +63,7 @@ export default function App() {
 
   return (
     <HashRouter>
+      <ScrollToTop />
       <UpdatePrompt />
       <Routes>
         <Route path="/" element={<HomePage />} />
