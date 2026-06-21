@@ -56,3 +56,19 @@ npm run preview  # 預覽 dist
 
 Dexie ORM，共 14 張資料表（含 `settings`），定義於 `src/db/`。  
 無全域狀態管理，mutation 後直接呼叫 `load()` 重整畫面。
+
+---
+
+## 設計系統 — Modern Nature
+
+色系基於 Modern Nature 設計系統：
+
+| 角色 | 顏色 | 用途 |
+|------|------|------|
+| Primary | #2D5A27 | 主要操作按鈕、重點強調 |
+| Secondary | #A0522D | 次要操作、輔助元素 |
+| Tertiary | #E6CCB2 | 背景、淡化狀態 |
+| Neutral | #757872 | 文字、邊框、禁用狀態 |
+
+組件狀態：Primary、Secondary、Inverted、Outlined  
+字型等級：Headline、Body、Label
