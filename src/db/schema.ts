@@ -13,7 +13,6 @@ export interface Reptile {
   enclosureName?: string
   photoUrl?: string
   notes?: string
-  allergyInfo?: string
   chronicInfo?: string
   qrTargetUrl: string
   fatherId?: string
@@ -240,6 +239,27 @@ export class ReptileManagerDb extends Dexie {
       visit_logs: 'id, reptileId, date, [reptileId+date]',
       clutch_logs: 'id, fatherReptileId, motherReptileId, date',
       settings: 'key',
+    })
+
+    this.version(4).stores({
+      reptiles: 'id, name, species, createdAt',
+      weight_logs: 'id, reptileId, date, [reptileId+date]',
+      feed_logs: 'id, reptileId, fedAt, [reptileId+fedAt]',
+      medication_courses: 'id, reptileId, active, [reptileId+active]',
+      medication_logs: 'id, reptileId, takenAt, [reptileId+takenAt]',
+      shed_logs: 'id, reptileId, date, [reptileId+date]',
+      habitat_logs: 'id, reptileId, loggedAt, [reptileId+loggedAt]',
+      uvb_logs: 'id, reptileId, startedAt',
+      substrate_logs: 'id, reptileId, changedAt, [reptileId+changedAt]',
+      todo_rules: 'id, reptileId, type, enabled',
+      todo_instances: 'id, reptileId, date, status, [reptileId+date], [date+status]',
+      visit_logs: 'id, reptileId, date, [reptileId+date]',
+      clutch_logs: 'id, fatherReptileId, motherReptileId, date',
+      settings: 'key',
+    }).upgrade(async (tx) => {
+      await tx.table('reptiles').toCollection().modify((reptile) => {
+        delete (reptile as { allergyInfo?: unknown }).allergyInfo
+      })
     })
   }
 }

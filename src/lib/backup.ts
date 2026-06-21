@@ -1,5 +1,11 @@
 import { db } from '../db/schema'
 
+function stripLegacyReptileFields(row: unknown): unknown {
+  if (!row || typeof row !== 'object') return row
+  const { allergyInfo: _allergyInfo, ...rest } = row as { allergyInfo?: unknown }
+  return rest
+}
+
 export async function exportAllData(): Promise<void> {
   const [
     reptiles,
@@ -33,11 +39,13 @@ export async function exportAllData(): Promise<void> {
     db.settings.toArray(),
   ])
 
+  const sanitizedReptiles = reptiles.map(stripLegacyReptileFields)
+
   const backup = {
     version: 1,
     exportedAt: new Date().toISOString(),
     data: {
-      reptiles,
+      reptiles: sanitizedReptiles,
       weight_logs,
       feed_logs,
       medication_courses,
@@ -115,8 +123,11 @@ export async function importAllData(file: File): Promise<void> {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (db as any)[t].clear()
       const rows = data[t]
+      const cleanRows = t === 'reptiles' && Array.isArray(rows)
+        ? rows.map(stripLegacyReptileFields)
+        : rows
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (rows?.length) await (db as any)[t].bulkAdd(rows)
+      if (cleanRows?.length) await (db as any)[t].bulkAdd(cleanRows)
     }
   })
 }

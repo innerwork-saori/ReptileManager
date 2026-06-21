@@ -45,7 +45,6 @@ export function ReptileFormPage() {
     enclosureName: '',
     photoUrl: '',
     notes: '',
-    allergyInfo: '',
     chronicInfo: '',
     fatherId: '',
     motherId: '',
@@ -77,7 +76,6 @@ export function ReptileFormPage() {
         enclosureName: r.enclosureName ?? '',
         photoUrl: r.photoUrl ?? '',
         notes: r.notes ?? '',
-        allergyInfo: r.allergyInfo ?? '',
         chronicInfo: r.chronicInfo ?? '',
         fatherId: r.fatherId ?? '',
         motherId: r.motherId ?? '',
@@ -126,7 +124,6 @@ export function ReptileFormPage() {
       enclosureName: form.enclosureName.trim() || undefined,
       photoUrl: form.photoUrl.trim() || undefined,
       notes: form.notes.trim() || undefined,
-      allergyInfo: form.allergyInfo.trim() || undefined,
       chronicInfo: form.chronicInfo.trim() || undefined,
       fatherId: form.fatherId || undefined,
       motherId: form.motherId || undefined,
@@ -200,33 +197,35 @@ export function ReptileFormPage() {
           </div>
           {errors.birthYear && <p className="text-xs text-red-500 mt-0.5">{errors.birthYear}</p>}
         </div>
-        <InputField label={t('reptile.form.enclosure')} value={form.enclosureName} onChange={set('enclosureName')} placeholder={t('reptile.form.enclosurePlaceholder')} />
+        <section className="space-y-3 rounded-xl border border-outline-variant bg-surface-container-lowest p-4">
+          <h2 className="text-sm font-semibold text-primary">{t('reptile.form.pairing')}</h2>
+          <SelectField
+            label={t('reptile.form.father')}
+            value={form.fatherId}
+            onChange={set('fatherId')}
+            options={[
+              { value: '', label: t('reptile.form.parentUnset') },
+              ...allReptiles
+                .filter((r) => r.id !== id)
+                .map((r) => ({ value: r.id, label: `${r.name}${r.sex ? ` (${SEX_LABEL[r.sex] ?? r.sex})` : ''}` })),
+            ]}
+          />
+          <SelectField
+            label={t('reptile.form.mother')}
+            value={form.motherId}
+            onChange={set('motherId')}
+            options={[
+              { value: '', label: t('reptile.form.parentUnset') },
+              ...allReptiles
+                .filter((r) => r.id !== id)
+                .map((r) => ({ value: r.id, label: `${r.name}${r.sex ? ` (${SEX_LABEL[r.sex] ?? r.sex})` : ''}` })),
+            ]}
+          />
+        </section>
         <InputField label={t('reptile.form.photoUrl')} type="url" value={form.photoUrl} onChange={set('photoUrl')} placeholder={t('reptile.form.photoUrlPlaceholder')} />
-        <TextareaField label={t('reptile.form.allergyInfo')} value={form.allergyInfo} onChange={set('allergyInfo')} />
         <TextareaField label={t('reptile.form.chronicInfo')} value={form.chronicInfo} onChange={set('chronicInfo')} />
         <TextareaField label={t('common.notes')} value={form.notes} onChange={set('notes')} />
-        <SelectField
-          label={t('reptile.form.father')}
-          value={form.fatherId}
-          onChange={set('fatherId')}
-          options={[
-            { value: '', label: t('reptile.form.parentUnset') },
-            ...allReptiles
-              .filter((r) => r.id !== id)
-              .map((r) => ({ value: r.id, label: `${r.name}${r.sex ? ` (${SEX_LABEL[r.sex] ?? r.sex})` : ''}` })),
-          ]}
-        />
-        <SelectField
-          label={t('reptile.form.mother')}
-          value={form.motherId}
-          onChange={set('motherId')}
-          options={[
-            { value: '', label: t('reptile.form.parentUnset') },
-            ...allReptiles
-              .filter((r) => r.id !== id)
-              .map((r) => ({ value: r.id, label: `${r.name}${r.sex ? ` (${SEX_LABEL[r.sex] ?? r.sex})` : ''}` })),
-          ]}
-        />
+        <InputField label={t('reptile.form.enclosure')} value={form.enclosureName} onChange={set('enclosureName')} placeholder={t('reptile.form.enclosurePlaceholder')} />
 
         <button type="submit" disabled={saving}
           className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold disabled:opacity-60">
