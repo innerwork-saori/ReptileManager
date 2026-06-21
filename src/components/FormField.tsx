@@ -10,7 +10,7 @@ type InputProps = BaseProps & InputHTMLAttributes<HTMLInputElement>
 type SelectProps = BaseProps & SelectHTMLAttributes<HTMLSelectElement> & { options: { value: string; label: string }[] }
 type TextareaProps = BaseProps & TextareaHTMLAttributes<HTMLTextAreaElement>
 
-const fieldCls = 'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent'
+const fieldCls = 'w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none'
 
 export function InputField({ label, error, required, ...props }: InputProps) {
   return (
