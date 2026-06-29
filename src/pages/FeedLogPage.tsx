@@ -64,7 +64,11 @@ export function FeedLogPage() {
     await load()
     setSaving(false)
     setTimeout(() => {
-      navigate('/reptiles')
+      navigate('/reptiles', {
+        state: {
+          restoreReptileId: id,
+        },
+      })
     }, 1000)
   }
 

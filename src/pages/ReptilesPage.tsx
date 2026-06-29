@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState, useMemo, useRef } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Plus, Search, SlidersHorizontal, Utensils, Scale, Layers3, RefreshCw, Pencil } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
@@ -11,6 +11,10 @@ type ReptileCardSummary = {
   lastFedAt?: string
   lastShedDate?: string
   lastWeight?: number
+}
+
+type ReptilesPageLocationState = {
+  restoreReptileId?: string
 }
 
 function fuzzyMatch(reptile: Reptile, query: string): boolean {
@@ -41,6 +45,7 @@ function getUsedCategories(reptiles: Reptile[]): string[] {
 }
 
 export function ReptilesPage() {
+  const location = useLocation()
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [reptiles, setReptiles] = useState<Reptile[]>([])
@@ -49,6 +54,8 @@ export function ReptilesPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
+  const [highlightedReptileId, setHighlightedReptileId] = useState<string | null>(null)
+  const restoredIdRef = useRef<string | null>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -88,6 +95,30 @@ export function ReptilesPage() {
     { key: 'all', label: t('reptile.filterAll') },
     ...categories.map((name) => ({ key: name, label: name })),
   ]
+
+  useEffect(() => {
+    if (loading) return
+
+    const restoreReptileId = (location.state as ReptilesPageLocationState | null)?.restoreReptileId
+    if (!restoreReptileId || restoredIdRef.current === restoreReptileId) return
+
+    const targetCard = document.getElementById(`reptile-card-${restoreReptileId}`)
+
+    if (targetCard) {
+      setHighlightedReptileId(restoreReptileId)
+      requestAnimationFrame(() => {
+        targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      })
+
+      window.setTimeout(() => {
+        setHighlightedReptileId((current) => (current === restoreReptileId ? null : current))
+      }, 1000)
+    } else {
+      window.scrollTo(0, 0)
+    }
+
+    restoredIdRef.current = restoreReptileId
+  }, [filtered, loading, location.state])
 
   return (
     <Layout title={t('reptile.list')}>
@@ -151,8 +182,11 @@ export function ReptilesPage() {
               return (
                 <article
                   key={r.id}
+                  id={`reptile-card-${r.id}`}
                   onClick={() => navigate(`/reptile/${r.id}`)}
-                  className="bg-surface-container-lowest border border-outline-variant rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.04)] overflow-hidden p-4 md:p-5 cursor-pointer transition-transform active:scale-[0.99]"
+                  className={`bg-surface-container-lowest border border-outline-variant rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.04)] overflow-hidden p-4 md:p-5 cursor-pointer transition-all duration-500 active:scale-[0.99] ${
+                    highlightedReptileId === r.id ? 'ring-2 ring-primary shadow-[0_10px_24px_rgba(59,105,52,0.28)]' : ''
+                  }`}
                 >
                   <div className="flex flex-col gap-4">
                     <div className="flex items-start gap-4 md:gap-5">
@@ -221,7 +255,12 @@ export function ReptilesPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          navigate(`/reptile/${r.id}/feed`)
+                          navigate(`/reptile/${r.id}/feed`, {
+                            state: {
+                              sourceReptileId: r.id,
+                              returnTo: '/reptiles',
+                            },
+                          })
                         }}
                         className="flex-1 bg-primary text-on-primary px-3 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity active:scale-95 flex items-center justify-center gap-1.5"
                       >
@@ -231,7 +270,12 @@ export function ReptilesPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          navigate(`/reptile/${r.id}/health`)
+                          navigate(`/reptile/${r.id}/health`, {
+                            state: {
+                              sourceReptileId: r.id,
+                              returnTo: '/reptiles',
+                            },
+                          })
                         }}
                         className="flex-1 bg-primary text-on-primary px-3 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity active:scale-95 flex items-center justify-center gap-1.5"
                       >

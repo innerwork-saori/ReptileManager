@@ -22,10 +22,14 @@ import { TasksPage } from './pages/TasksPage'
 import { CategoriesPage } from './pages/CategoriesPage'
 
 function ScrollToTop() {
-  const { pathname } = useLocation()
+  const { pathname, state } = useLocation()
+
   useEffect(() => {
+    const restoreReptileId = (state as { restoreReptileId?: string } | null)?.restoreReptileId
+    if (pathname === '/reptiles' && restoreReptileId) return
     window.scrollTo(0, 0)
   }, [pathname])
+
   return null
 }
 

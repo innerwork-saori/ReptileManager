@@ -78,7 +78,11 @@ export function HealthPage() {
     await load()
     setSaving(false)
     setTimeout(() => {
-      navigate('/reptiles')
+      navigate('/reptiles', {
+        state: {
+          restoreReptileId: id,
+        },
+      })
     }, 1000)
   }
 
@@ -91,7 +95,11 @@ export function HealthPage() {
     await load()
     setSaving(false)
     setTimeout(() => {
-      navigate('/reptiles')
+      navigate('/reptiles', {
+        state: {
+          restoreReptileId: id,
+        },
+      })
     }, 1000)
   }
 
@@ -104,7 +112,11 @@ export function HealthPage() {
     await load()
     setSaving(false)
     setTimeout(() => {
-      navigate('/reptiles')
+      navigate('/reptiles', {
+        state: {
+          restoreReptileId: id,
+        },
+      })
     }, 1000)
   }
 
