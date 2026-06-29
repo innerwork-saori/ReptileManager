@@ -272,6 +272,7 @@ export function ReptilesPage() {
                           e.stopPropagation()
                           navigate(`/reptile/${r.id}/health`, {
                             state: {
+                              tab: 'shed',
                               sourceReptileId: r.id,
                               returnTo: '/reptiles',
                             },

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
@@ -11,13 +11,21 @@ import { WeightChart } from '../components/WeightChart'
 import { formatDate } from '../lib/todoEngine'
 
 type HealthTab = 'weight' | 'shed' | 'visit'
+type HealthPageLocationState = {
+  tab?: HealthTab
+}
 
 export function HealthPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const { t } = useTranslation()
   const [reptileName, setReptileName] = useState('')
-  const [tab, setTab] = useState<HealthTab>('weight')
+  const [tab, setTab] = useState<HealthTab>(() => {
+    const candidate = (location.state as HealthPageLocationState | null)?.tab
+    if (candidate === 'weight' || candidate === 'shed' || candidate === 'visit') return candidate
+    return 'weight'
+  })
   const [weightLogs, setWeightLogs] = useState<WeightLog[]>([])
   const [shedLogs, setShedLogs] = useState<ShedLog[]>([])
   const [visitLogs, setVisitLogs] = useState<VisitLog[]>([])

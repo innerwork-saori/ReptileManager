@@ -239,7 +239,7 @@ export function HomePage() {
                 {recentSheds.length > 0 ? recentSheds.slice(0, 3).map((shed) => (
                   <button
                     key={shed.id}
-                    onClick={() => navigate(`/reptile/${shed.reptileId}/health`)}
+                    onClick={() => navigate(`/reptile/${shed.reptileId}/health`, { state: { tab: 'shed' } })}
                     className="w-full rounded-xl bg-white px-3 py-2.5 text-left transition-transform active:scale-[0.99] shadow-sm"
                   >
                     <div className="flex items-center gap-3">
