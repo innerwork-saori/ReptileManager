@@ -1,37 +1,116 @@
 @import "tailwindcss";
 
-/* Colour palette derived from the reptile-scale banner image.
-   Overrides Tailwind's built-in green so every green-* class
-   across the app automatically uses the new navy tones. */
+/* Modern Nature design tokens.
+   Keep Tailwind utility compatibility by mapping commonly used
+   scales (green/blue/red/amber/gray) into the same palette system. */
 @theme {
-  --color-green-50:  #f0f6f9;
-  --color-green-100: #dce9f0;
-  --color-green-200: #a8c4d4;
-  --color-green-300: #6a8fb8;
-  --color-green-400: #3a5a90;
-  --color-green-500: #253f74;
-  --color-green-600: #1f3561;
-  --color-green-700: #1b2c4e;
-  --color-green-800: #152240;
-  --color-green-900: #0f1a30;
-  --color-green-950: #090f1e;
-
-  /* Material Design 3 green tokens for dashboard design */
-  --color-primary: #3b6934;
+  /* Core palette (CLAUDE.md) */
+  --color-primary: #2d5a27;
   --color-on-primary: #ffffff;
-  --color-primary-container: #bcf0ae;
-  --color-on-primary-container: #002201;
-  --color-surface: #f9faf2;
-  --color-surface-container: #edefe7;
-  --color-surface-container-low: #f3f4ed;
+  --color-primary-container: #d8e6d5;
+  --color-on-primary-container: #1f3d1b;
+
+  --color-secondary: #a0522d;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #ecd6cb;
+  --color-on-secondary-container: #6f381f;
+
+  --color-tertiary: #e6ccb2;
+  --color-on-tertiary: #5b4838;
+  --color-tertiary-container: #f2e2d2;
+  --color-on-tertiary-container: #6b5643;
+
+  --color-neutral: #757872;
+  --color-outline: #757872;
+  --color-outline-variant: #c7cac4;
+
+  --color-surface: #f7f4ef;
+  --color-surface-dim: #ece8e2;
+  --color-surface-container: #efebe5;
+  --color-surface-container-high: #e3ded6;
+  --color-surface-container-low: #f2eee8;
   --color-surface-container-lowest: #ffffff;
-  --color-on-surface: #191c18;
-  --color-on-surface-variant: #42493e;
-  --color-outline-variant: #c2c9bb;
-  --color-secondary: #944925;
-  --color-secondary-container: #ffdbc8;
-  --color-on-secondary-container: #360f00;
-  --color-surface-container-high: #e7e9e1;
+  --color-inverse-surface: #3f423d;
+  --color-on-surface: #2f312e;
+  --color-on-surface-variant: #666962;
+
+  /* Semantic colors */
+  --color-error: #8a3d35;
+  --color-error-container: #f4ddd9;
+  --color-on-error-container: #5a2520;
+
+  --color-success: #2d5a27;
+  --color-success-container: #d8e6d5;
+  --color-on-success-container: #1f3d1b;
+
+  --color-warning: #a0522d;
+  --color-warning-container: #f0e0d7;
+  --color-on-warning-container: #6f381f;
+
+  /* Neutral grayscale compatibility */
+  --color-gray-50: #f6f6f5;
+  --color-gray-100: #efefed;
+  --color-gray-200: #dfdfdc;
+  --color-gray-300: #c7cac4;
+  --color-gray-400: #a2a49f;
+  --color-gray-500: #757872;
+  --color-gray-600: #666962;
+  --color-gray-700: #52554f;
+  --color-gray-800: #3f423d;
+  --color-gray-900: #2f312e;
+  --color-gray-950: #1f211f;
+
+  /* Primary compatibility for existing green-* utilities */
+  --color-green-50: #eef4ed;
+  --color-green-100: #d8e6d5;
+  --color-green-200: #bfd3ba;
+  --color-green-300: #9ab595;
+  --color-green-400: #6f916a;
+  --color-green-500: #4d7748;
+  --color-green-600: #3a6535;
+  --color-green-700: #2d5a27;
+  --color-green-800: #23481f;
+  --color-green-900: #1a3617;
+  --color-green-950: #11250f;
+
+  /* Secondary compatibility for existing blue-* utilities */
+  --color-blue-50: #f5ede8;
+  --color-blue-100: #ecd6cb;
+  --color-blue-200: #ddbba9;
+  --color-blue-300: #c9967e;
+  --color-blue-400: #b57757;
+  --color-blue-500: #a9623a;
+  --color-blue-600: #a0522d;
+  --color-blue-700: #8a4524;
+  --color-blue-800: #73391f;
+  --color-blue-900: #5d2d18;
+  --color-blue-950: #421f11;
+
+  /* Semantic compatibility for existing red-* utilities */
+  --color-red-50: #fbf0ee;
+  --color-red-100: #f4ddd9;
+  --color-red-200: #e8bdb7;
+  --color-red-300: #d59a90;
+  --color-red-400: #be7468;
+  --color-red-500: #a7594d;
+  --color-red-600: #8a3d35;
+  --color-red-700: #72322c;
+  --color-red-800: #5d2924;
+  --color-red-900: #4a211e;
+  --color-red-950: #321613;
+
+  /* Warning compatibility for existing amber-* utilities */
+  --color-amber-50: #f9f2ed;
+  --color-amber-100: #f0e0d7;
+  --color-amber-200: #e3c4b1;
+  --color-amber-300: #d2a182;
+  --color-amber-400: #be8158;
+  --color-amber-500: #ad693d;
+  --color-amber-600: #a0522d;
+  --color-amber-700: #884426;
+  --color-amber-800: #6f381f;
+  --color-amber-900: #5a2d19;
+  --color-amber-950: #3f1f11;
 }
 
 @layer base {
@@ -40,7 +119,7 @@
   }
 
   html {
-    background-color: #f9faf2;
+    background-color: var(--color-surface);
   }
 
   body {

@@ -184,8 +184,8 @@ export function ReptilesPage() {
                   key={r.id}
                   id={`reptile-card-${r.id}`}
                   onClick={() => navigate(`/reptile/${r.id}`)}
-                  className={`bg-surface-container-lowest border border-outline-variant rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.04)] overflow-hidden p-4 md:p-5 cursor-pointer transition-all duration-500 active:scale-[0.99] ${
-                    highlightedReptileId === r.id ? 'ring-2 ring-primary shadow-[0_10px_24px_rgba(59,105,52,0.28)]' : ''
+                  className={`bg-surface-container-lowest border border-outline-variant rounded-3xl shadow-sm overflow-hidden p-4 md:p-5 cursor-pointer transition-all duration-500 active:scale-[0.99] ${
+                    highlightedReptileId === r.id ? 'ring-2 ring-primary shadow-lg' : ''
                   }`}
                 >
                   <div className="flex flex-col gap-4">

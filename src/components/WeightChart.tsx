@@ -16,6 +16,8 @@ interface Props {
 
 export function WeightChart({ logs }: Props) {
   const { t } = useTranslation()
+  const chartGrid = 'var(--color-outline-variant)'
+  const chartLine = 'var(--color-primary)'
 
   if (logs.length === 0) {
     return <p className="text-gray-400 text-sm text-center py-6">{t('common.noRecords')}</p>
@@ -29,7 +31,7 @@ export function WeightChart({ logs }: Props) {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <LineChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+        <CartesianGrid strokeDasharray="3 3" stroke={chartGrid} />
         <XAxis dataKey="date" tick={{ fontSize: 11 }} />
         <YAxis tick={{ fontSize: 11 }} unit="g" />
         <Tooltip
@@ -39,9 +41,9 @@ export function WeightChart({ logs }: Props) {
         <Line
           type="monotone"
           dataKey="weight"
-          stroke="#16a34a"
+          stroke={chartLine}
           strokeWidth={2}
-          dot={{ r: 3, fill: '#16a34a' }}
+          dot={{ r: 3, fill: chartLine }}
         />
       </LineChart>
     </ResponsiveContainer>

@@ -123,14 +123,15 @@ export function BackupPage() {
 <meta charset="UTF-8">
 <title>ReptileManager QR Codes</title>
 <style>
+:root{--surface:#f7f4ef;--on-surface:#2f312e;--outline:#c7cac4;--on-surface-variant:#666962}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;padding:20px}
-h1{font-size:16px;font-weight:700;margin-bottom:16px;color:#333}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--surface);padding:20px}
+h1{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--on-surface)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
-.card{border:1px solid #e5e7eb;border-radius:10px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.card{border:1px solid var(--outline);border-radius:10px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;background:#ffffff}
 .card img{width:130px;height:130px}
-.name{font-size:13px;font-weight:600;color:#111;text-align:center}
-.sp{font-size:11px;color:#6b7280;text-align:center}
+.name{font-size:13px;font-weight:600;color:var(--on-surface);text-align:center}
+.sp{font-size:11px;color:var(--on-surface-variant);text-align:center}
 @media print{@page{margin:1cm}body{padding:0}}
 </style>
 </head>
