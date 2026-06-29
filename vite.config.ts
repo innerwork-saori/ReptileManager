@@ -20,7 +20,7 @@ export default defineConfig({
         name: 'ReptileManager',
         short_name: 'ReptileManager',
         description: '爬蟲日常管理工具',
-        theme_color: '#1b2c4e',
+        theme_color: '#f0f6f9',
         background_color: '#f0f6f9',
         display: 'standalone',
         orientation: 'portrait',
