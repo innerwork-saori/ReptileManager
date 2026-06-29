@@ -152,7 +152,7 @@ export function HomePage() {
               </div>
               <p className="text-xs text-on-surface-variant mb-3">{t('home.recentFeedingsSubtitle')}</p>
               <div className="space-y-2">
-                {overdueFeeds.length > 0 ? overdueFeeds.slice(0, 3).map((feed) => (
+                {overdueFeeds.length > 0 ? overdueFeeds.slice(0, 5).map((feed) => (
                   <button
                     key={feed.reptileId}
                     onClick={() => navigate(`/reptile/${feed.reptileId}/feed`)}
@@ -177,7 +177,7 @@ export function HomePage() {
                   <p className="py-6 text-center text-sm text-on-surface-variant">{t('common.noRecords')}</p>
                 )}
               </div>
-              {overdueFeeds.length > 3 && (
+              {overdueFeeds.length > 5 && (
                 <button
                   onClick={() => navigate('/reptiles')}
                   className="mt-3 w-full bg-primary text-on-primary rounded-xl py-2.5 text-sm font-semibold text-center"
