@@ -21,6 +21,12 @@ function escapeHtml(s: string) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
+function getQrSexLabel(reptile: Reptile): string {
+  if (reptile.sex === 'female') return 'F ♀'
+  if (reptile.sex === 'male') return 'M ♂'
+  return 'Unknown'
+}
+
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
@@ -117,7 +123,7 @@ export function BackupPage() {
     const canvases = container.querySelectorAll('canvas')
     const items = qrReptiles.map((r, i) => ({
       name: r.name,
-      species: r.species,
+      sex: getQrSexLabel(r),
       url: (canvases[i] as HTMLCanvasElement)?.toDataURL('image/png') ?? '',
     })).filter(d => d.url)
 
@@ -138,13 +144,13 @@ h1{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--on-surface)}
 .card{border:1px solid var(--outline);border-radius:10px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;background:#ffffff}
 .card img{width:130px;height:130px}
 .name{font-size:13px;font-weight:600;color:var(--on-surface);text-align:center}
-.sp{font-size:11px;color:var(--on-surface-variant);text-align:center}
+.sp{font-size:13px;font-weight:600;color:var(--on-surface);text-align:center}
 @media print{@page{margin:1cm}body{padding:0}}
 </style>
 </head>
 <body>
 <h1>ReptileManager QR Codes</h1>
-<div class="grid">${items.map(d => `<div class="card"><img src="${d.url}" alt="${escapeHtml(d.name)}"><p class="name">${escapeHtml(d.name)}</p><p class="sp">${escapeHtml(d.species)}</p></div>`).join('')}</div>
+<div class="grid">${items.map(d => `<div class="card"><img src="${d.url}" alt="${escapeHtml(d.name)}"><p class="name">${escapeHtml(d.name)}</p><p class="sp">${escapeHtml(d.sex)}</p></div>`).join('')}</div>
 <script>window.onload=function(){window.print()}<\/script>
 </body>
 </html>`)
@@ -323,7 +329,7 @@ h1{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--on-surface)}
                       size={130}
                     />
                     <p className="text-sm font-semibold text-center text-on-surface leading-tight">{r.name}</p>
-                    <p className="text-xs text-on-surface-variant text-center leading-tight">{r.species}</p>
+                    <p className="text-sm font-semibold text-center text-on-surface leading-tight">{getQrSexLabel(r)}</p>
                   </div>
                 ))}
               </div>

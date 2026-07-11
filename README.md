@@ -233,7 +233,7 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 | 語言切換 | 繁體中文 / English，偏好存於 localStorage |
 | 資料統計 | Bento Grid 顯示爬寵數量、餵食紀錄、健康紀錄、IndexedDB 佔用大小 |
 | 匯出備份 | 將所有資料表（含 categories）序列化為 JSON 下載，並自動排除已移除的舊 reptile 健康欄位 |
-| 匯出 QR Code | 批次產生所有爬蟲 QR Code，支援列印 / PDF |
+| 匯出 QR Code | 批次產生所有爬蟲 QR Code，每張顯示名稱與性別（M ♂ / F ♀ / Unknown），支援列印 / PDF |
 | 匯入備份 | 上傳 JSON 檔，驗證後寫入 IndexedDB（覆蓋模式） |
 | 重設所有數據 | 危險區域操作，清除全部資料表並重新載入 |
 
