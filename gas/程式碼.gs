@@ -131,7 +131,7 @@ return normalizeAuthResult(result);
 }
 
 function runExchangeWithMyToken() {
-var myToken = 'ya29.a0AT3oNZ_qzgKX8KsNIX9d7UYd-h2ck3GOdsj8NR8M2KLVy-i3bklW1LMUhCeZqXMP2RqJIvC7A43z1sMNTwGRG8x4xqCBaPjMiuJ0cLSzqV3N2bknN-nFbkTyYgUwQzG0DsTH5yr1Kg8bM_-oG6gaewd9SQtOABr98fRujg9OvvPchWLUAfRlf3lUk9X0iBXGZ3RGiaMaCgYKARwSARESFQHGX2MilmzY4aYYwVYDWIrEYbetCA0206';
+var myToken = 'PropertiesService.getScriptProperties().getProperty('testToken')';
 var result = testAuthExchange(myToken);
 Logger.log(JSON.stringify(result));
 }
