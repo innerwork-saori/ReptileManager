@@ -30,6 +30,7 @@ export function ScanPage() {
   const streamRef = useRef<MediaStream | null>(null)
   const rafRef = useRef<number | null>(null)
   const handlingResultRef = useRef(false)
+  const isStartingRef = useRef(false)
 
   const cleanupStream = useCallback(() => {
     if (rafRef.current != null) {
@@ -122,26 +123,48 @@ export function ScanPage() {
   }, [handleParsedText])
 
   const startScanner = useCallback(async () => {
+    if (isStartingRef.current) return
+
     if (!navigator.mediaDevices?.getUserMedia) {
       setError('api_unavailable')
       setMessage(t('scan.apiUnavailable'))
       return
     }
 
+    isStartingRef.current = true
+    cleanupStream()
     handlingResultRef.current = false
     setMessage('')
     setError(null)
     setStatus('starting')
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+      let stream: MediaStream | null = null
+      const attempts: MediaStreamConstraints[] = [
+        {
+          video: {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
         },
-        audio: false,
-      })
+        { video: true, audio: false },
+      ]
+
+      for (const constraints of attempts) {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia(constraints)
+          break
+        } catch (err) {
+          if (!(err instanceof DOMException)) throw err
+          if (err.name === 'NotAllowedError') throw err
+        }
+      }
+
+      if (!stream) {
+        throw new DOMException('camera stream unavailable', 'NotReadableError')
+      }
 
       streamRef.current = stream
       const video = videoRef.current
@@ -172,6 +195,8 @@ export function ScanPage() {
 
       setError('camera_unavailable')
       setMessage(t('scan.cameraBusy'))
+    } finally {
+      isStartingRef.current = false
     }
   }, [cleanupStream, scanFrame, t])
 
@@ -193,11 +218,9 @@ export function ScanPage() {
 
   useEffect(() => {
     const onVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
+      if (document.visibilityState === 'hidden' && status === 'ready') {
         cleanupStream()
-        if (status === 'ready' || status === 'starting') {
-          setStatus('stopped')
-        }
+        setStatus('stopped')
       }
     }
 
