@@ -10,6 +10,13 @@ import {
 } from '../db/repos'
 import type { Reptile, FeedLog, WeightLog, ShedLog, HabitatLog, VisitLog } from '../db/schema'
 import { formatRelativeTime, formatRelativeTimeInDays, calcAge } from '../lib/todoEngine'
+import { buildReptileQrPayload } from '../lib/qrPayload'
+
+function getReptileQrValue(reptile: Reptile): string {
+  const saved = String(reptile.qrTargetUrl || '').trim()
+  if (saved.toLowerCase().startsWith('rm:v1:')) return saved
+  return buildReptileQrPayload(reptile.id)
+}
 
 export function ReptileDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -282,7 +289,7 @@ export function ReptileDetailPage() {
           className="absolute bottom-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-white/50 active:scale-95 transition-transform"
         >
           <div className="w-16 h-16">
-            <QRCodeSVG value={reptile.qrTargetUrl || window.location.href} size={64} />
+            <QRCodeSVG value={getReptileQrValue(reptile)} size={64} />
           </div>
           <p className="text-[8px] text-center mt-1 font-bold text-on-surface">
             #{reptile.id.slice(-6).toUpperCase()}
@@ -479,9 +486,9 @@ export function ReptileDetailPage() {
               {t('reptile.qrTitle', { name: reptile.name })}
             </h3>
             <div className="flex justify-center">
-              <QRCodeSVG value={reptile.qrTargetUrl || window.location.href} size={200} />
+              <QRCodeSVG value={getReptileQrValue(reptile)} size={200} />
             </div>
-            <p className="text-xs text-on-surface-variant text-center break-all">{reptile.qrTargetUrl}</p>
+            <p className="text-xs text-on-surface-variant text-center break-all">{getReptileQrValue(reptile)}</p>
             <button
               onClick={() => setShowQr(false)}
               className="w-full bg-surface-container py-2.5 rounded-xl text-on-surface font-medium"

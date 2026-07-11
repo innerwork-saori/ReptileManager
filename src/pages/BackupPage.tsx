@@ -9,6 +9,13 @@ import { Layout } from '../components/Layout'
 import { exportAllData, importAllData, getDataSummary, resetAllData } from '../lib/backup'
 import { reptileRepo } from '../db/repos'
 import type { Reptile } from '../db/schema'
+import { buildReptileQrPayload } from '../lib/qrPayload'
+
+function getReptileQrValue(reptile: Reptile): string {
+  const saved = String(reptile.qrTargetUrl || '').trim()
+  if (saved.toLowerCase().startsWith('rm:v1:')) return saved
+  return buildReptileQrPayload(reptile.id)
+}
 
 function escapeHtml(s: string) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -312,7 +319,7 @@ h1{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--on-surface)}
                 {qrReptiles.map(r => (
                   <div key={r.id} className="flex flex-col items-center border border-outline-variant rounded-xl p-3 gap-2">
                     <QRCodeCanvas
-                      value={r.qrTargetUrl || `${window.location.origin}${window.location.pathname}#/reptile/${r.id}`}
+                      value={getReptileQrValue(r)}
                       size={130}
                     />
                     <p className="text-sm font-semibold text-center text-on-surface leading-tight">{r.name}</p>

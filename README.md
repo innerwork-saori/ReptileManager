@@ -1,6 +1,6 @@
 # ReptileManager — 功能架構書
 
-> 版本：0.3.5　　最後更新：2026-06-29
+> 版本：0.3.6　　最後更新：2026-07-11
 
 ---
 
@@ -66,7 +66,7 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 | 照片 URL | 自定義大頭照 |
 | 健康資訊（Healthy Info） | 爬蟲健康摘要欄位 |
 | 飼育箱名稱 | 用於首頁快速識別 |
-| QR Code | 可設定自訂目標 URL，於詳細頁產生 QR Code |
+| QR Code | 以 `rm:v1:reptile:{id}` 載荷產生 QR Code，可供 PWA 內掃描直接開啟資料 |
 
 **新增 / 編輯表單行為**：
 
@@ -101,6 +101,16 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 - 支援新增、修改、刪除分類
 - 若分類已被爬蟲使用，會阻擋刪除並提示先調整爬蟲分類
 - 相容舊資料：既有 reptile 的歷史分類值會自動收編進分類清單
+
+### 3.10 PWA 內建掃描（QR Scanner）
+
+提供 app 內掃描頁，避免 iPhone 以系統相機掃碼時跳到外部瀏覽器。
+
+- 掃描入口：burger menu 新增「掃描」入口
+- 載荷格式：優先解析 `rm:v1:reptile:{id}`，並相容舊版 URL / 純 ID
+- 成功行為：直接在 PWA 內導向對應爬蟲頁
+- 錯誤與復原：涵蓋權限拒絕、無相機、相機占用、無效碼與資料不存在
+- Fallback：提供手動輸入載荷 / URL / ID
 
 ---
 
@@ -291,6 +301,7 @@ Reptile (1)
 | `/feed` | FeedQuickPage | 快速餵食記錄（底部導覽第 3 項，跨爬蟲快速新增餵食） |
 | `/breeding` | BreedingPage | 全域繁殖管理（統計 + 列表 + 新增） |
 | `/categories` | CategoriesPage | 分類新增 / 編輯 / 刪除管理（burger menu 入口） |
+| `/scan` | ScanPage | PWA 內建 QR 掃描（相機權限處理 + 手動輸入 fallback） |
 | `/backup` | BackupPage | 設定 + 備份匯出入 |
 
 ---
@@ -303,7 +314,7 @@ Reptile (1)
 | 語言偵測 | 優先讀取 localStorage，次為瀏覽器語系 |
 | 支援語言 | `zh-TW`（繁體中文，預設）、`en`（英文） |
 | 翻譯檔路徑 | `src/i18n/zh-TW.ts`、`src/i18n/en.ts` |
-| 命名空間 | common, nav, pwa, home, reptile, feed, medication, environment, health, todo, todoItem, categories, clutch, activityLog, backup |
+| 命名空間 | common, nav, pwa, home, reptile, feed, medication, environment, health, todo, todoItem, categories, clutch, activityLog, scan, backup |
 | 偏好儲存 | localStorage key: `reptileManager_lang` |
 
 ---

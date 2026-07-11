@@ -6,11 +6,12 @@ import { Layout } from '../components/Layout'
 import { InputField, SelectField, TextareaField } from '../components/FormField'
 import { categoryRepo, reptileRepo } from '../db/repos'
 import type { Reptile } from '../db/schema'
+import { buildReptileQrPayload } from '../lib/qrPayload'
 
 const SEX_LABEL: Record<string, string> = { male: '公', female: '母', unknown: '未知' }
 
-function buildQrUrl(id: string): string {
-  return `${window.location.origin}${window.location.pathname}#/reptile/${id}`
+function buildQrPayload(id: string): string {
+  return buildReptileQrPayload(id)
 }
 
 function focusFieldById(fieldId: string) {
@@ -187,7 +188,7 @@ export function ReptileFormPage() {
       navigate(`/reptile/${id}`)
     } else {
       const created = await reptileRepo.create(data)
-      await reptileRepo.update(created.id, { qrTargetUrl: buildQrUrl(created.id) })
+      await reptileRepo.update(created.id, { qrTargetUrl: buildQrPayload(created.id) })
       navigate(`/reptile/${created.id}`)
     }
   }

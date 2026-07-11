@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, List, ClipboardList, Egg, Settings, ArrowLeft, Menu, X, ListChecks, Tags } from 'lucide-react'
+import { Home, List, ClipboardList, Egg, Settings, ArrowLeft, Menu, X, ListChecks, Tags, ScanLine } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
@@ -34,6 +34,7 @@ export function Layout({ children, title, back, action }: Props) {
     { to: '/reptiles',     icon: List,           label: t('nav.reptiles') },
     { to: '/feed',         icon: ClipboardList,  label: t('nav.log') },
     { to: '/breeding',     icon: Egg,            label: t('nav.breeding') },
+    { to: '/scan',         icon: ScanLine,       label: t('nav.scan') },
     { to: '/backup',       icon: Settings,       label: t('nav.backup') },
   ]
 

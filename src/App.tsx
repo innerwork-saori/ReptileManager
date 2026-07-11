@@ -20,6 +20,7 @@ import { ActivityLogPage } from './pages/ActivityLogPage'
 import { TodosPage } from './pages/TodosPage'
 import { TasksPage } from './pages/TasksPage'
 import { CategoriesPage } from './pages/CategoriesPage'
+import { ScanPage } from './pages/ScanPage'
 
 function ScrollToTop() {
   const { pathname, state } = useLocation()
@@ -90,6 +91,7 @@ export default function App() {
         <Route path="/todos" element={<TodosPage />} />
         <Route path="/tasks" element={<TasksPage />} />
         <Route path="/categories" element={<CategoriesPage />} />
+        <Route path="/scan" element={<ScanPage />} />
         <Route path="/backup" element={<BackupPage />} />
       </Routes>
     </HashRouter>
