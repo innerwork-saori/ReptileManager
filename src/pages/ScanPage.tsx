@@ -17,6 +17,10 @@ type ScanError =
   | 'not_found'
   | null
 
+const wait = (ms: number) => new Promise<void>((resolve) => {
+  window.setTimeout(() => resolve(), ms)
+})
+
 export function ScanPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -29,10 +33,32 @@ export function ScanPage() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const rafRef = useRef<number | null>(null)
+  const hideCleanupTimerRef = useRef<number | null>(null)
+  const autoRetryTimerRef = useRef<number | null>(null)
   const handlingResultRef = useRef(false)
   const isStartingRef = useRef(false)
+  const hasAutoRetriedRef = useRef(false)
+
+  const isIosStandalone = useMemo(() => {
+    const ua = navigator.userAgent
+    const isIosDevice = /iPad|iPhone|iPod/.test(ua)
+      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    const standaloneByDisplayMode = window.matchMedia('(display-mode: standalone)').matches
+    const standaloneByNavigator = (window.navigator as Navigator & { standalone?: boolean }).standalone === true
+    return isIosDevice && (standaloneByDisplayMode || standaloneByNavigator)
+  }, [])
 
   const cleanupStream = useCallback(() => {
+    if (hideCleanupTimerRef.current != null) {
+      window.clearTimeout(hideCleanupTimerRef.current)
+      hideCleanupTimerRef.current = null
+    }
+
+    if (autoRetryTimerRef.current != null) {
+      window.clearTimeout(autoRetryTimerRef.current)
+      autoRetryTimerRef.current = null
+    }
+
     if (rafRef.current != null) {
       cancelAnimationFrame(rafRef.current)
       rafRef.current = null
@@ -122,7 +148,28 @@ export function ScanPage() {
     rafRef.current = requestAnimationFrame(scanFrame)
   }, [handleParsedText])
 
-  const startScanner = useCallback(async () => {
+  const warmupCameraPermission = useCallback(async () => {
+    const warmupStream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: false,
+    })
+
+    for (const track of warmupStream.getTracks()) {
+      track.stop()
+    }
+  }, [])
+
+  const startScanner = useCallback(async (options?: { isAutoRetry?: boolean }) => {
+    const isAutoRetry = options?.isAutoRetry === true
+
+    if (!isAutoRetry) {
+      hasAutoRetriedRef.current = false
+      if (autoRetryTimerRef.current != null) {
+        window.clearTimeout(autoRetryTimerRef.current)
+        autoRetryTimerRef.current = null
+      }
+    }
+
     if (isStartingRef.current) return
 
     if (!navigator.mediaDevices?.getUserMedia) {
@@ -139,6 +186,11 @@ export function ScanPage() {
     setStatus('starting')
 
     try {
+      if (!isAutoRetry) {
+        await warmupCameraPermission()
+        await wait(500)
+      }
+
       let stream: MediaStream | null = null
       const attempts: MediaStreamConstraints[] = [
         {
@@ -172,8 +224,26 @@ export function ScanPage() {
         throw new DOMException('video element not ready', 'AbortError')
       }
 
+      video.muted = true
+      video.playsInline = true
+      video.setAttribute('playsinline', 'true')
+      video.setAttribute('webkit-playsinline', 'true')
       video.srcObject = stream
       await video.play()
+
+      if (isIosStandalone) {
+        await new Promise<void>((resolve) => {
+          window.setTimeout(() => resolve(), 280)
+        })
+
+        const hasFrames = video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
+          && video.videoWidth > 0
+          && video.videoHeight > 0
+        if (!hasFrames) {
+          throw new DOMException('camera stream has no frames', 'AbortError')
+        }
+      }
+
       setStatus('ready')
       rafRef.current = requestAnimationFrame(scanFrame)
     } catch (err) {
@@ -193,12 +263,21 @@ export function ScanPage() {
         }
       }
 
+      if (isIosStandalone && !isAutoRetry && !hasAutoRetriedRef.current) {
+        hasAutoRetriedRef.current = true
+        autoRetryTimerRef.current = window.setTimeout(() => {
+          autoRetryTimerRef.current = null
+          void startScanner({ isAutoRetry: true })
+        }, 450)
+        return
+      }
+
       setError('camera_unavailable')
       setMessage(t('scan.cameraBusy'))
     } finally {
       isStartingRef.current = false
     }
-  }, [cleanupStream, scanFrame, t])
+  }, [cleanupStream, isIosStandalone, scanFrame, t, warmupCameraPermission])
 
   const stopScanner = useCallback(() => {
     cleanupStream()
@@ -218,9 +297,26 @@ export function ScanPage() {
 
   useEffect(() => {
     const onVisibilityChange = () => {
-      if (document.visibilityState === 'hidden' && status === 'ready') {
-        cleanupStream()
-        setStatus('stopped')
+      if (document.visibilityState === 'hidden') {
+        if (hideCleanupTimerRef.current != null) {
+          window.clearTimeout(hideCleanupTimerRef.current)
+        }
+
+        // iOS standalone PWA may briefly flip to hidden while permission sheet is shown.
+        // Delay cleanup so transient visibility changes do not kill a freshly-started stream.
+        hideCleanupTimerRef.current = window.setTimeout(() => {
+          hideCleanupTimerRef.current = null
+          if (document.visibilityState === 'hidden' && status === 'ready') {
+            cleanupStream()
+            setStatus('stopped')
+          }
+        }, 1200)
+        return
+      }
+
+      if (hideCleanupTimerRef.current != null) {
+        window.clearTimeout(hideCleanupTimerRef.current)
+        hideCleanupTimerRef.current = null
       }
     }
 
