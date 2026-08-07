@@ -140,6 +140,15 @@ export function Layout({ children, title, back, action }: Props) {
             </NavLink>
           ))}
 
+          <a
+            href={supportMailto}
+            onClick={closeDrawer}
+            className="mx-2 mt-1 mb-2 inline-flex items-center justify-center gap-2 rounded-xl bg-primary-container px-4 py-3 text-sm font-semibold text-on-primary-container shadow-sm hover:brightness-95 active:scale-[0.99] transition-all"
+          >
+            <Mail size={18} />
+            <span>{t('nav.supportContact')}</span>
+          </a>
+
           {/* Divider before todos */}
           <div className="mx-4 my-2 border-t border-outline-variant/50" />
 
@@ -177,13 +186,6 @@ export function Layout({ children, title, back, action }: Props) {
         {/* Drawer footer */}
         <div className="p-4 border-t border-outline-variant/30">
           <p className="text-xs text-outline text-center opacity-60">ReptileManager</p>
-          <a
-            href={supportMailto}
-            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary-container px-4 py-2 text-xs font-semibold text-on-primary-container shadow-sm hover:brightness-95 active:scale-[0.99] transition-all"
-          >
-            <Mail size={14} />
-            {t('nav.supportContact')}
-          </a>
         </div>
       </aside>
     </div>
