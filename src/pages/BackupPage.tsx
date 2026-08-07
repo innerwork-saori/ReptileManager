@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   Upload, Download, HardDrive, Activity, Utensils, Layers,
-  QrCode, Printer, X, ChevronRight, AlertTriangle,
+  QrCode, Printer, X, ChevronRight, AlertTriangle, Mail, Copy, Check,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { QRCodeCanvas } from 'qrcode.react'
@@ -38,6 +38,9 @@ const LANGUAGES = [
   { code: 'en',    label: 'EN' },
 ]
 
+const CONTACT_EMAIL = 'reptilemanager@heysaori.com'
+const CONTACT_MAILTO = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('ReptileManager Support')}`
+
 export function BackupPage() {
   const { t, i18n } = useTranslation()
   const [summary, setSummary] = useState({ reptiles: 0, feedLogs: 0, medicationLogs: 0, otherRecords: 0, total: 0 })
@@ -51,7 +54,9 @@ export function BackupPage() {
   const [qrExportOpen, setQrExportOpen] = useState(false)
   const [qrReptiles, setQrReptiles] = useState<Reptile[]>([])
   const [loadingQr, setLoadingQr] = useState(false)
+  const [copiedContact, setCopiedContact] = useState(false)
   const qrContainerRef = useRef<HTMLDivElement>(null)
+  const copyResetTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
     void getDataSummary().then(setSummary)
@@ -59,6 +64,12 @@ export function BackupPage() {
       void navigator.storage.estimate().then(({ usage }) => {
         if (usage !== undefined) setDataSize(formatSize(usage))
       })
+    }
+
+    return () => {
+      if (copyResetTimerRef.current != null) {
+        window.clearTimeout(copyResetTimerRef.current)
+      }
     }
   }, [])
 
@@ -114,6 +125,34 @@ export function BackupPage() {
       setQrExportOpen(true)
     } finally {
       setLoadingQr(false)
+    }
+  }
+
+  const handleCopyContact = async () => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(CONTACT_EMAIL)
+      } else {
+        const textarea = document.createElement('textarea')
+        textarea.value = CONTACT_EMAIL
+        textarea.setAttribute('readonly', '')
+        textarea.style.position = 'fixed'
+        textarea.style.left = '-9999px'
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+      }
+
+      setCopiedContact(true)
+      if (copyResetTimerRef.current != null) {
+        window.clearTimeout(copyResetTimerRef.current)
+      }
+      copyResetTimerRef.current = window.setTimeout(() => {
+        setCopiedContact(false)
+      }, 1800)
+    } catch {
+      setCopiedContact(false)
     }
   }
 
@@ -278,6 +317,43 @@ h1{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--on-surface)}
           {importResult === 'error' && (
             <p className="text-center text-sm text-red-500 font-medium">{t('backup.importError')}</p>
           )}
+        </section>
+
+        {/* Contact Support */}
+        <section className="space-y-3">
+          <div>
+            <h2 className="text-xl font-semibold text-primary">{t('backup.contactTitle')}</h2>
+            <p className="text-[10px] text-on-surface-variant">{t('backup.contactSubtitle')}</p>
+          </div>
+
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm space-y-3">
+            <p className="text-sm text-on-surface break-all">
+              <span className="font-semibold">{t('backup.contactEmailLabel')} </span>
+              <span>{CONTACT_EMAIL}</span>
+            </p>
+            <p className="text-[11px] text-on-surface-variant">{t('backup.contactResponseTime')}</p>
+
+            <div className="grid grid-cols-2 gap-2">
+              <a
+                href={CONTACT_MAILTO}
+                aria-label={t('backup.contactOpenEmail')}
+                className="min-h-11 flex items-center justify-center gap-2 bg-primary text-on-primary rounded-lg text-xs font-semibold active:scale-[0.98] transition-transform"
+              >
+                <Mail size={16} />
+                <span>{t('backup.contactOpenEmail')}</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={handleCopyContact}
+                aria-label={t('backup.contactCopyEmail')}
+                className="min-h-11 flex items-center justify-center gap-2 bg-secondary text-white rounded-lg text-xs font-semibold active:scale-[0.98] transition-transform"
+              >
+                {copiedContact ? <Check size={16} /> : <Copy size={16} />}
+                <span>{copiedContact ? t('backup.contactCopied') : t('backup.contactCopyEmail')}</span>
+              </button>
+            </div>
+          </div>
         </section>
 
         {/* Danger Zone */}
