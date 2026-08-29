@@ -254,6 +254,12 @@ export const feedLogRepo = {
     return log
   },
 
+  updateAmount: async (id: string, amount: string): Promise<void> => {
+    const existing = await db.feed_logs.get(id)
+    if (!existing) throw new Error('FEED_LOG_NOT_FOUND')
+    await db.feed_logs.update(id, { amount })
+  },
+
   delete: (id: string) => db.feed_logs.delete(id),
 }
 

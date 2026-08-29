@@ -6,7 +6,7 @@ import { HomePage } from './pages/HomePage'
 import { ReptilesPage } from './pages/ReptilesPage'
 import { ReptileDetailPage } from './pages/ReptileDetailPage'
 import { ReptileFormPage } from './pages/ReptileFormPage'
-import { FeedLogPage } from './pages/FeedLogPage'
+import { FeedPage } from './pages/FeedPage'
 import { MedicationPage } from './pages/MedicationPage'
 import { EnvironmentPage } from './pages/EnvironmentPage'
 import { HealthPage } from './pages/HealthPage'
@@ -15,7 +15,6 @@ import { BackupPage } from './pages/BackupPage'
 import { ClutchFormPage } from './pages/ClutchFormPage'
 import { ClutchDetailPage } from './pages/ClutchDetailPage'
 import { BreedingPage } from './pages/BreedingPage'
-import { FeedQuickPage } from './pages/FeedQuickPage'
 import { ActivityLogPage } from './pages/ActivityLogPage'
 import { TodosPage } from './pages/TodosPage'
 import { TasksPage } from './pages/TasksPage'
@@ -78,14 +77,14 @@ export default function App() {
         <Route path="/reptile/new" element={<ReptileFormPage />} />
         <Route path="/reptile/:id" element={<ReptileDetailPage />} />
         <Route path="/reptile/:id/edit" element={<ReptileFormPage />} />
-        <Route path="/reptile/:id/feed" element={<FeedLogPage />} />
+        <Route path="/reptile/:id/feed" element={<FeedPage />} />
         <Route path="/reptile/:id/logs" element={<ActivityLogPage />} />
         <Route path="/reptile/:id/medication" element={<MedicationPage />} />
         <Route path="/reptile/:id/environment" element={<EnvironmentPage />} />
         <Route path="/reptile/:id/health" element={<HealthPage />} />
         <Route path="/reptile/:id/todos" element={<TodoRulesPage />} />
         <Route path="/reptile/:id/clutch" element={<ClutchFormPage />} />
-        <Route path="/feed" element={<FeedQuickPage />} />
+        <Route path="/feed" element={<FeedPage />} />
         <Route path="/breeding" element={<BreedingPage />} />
         <Route path="/breeding/:id" element={<ClutchDetailPage />} />
         <Route path="/todos" element={<TodosPage />} />
