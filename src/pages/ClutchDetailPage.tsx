@@ -172,7 +172,7 @@ export function ClutchDetailPage() {
                       {m.label}
                     </p>
                     <span className={`text-xs font-semibold ${isToday ? 'text-primary' : isPast ? 'text-on-surface-variant' : 'text-secondary'}`}>
-                      {isToday ? '今天' : isPast ? `${Math.abs(diff)} 天前` : `${diff} 天後`}
+                      {isToday ? t('common.today') : isPast ? t('common.daysAgo', { count: Math.abs(diff) }) : t('common.daysLater', { count: diff })}
                     </span>
                   </div>
                 )

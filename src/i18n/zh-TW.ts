@@ -28,6 +28,8 @@ const zhTW = {
     minutesAgo: '{{count}} 分鐘前',
     hoursAgo: '{{count}} 小時前',
     daysAgo: '{{count}} 天前',
+    daysLater: '{{count}} 天後',
+    today: '今天',
     notRecorded: '未記錄',
     unknown: '未知',
   },

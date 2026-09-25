@@ -30,6 +30,8 @@ const en: Translation = {
     minutesAgo: '{{count}} min ago',
     hoursAgo: '{{count}} hr ago',
     daysAgo: '{{count}} day(s) ago',
+    daysLater: 'in {{count}} day(s)',
+    today: 'Today',
     notRecorded: 'Not recorded',
     unknown: 'Unknown',
   },

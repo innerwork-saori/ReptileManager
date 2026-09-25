@@ -7,8 +7,6 @@ import { InputField, SelectField, TextareaField } from '../components/FormField'
 import { clutchLogRepo, reptileRepo } from '../db/repos'
 import type { ClutchLog, Reptile } from '../db/schema'
 
-const SEX_LABEL: Record<string, string> = { male: '公', female: '母', unknown: '未知' }
-
 function addDays(dateStr: string, days: number): string {
   const d = new Date(dateStr + 'T00:00:00')
   d.setDate(d.getDate() + days)
@@ -55,7 +53,7 @@ export function BreedingPage() {
     { value: '', label: t('clutch.unset') },
     ...reptiles.map((r) => ({
       value: r.id,
-      label: `${r.name}${r.sex ? ` (${SEX_LABEL[r.sex] ?? r.sex})` : ''}`,
+      label: `${r.name}${r.sex ? ` (${t(`common.sex.${r.sex}`, { defaultValue: r.sex })})` : ''}`,
     })),
   ]
 
@@ -192,7 +190,7 @@ export function BreedingPage() {
                       className="min-w-[140px] bg-surface-container-lowest border border-outline-variant rounded-lg p-3 flex flex-col gap-1 shrink-0"
                     >
                       <span className="text-[10px] uppercase font-bold text-on-surface-variant tracking-wide">
-                        {diff === 0 ? '今天' : diff > 0 ? `${diff} 天後` : `${Math.abs(diff)} 天前`}
+                        {diff === 0 ? t('common.today') : diff > 0 ? t('common.daysLater', { count: diff }) : t('common.daysAgo', { count: Math.abs(diff) })}
                       </span>
                       <p className="text-xs font-bold text-on-surface leading-tight">{next!.label}</p>
                       {mother && (
