@@ -20,6 +20,8 @@ import { TodosPage } from './pages/TodosPage'
 import { TasksPage } from './pages/TasksPage'
 import { CategoriesPage } from './pages/CategoriesPage'
 import { ScanPage } from './pages/ScanPage'
+import { WelcomePage } from './pages/WelcomePage'
+import { shouldShowWelcome } from './lib/welcome'
 import { isDemoMode, exitDemoMode } from './lib/demoMode'
 import { ensureDemoData, seedDemoData } from './lib/demoSeed'
 
@@ -87,12 +89,14 @@ export default function App() {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    if (!isDemoMode()) {
-      setReady(true)
-      return
+    const init = async () => {
+      if (isDemoMode()) await ensureDemoData()
+      // Only redirect from the home route so deep links (e.g. scanned QR codes) still open directly
+      const atHome = window.location.hash === '' || window.location.hash === '#/'
+      if (atHome && (await shouldShowWelcome())) window.location.hash = '#/welcome'
     }
-    ensureDemoData()
-      .catch((err) => console.error('[demo] seed failed', err))
+    init()
+      .catch((err) => console.error('[init] startup failed', err))
       .finally(() => setReady(true))
   }, [])
 
@@ -105,6 +109,7 @@ export default function App() {
       {isDemoMode() && <DemoBanner />}
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/reptiles" element={<ReptilesPage />} />
         <Route path="/reptile/new" element={<ReptileFormPage />} />
         <Route path="/reptile/:id" element={<ReptileDetailPage />} />

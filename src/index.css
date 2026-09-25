@@ -140,3 +140,21 @@
     scrollbar-width: none;
   }
 }
+
+/* Welcome page: the enclosure-tag sparkline draws once on load */
+.welcome-spark {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: welcome-draw 1.1s 0.35s cubic-bezier(0.3, 0.7, 0.2, 1) forwards;
+}
+
+@keyframes welcome-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-spark {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

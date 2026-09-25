@@ -18,6 +18,11 @@ import type {
 // Sample data for demo mode. All dates are relative to "now" so the demo always looks current.
 
 const SESSION_KEY = 'reptileManager_demoSeeded'
+const LANG_KEY = 'demoLanguage'
+
+function currentLang(): string {
+  return i18n.language?.startsWith('en') ? 'en' : 'zh-TW'
+}
 
 const DAY = 24 * 60 * 60 * 1000
 
@@ -223,6 +228,7 @@ export async function seedDemoData(): Promise<void> {
     await db.substrate_logs.bulkAdd(data.substrate_logs)
     await db.clutch_logs.bulkAdd(data.clutch_logs)
   })
+  await db.settings.put({ key: LANG_KEY, value: currentLang() })
   try {
     sessionStorage.setItem(SESSION_KEY, '1')
   } catch {
@@ -239,4 +245,11 @@ export async function ensureDemoData(): Promise<void> {
     // fall through and seed
   }
   await seedDemoData()
+}
+
+// Sample names and food labels are generated in the UI language, so regenerate them
+// if the visitor switched language on the welcome page before entering the demo.
+export async function reseedDemoIfLanguageChanged(): Promise<void> {
+  const seeded = (await db.settings.get(LANG_KEY))?.value
+  if (seeded !== currentLang()) await seedDemoData()
 }
