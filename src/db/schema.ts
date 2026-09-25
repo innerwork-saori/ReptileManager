@@ -1,4 +1,5 @@
 import Dexie, { type Table } from 'dexie'
+import { isDemoMode } from '../lib/demoMode'
 
 export type ReptileCategory = string
 
@@ -196,8 +197,8 @@ export class ReptileManagerDb extends Dexie {
   clutch_logs!: Table<ClutchLog, string>
   settings!: Table<Setting, string>
 
-  constructor() {
-    super('reptileManagerDb')
+  constructor(name = 'reptileManagerDb') {
+    super(name)
 
     this.version(1).stores({
       categories: 'id, name, createdAt',
@@ -350,4 +351,5 @@ export class ReptileManagerDb extends Dexie {
   }
 }
 
-export const db = new ReptileManagerDb()
+// Demo mode uses a separate database so sample data never touches the user's real records
+export const db = new ReptileManagerDb(isDemoMode() ? 'reptileManagerDb-demo' : 'reptileManagerDb')

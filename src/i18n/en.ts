@@ -435,7 +435,7 @@ const en: Translation = {
     qrExporting: 'Preparing…',
     aboutSection: 'About',
     appName: 'ReptileManager',
-    version: 'Version 0.3.8',
+    version: 'Version 0.3.9',
     description: 'Reptile daily management PWA · Data stored in IndexedDB',
     languageSection: 'Language',
     languageLabel: 'Interface language',
@@ -461,6 +461,11 @@ const en: Translation = {
     resetAllLabel: 'Reset All Data',
     resetAllSub: 'Clear all data & cache',
     resetConfirm: 'Reset all data?\n\nThis cannot be undone. All reptile data will be deleted.',
+  },
+  demo: {
+    banner: "Demo mode: this is sample data and won't affect your real records.",
+    reset: 'Reset sample',
+    exit: 'Use my own data',
   },
 }
 

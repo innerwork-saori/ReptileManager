@@ -20,6 +20,8 @@ import { TodosPage } from './pages/TodosPage'
 import { TasksPage } from './pages/TasksPage'
 import { CategoriesPage } from './pages/CategoriesPage'
 import { ScanPage } from './pages/ScanPage'
+import { isDemoMode, exitDemoMode } from './lib/demoMode'
+import { ensureDemoData, seedDemoData } from './lib/demoSeed'
 
 function ScrollToTop() {
   const { pathname, state } = useLocation()
@@ -58,11 +60,40 @@ function UpdatePrompt() {
   )
 }
 
+function DemoBanner() {
+  const { t } = useTranslation()
+  const [resetting, setResetting] = useState(false)
+
+  const handleReset = async () => {
+    setResetting(true)
+    await seedDemoData()
+    window.location.reload()
+  }
+
+  return (
+    <div className="bg-secondary text-on-secondary px-4 py-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+      <p className="flex-1 min-w-[10rem] font-medium">{t('demo.banner')}</p>
+      <button onClick={handleReset} disabled={resetting} className="shrink-0 underline underline-offset-2 opacity-90 disabled:opacity-50">
+        {t('demo.reset')}
+      </button>
+      <button onClick={exitDemoMode} className="shrink-0 bg-on-secondary text-secondary px-3 py-1 rounded-lg font-semibold">
+        {t('demo.exit')}
+      </button>
+    </div>
+  )
+}
+
 export default function App() {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    setReady(true)
+    if (!isDemoMode()) {
+      setReady(true)
+      return
+    }
+    ensureDemoData()
+      .catch((err) => console.error('[demo] seed failed', err))
+      .finally(() => setReady(true))
   }, [])
 
   if (!ready) return null
@@ -71,6 +102,7 @@ export default function App() {
     <HashRouter>
       <ScrollToTop />
       <UpdatePrompt />
+      {isDemoMode() && <DemoBanner />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/reptiles" element={<ReptilesPage />} />

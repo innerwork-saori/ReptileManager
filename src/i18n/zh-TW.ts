@@ -433,7 +433,7 @@ const zhTW = {
     qrExporting: '準備中…',
     aboutSection: '關於',
     appName: 'ReptileManager',
-    version: '版本 0.3.8',
+    version: '版本 0.3.9',
     description: '爬蟲日常管理 PWA · 資料儲存於本機 IndexedDB',
     languageSection: '語言設定',
     languageLabel: '介面語言',
@@ -459,6 +459,11 @@ const zhTW = {
     resetAllLabel: '重設所有數據',
     resetAllSub: '清除所有資料與快取',
     resetConfirm: '確定要重設所有數據嗎？\n\n此操作無法還原，所有爬蟲資料將被清除。',
+  },
+  demo: {
+    banner: '示範模式：這些是範例資料，不會影響你的真實紀錄。',
+    reset: '重置範例',
+    exit: '開始使用我的資料',
   },
 }
 
