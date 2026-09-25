@@ -33,7 +33,13 @@ export function WeightChart({ logs }: Props) {
       <LineChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke={chartGrid} />
         <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-        <YAxis tick={{ fontSize: 11 }} unit="g" />
+        {/* Fit the axis to the data (not 0) so gradual weight changes are visible */}
+        <YAxis
+          tick={{ fontSize: 11 }}
+          unit="g"
+          domain={[(min: number) => Math.floor(min * 0.95), (max: number) => Math.ceil(max * 1.05)]}
+          allowDecimals={false}
+        />
         <Tooltip
           formatter={(v: number) => [`${v} g`, t('health.weight')]}
           labelFormatter={(l) => `${t('common.date')}: ${l}`}

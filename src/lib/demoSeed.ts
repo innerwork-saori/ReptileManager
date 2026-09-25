@@ -65,17 +65,18 @@ function buildDemoData() {
     sex: 'female',
     birthDate: dateDaysAgo(900),
     enclosureName: 'A-1',
-    photoUrl: '/demo/ballpython.jpg',
+    photoUrl: '/demo/mango.jpg',
     notes: pick('個性溫馴，換季時容易拒食。', 'Docile; tends to refuse food when seasons change.'),
   })
   const butter = reptile('butter', {
     name: pick('奶油', 'Butter'),
     species: 'Ball python',
     category: 'Ball python',
-    breed: 'Pastel',
+    breed: 'Lucy',
     sex: 'male',
     birthDate: dateDaysAgo(1100),
     enclosureName: 'A-2',
+    photoUrl: '/demo/butter.jpg',
   })
   const mochi = reptile('mochi', {
     name: pick('麻糬', 'Mochi'),
@@ -103,7 +104,6 @@ function buildDemoData() {
     sex: 'male',
     birthDate: dateDaysAgo(420),
     enclosureName: 'C-1',
-    photoUrl: '/demo/chameleon.jpg',
     chronicInfo: pick('曾有輕微代謝性骨病，持續補鈣中。', 'Mild MBD history; on calcium supplements.'),
   })
   const reptiles = [mango, butter, mochi, tofu, kiwi]

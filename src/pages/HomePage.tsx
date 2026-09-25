@@ -182,7 +182,7 @@ export function HomePage() {
                   onClick={() => navigate('/reptiles')}
                   className="mt-3 w-full bg-primary text-on-primary rounded-xl py-2.5 text-sm font-semibold text-center"
                 >
-                  {t('home.viewAll')} (View All) »
+                  {t('home.viewAll')} »
                 </button>
               )}
             </div>
@@ -224,7 +224,7 @@ export function HomePage() {
                   onClick={() => navigate('/reptiles')}
                   className="mt-3 w-full bg-primary text-on-primary rounded-xl py-2.5 text-sm font-semibold text-center"
                 >
-                  {t('home.viewAll')} (View All) »
+                  {t('home.viewAll')} »
                 </button>
               )}
             </div>
@@ -266,7 +266,7 @@ export function HomePage() {
                   onClick={() => navigate('/reptiles')}
                   className="mt-3 w-full bg-primary text-on-primary rounded-xl py-2.5 text-sm font-semibold text-center"
                 >
-                  {t('home.viewAll')} (View All) »
+                  {t('home.viewAll')} »
                 </button>
               )}
             </div>

@@ -33,7 +33,7 @@ function EnclosureTag() {
       <span className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-surface shadow-[inset_0_1px_2px_rgba(91,72,56,0.45)]" aria-hidden="true" />
 
       <div className="flex items-start gap-3">
-        <img src="/demo/ballpython.jpg" alt="" className="w-14 h-14 rounded-lg object-cover shrink-0" />
+        <img src="/demo/mango.jpg" alt="" className="w-14 h-14 rounded-lg object-cover shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="text-[11px] text-on-tertiary-container">{t('welcome.tagEnclosure')}</p>
           <p className="text-lg font-bold leading-tight text-on-surface">{t('welcome.tagName')}</p>
