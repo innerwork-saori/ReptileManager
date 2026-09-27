@@ -6,6 +6,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { QRCodeCanvas } from 'qrcode.react'
 import { Layout } from '../components/Layout'
+import { InstallAppCard } from '../components/InstallAppCard'
 import { exportAllData, importAllData, getDataSummary, resetAllData } from '../lib/backup'
 import { reptileRepo } from '../db/repos'
 import type { Reptile } from '../db/schema'
@@ -232,6 +233,15 @@ h1{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--on-surface)}
               ))}
             </div>
           </div>
+        </section>
+
+        {/* Install App */}
+        <section className="space-y-3">
+          <div>
+            <h2 className="text-xl font-semibold text-primary">{t('install.title')}</h2>
+            <p className="text-[10px] text-on-surface-variant">Install App</p>
+          </div>
+          <InstallAppCard />
         </section>
 
         {/* Data Statistics Bento Grid */}

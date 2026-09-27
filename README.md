@@ -1,6 +1,6 @@
 # ReptileManager — 功能架構書
 
-> 版本：0.5.0　　最後更新：2026-09-27
+> 版本：0.5.1　　最後更新：2026-09-27
 
 ---
 
@@ -127,7 +127,8 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 - 顯示條件：尚未看過歡迎頁（`settings` 的 `welcomeSeen`）且資料庫沒有任何爬蟲；已有資料的既有使用者不會看到
 - 示範模式：每個示範工作階段一開始一定會顯示（重新產生範例資料時會清除 `welcomeSeen`）
 - 僅在從首頁（`#/`）進入時導向，QR Code 等深層連結不受影響
-- 內容：標語、理念說明、飼育箱標籤範例（照片、QR Code、上次餵食、體重曲線動畫）、三項核心功能、資料隱私說明
+- 內容：標語、理念說明、飼育箱標籤範例（照片、QR Code、上次餵食、體重曲線動畫）、三項核心功能、資料隱私說明、安裝提示
+- 安裝提示：未安裝時顯示「可以安裝到手機主畫面」；瀏覽器支援安裝時旁邊直接提供「安裝」按鈕，否則提示到「設定」查看安裝方式；已安裝則不顯示
 - 語言切換：頁首可直接切換中文 / English；示範模式下若切換語言，進入時會以新語言重新產生範例資料
 - 操作：一般模式提供「新增第一隻爬寵」、「先看看範例資料」（開啟 `?demo=1`）、「略過介紹」；示範模式提供「開始看範例」與「開始使用我的資料」
 - 動畫：僅體重曲線於載入時繪製一次，並遵循 `prefers-reduced-motion`
@@ -260,6 +261,7 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 |------|------|
 | PWA 狀態 | 顯示目前連線狀態（online / offline） |
 | 語言切換 | 繁體中文 / English，偏好存於 localStorage |
+| 安裝 App | 說明安裝成 PWA 的好處（主畫面開啟、離線可用、iOS 較不會被清除資料），並依環境顯示：已安裝 → 「已安裝為 App」；支援 `beforeinstallprompt`（Android / 桌機 Chrome、Edge）→ 「安裝到主畫面」按鈕；iPhone / iPad → 「分享 → 加入主畫面」兩步驟說明；LINE、Facebook、Instagram、Threads 等 App 內建瀏覽器 → 提示改用 Safari / Chrome 並可複製網址；其他 → 通用說明。判斷邏輯在 `src/lib/pwaInstall.ts` |
 | 資料統計 | Bento Grid 顯示爬寵數量、餵食紀錄、健康紀錄、IndexedDB 佔用大小 |
 | 匯出備份 | 將所有資料表（含 categories、photos）序列化為單一 JSON 下載（備份格式 version 2，照片以 base64 data URL 內嵌），並自動排除已移除的舊 reptile 健康欄位 |
 | 匯出 QR Code | 批次產生所有爬蟲 QR Code，每張顯示名稱與性別（M ♂ / F ♀ / Unknown），支援列印 / PDF |
@@ -349,7 +351,7 @@ Reptile (1)
 | 語言偵測 | 優先讀取 localStorage，次為瀏覽器語系 |
 | 支援語言 | `zh-TW`（繁體中文，預設）、`en`（英文） |
 | 翻譯檔路徑 | `src/i18n/zh-TW.ts`、`src/i18n/en.ts` |
-| 命名空間 | common, nav, pwa, home, reptile, feed, medication, environment, health, todo, todoItem, categories, clutch, activityLog, scan, backup |
+| 命名空間 | common, nav, pwa, home, reptile, feed, medication, environment, health, todo, todoItem, categories, clutch, activityLog, scan, install, backup |
 | 偏好儲存 | localStorage key: `reptileManager_lang` |
 
 ---

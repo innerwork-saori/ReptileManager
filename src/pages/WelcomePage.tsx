@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { QRCodeSVG } from 'qrcode.react'
-import { UtensilsCrossed, LineChart, QrCode, ShieldCheck } from 'lucide-react'
+import { UtensilsCrossed, LineChart, QrCode, ShieldCheck, Smartphone } from 'lucide-react'
 import { isDemoMode, exitDemoMode } from '../lib/demoMode'
 import { markWelcomeSeen } from '../lib/welcome'
 import { reseedDemoIfLanguageChanged } from '../lib/demoSeed'
 import { buildReptileQrPayload } from '../lib/qrPayload'
+import { usePwaInstall } from '../lib/pwaInstall'
 
 // Sample weights (g) for the illustrative enclosure tag; mirrors the demo ball python.
 const TAG_WEIGHTS = [1420, 1465, 1510, 1540, 1590, 1635]
@@ -77,6 +78,7 @@ export function WelcomePage() {
   const { t, i18n } = useTranslation()
   const demo = isDemoMode()
   const isEn = i18n.language?.startsWith('en')
+  const { platform: installPlatform, promptInstall } = usePwaInstall()
 
   const finish = async (to: string) => {
     if (demo) await reseedDemoIfLanguageChanged()
@@ -130,6 +132,26 @@ export function WelcomePage() {
           <ShieldCheck size={20} className="text-primary shrink-0 mt-0.5" aria-hidden="true" />
           <span>{t('welcome.privacy')}</span>
         </p>
+
+        {installPlatform !== 'installed' && (
+          <div className="flex gap-4 text-sm leading-relaxed text-on-surface-variant">
+            <Smartphone size={20} className="text-primary shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="flex flex-1 flex-wrap items-center justify-between gap-x-3 gap-y-2">
+              <span>
+                {t('install.welcomeHint')}
+                {installPlatform !== 'promptable' && t('install.welcomeWhere')}
+              </span>
+              {installPlatform === 'promptable' && (
+                <button
+                  onClick={() => void promptInstall()}
+                  className="shrink-0 rounded-lg border border-primary px-3 py-1.5 text-sm font-semibold text-primary active:scale-[0.98] transition-transform focus-visible:outline-2 focus-visible:outline-primary"
+                >
+                  {t('install.welcomeInstall')}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col gap-3 pt-2">
           {demo ? (
