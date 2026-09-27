@@ -96,7 +96,11 @@ export function WelcomePage() {
     <div className="min-h-dvh bg-surface text-on-surface">
       <div className="max-w-md mx-auto px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-10 flex flex-col gap-8">
         <header className="flex items-center justify-between">
-          <span className="text-sm font-bold text-primary">ReptileManager</span>
+          <span className="flex items-center gap-2 text-sm font-bold text-primary">
+            {/* The icon's cream background matches bg-surface, so only the logo shows */}
+            <img src="/icon-192-v20260927.png" alt="" className="h-8 w-8" />
+            {t('common.appName')}
+          </span>
           <button
             onClick={() => void i18n.changeLanguage(isEn ? 'zh-TW' : 'en')}
             className="text-sm text-on-surface-variant px-2 py-1 rounded-md hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-primary"

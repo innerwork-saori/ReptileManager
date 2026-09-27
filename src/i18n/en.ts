@@ -2,6 +2,7 @@ import type { Translation } from './zh-TW'
 
 const en: Translation = {
   common: {
+    appName: 'Reptile Manager',
     loading: 'Loading…',
     saving: 'Saving…',
     save: 'Save',
@@ -52,7 +53,7 @@ const en: Translation = {
     later: 'Later',
   },
   home: {
-    title: 'ReptileManager',
+    title: 'Reptile Manager',
     tagline: 'Daily reptile care tracker',
     overview: 'Reptile Overview',
     lastFed: 'Last fed: {{time}}',
@@ -500,7 +501,7 @@ const en: Translation = {
   welcome: {
     headline1: "They don't call out.",
     headline2: "They don't beg for food.",
-    lead: "A reptile's health depends on what you remember: when it last ate, whether the shed came off clean, whether its weight is quietly slipping. ReptileManager keeps track of it for you.",
+    lead: "A reptile's health depends on what you remember: when it last ate, whether the shed came off clean, whether its weight is quietly slipping. $t(common.appName) keeps track of it for you.",
     tagAria: 'Sample enclosure tag: Mango, last fed 12 days ago, weight 1,635 grams',
     tagEnclosure: 'Enclosure A-1',
     tagName: 'Mango',

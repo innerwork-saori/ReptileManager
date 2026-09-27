@@ -1,5 +1,6 @@
 const zhTW = {
   common: {
+    appName: '爬爬管理員',
     loading: '載入中…',
     saving: '儲存中…',
     save: '儲存',
@@ -50,7 +51,7 @@ const zhTW = {
     later: '稍後',
   },
   home: {
-    title: 'ReptileManager',
+    title: '爬爬管理員',
     tagline: '爬蟲日常照護管理',
     overview: '爬蟲總覽',
     lastFed: '上次餵食：{{time}}',
@@ -498,7 +499,7 @@ const zhTW = {
   welcome: {
     headline1: '牠不會叫，',
     headline2: '也不會討食。',
-    lead: '爬寵的健康，全靠你記得：上次餵食是哪天、這次脫皮完整嗎、體重是不是悄悄在掉。ReptileManager 幫你把這些都記下來。',
+    lead: '爬寵的健康，全靠你記得：上次餵食是哪天、這次脫皮完整嗎、體重是不是悄悄在掉。$t(common.appName)幫你把這些都記下來。',
     tagAria: '飼育箱標籤範例：小芒果，上次餵食 12 天前，體重 1,635 公克',
     tagEnclosure: '飼育箱 A-1',
     tagName: '小芒果',

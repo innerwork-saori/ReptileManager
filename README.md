@@ -127,6 +127,7 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 - 顯示條件：尚未看過歡迎頁（`settings` 的 `welcomeSeen`）且資料庫沒有任何爬蟲；已有資料的既有使用者不會看到
 - 示範模式：每個示範工作階段一開始一定會顯示（重新產生範例資料時會清除 `welcomeSeen`）
 - 僅在從首頁（`#/`）進入時導向，QR Code 等深層連結不受影響
+- 頁首：左上角為 app logo（沿用 `icon-192`，米白底與頁面背景同色）＋依語系的 App 名稱，右上角為語言切換
 - 內容：標語、理念說明、飼育箱標籤範例（照片、QR Code、上次餵食、體重曲線動畫）、三項核心功能、資料隱私說明、安裝提示
 - 安裝提示：未安裝時顯示「可以安裝到手機主畫面」；瀏覽器支援安裝時旁邊直接提供「安裝」按鈕，否則提示到「設定」查看安裝方式；已安裝則不顯示
 - 語言切換：頁首可直接切換中文 / English；示範模式下若切換語言，進入時會以新語言重新產生範例資料
@@ -349,6 +350,7 @@ Reptile (1)
 |------|------|
 | 框架 | i18next + react-i18next |
 | 語言偵測 | 優先讀取 localStorage，次為瀏覽器語系 |
+| App 名稱 | 介面顯示的名稱依語系切換（`common.appName`）：中文「爬爬管理員」、英文「Reptile Manager」，用於首頁標題、側邊選單上方與底部、歡迎頁左上角 |
 | 支援語言 | `zh-TW`（繁體中文，預設）、`en`（英文） |
 | 翻譯檔路徑 | `src/i18n/zh-TW.ts`、`src/i18n/en.ts` |
 | 命名空間 | common, nav, pwa, home, reptile, feed, medication, environment, health, todo, todoItem, categories, clutch, activityLog, scan, install, backup |
@@ -361,7 +363,7 @@ Reptile (1)
 | 特性 | 實作方式 |
 |------|---------|
 | 可安裝 | Web App Manifest（圖示、名稱、顯示模式）；主題色與啟動畫面底色為 `#f7f4ef`（同 `--color-surface`） |
-| App 圖示 | 由 `images/reptilemanager_logo.png`（去背）疊在米白底 `#f7f4ef` 產生，不用透明背景（iOS 會把透明處填黑）：`icon-192` / `icon-512`（`any`）、`icon-maskable-512`（logo 縮進 Android 80% 安全區）、`apple-touch-icon-180`；檔名帶日期版號（目前 `v20260927`）以避開裝置快取，換圖時請改用新版號 |
+| App 圖示 | 由 `images/reptilemanager_logo.png`（去背）疊在米白底 `#f7f4ef` 產生，不用透明背景（iOS 會把透明處填黑）：`icon-192` / `icon-512`（`any`）、`icon-maskable-512`（logo 縮進 Android 80% 安全區）、`apple-touch-icon-180`；檔名帶日期版號（目前 `v20260927`）以避開裝置快取，換圖時請改用新版號，並同步更新 `vite.config.ts`、`index.html` 與歡迎頁左上角 logo（`WelcomePage.tsx`）。側邊選單上方另用去背、裁掉留白的 `logo-128`（`Layout.tsx`），因為選單底色 `#f2eee8` 與米白 icon 底色不同 |
 | 離線存取 | Service Worker（vite-plugin-pwa + Workbox） |
 | 更新通知 | 新版本上線時提示用戶手動更新 |
 | HTML 快取策略 | StaleWhileRevalidate |

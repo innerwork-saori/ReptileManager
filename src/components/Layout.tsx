@@ -105,10 +105,8 @@ export function Layout({ children, title, back, action }: Props) {
         {/* Drawer header */}
         <div className="px-4 pt-10 pb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-primary p-1.5 rounded-lg">
-              <ListChecks size={20} className="text-on-primary" />
-            </div>
-            <span className="text-base font-bold text-primary">ReptileManager</span>
+            <img src="/logo-128-v20260927.png" alt="" className="h-9 w-9" />
+            <span className="text-base font-bold text-primary">{t('common.appName')}</span>
           </div>
           <button
             onClick={closeDrawer}
@@ -185,7 +183,7 @@ export function Layout({ children, title, back, action }: Props) {
 
         {/* Drawer footer */}
         <div className="p-4 border-t border-outline-variant/30">
-          <p className="text-xs text-outline text-center opacity-60">ReptileManager</p>
+          <p className="text-xs text-outline text-center opacity-60">{t('common.appName')}</p>
         </div>
       </aside>
     </div>
