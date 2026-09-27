@@ -1,6 +1,6 @@
 # ReptileManager — 功能架構書
 
-> 版本：0.5.1　　最後更新：2026-09-27
+> 版本：0.5.2　　最後更新：2026-09-27
 
 ---
 
@@ -133,6 +133,15 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 - 語言切換：頁首可直接切換中文 / English；示範模式下若切換語言，進入時會以新語言重新產生範例資料
 - 操作：一般模式提供「新增第一隻爬寵」、「先看看範例資料」（開啟 `?demo=1`）、「略過介紹」；示範模式提供「開始看範例」與「開始使用我的資料」
 - 動畫：僅體重曲線於載入時繪製一次，並遵循 `prefers-reduced-motion`
+
+### 3.13 意見回饋（Feedback）
+
+側邊抽屜「給作者建議 / 許願功能」開啟 `#/feedback`，使用者可直接在 App 內送出建議，不需開啟 Email App。
+
+- 欄位：類型（功能建議 / 許願 / 問題回報，必選，會切換內容欄的提示文字）、內容（必填）、Email（選填，僅供回覆）
+- 自動附上：App 版本（build 時由 `package.json` 注入 `__APP_VERSION__`）、介面語言、是否為安裝版、是否為示範模式；不含任何爬寵資料，頁面上有隱私說明
+- 送出成功顯示感謝畫面，可「再寫一則」；失敗（離線或伺服器錯誤）時保留已輸入的內容，並提供作者信箱作為替代管道
+- 後端：Netlify Forms（表單名稱 `feedback`），設定方式見第 8 節
 
 ### 3.11 示範模式（Demo Mode）
 
@@ -267,7 +276,7 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 | 匯出備份 | 將所有資料表（含 categories、photos）序列化為單一 JSON 下載（備份格式 version 2，照片以 base64 data URL 內嵌），並自動排除已移除的舊 reptile 健康欄位 |
 | 匯出 QR Code | 批次產生所有爬蟲 QR Code，每張顯示名稱與性別（M ♂ / F ♀ / Unknown），支援列印 / PDF |
 | 匯入備份 | 上傳 JSON 檔，驗證後寫入 IndexedDB（覆蓋模式）；相容不含照片的舊版 version 1 備份 |
-| 聯絡支援 | 設定頁與側邊抽屜提供官方聯絡信箱 `reptilemanager@heysaori.com`，支援問題回報與功能建議 |
+| 聯絡支援 | 設定頁提供官方聯絡信箱 `reptilemanager@heysaori.com`（開啟 Email / 複製信箱）；側邊抽屜的「給作者建議 / 許願功能」改為開啟意見回饋表單（見 3.13） |
 | 重設所有數據 | 危險區域操作，清除全部資料表並重新載入 |
 
 ---
@@ -341,6 +350,7 @@ Reptile (1)
 | `/categories` | CategoriesPage | 分類新增 / 編輯 / 刪除管理（burger menu 入口） |
 | `/scan` | ScanPage | PWA 內建 QR 掃描（相機權限處理 + 手動輸入 fallback） |
 | `/backup` | BackupPage | 設定 + 備份匯出入 |
+| `/feedback` | FeedbackPage | 意見回饋表單（Netlify Forms） |
 
 ---
 
@@ -353,7 +363,7 @@ Reptile (1)
 | App 名稱 | 介面顯示的名稱依語系切換（`common.appName`）：中文「爬爬管理員」、英文「Reptile Manager」，用於首頁標題、側邊選單上方與底部、歡迎頁左上角 |
 | 支援語言 | `zh-TW`（繁體中文，預設）、`en`（英文） |
 | 翻譯檔路徑 | `src/i18n/zh-TW.ts`、`src/i18n/en.ts` |
-| 命名空間 | common, nav, pwa, home, reptile, feed, medication, environment, health, todo, todoItem, categories, clutch, activityLog, scan, install, backup |
+| 命名空間 | common, nav, pwa, home, reptile, feed, medication, environment, health, todo, todoItem, categories, clutch, activityLog, scan, install, feedback, backup |
 | 偏好儲存 | localStorage key: `reptileManager_lang` |
 
 ---
@@ -400,6 +410,12 @@ Reptile (1)
 - **Publish 目錄**：`dist`
 - **Redirect 規則**：`/* → /index.html 200`（支援 SPA Hash Routing）
 - **快取控制 Header**：`/sw.js` 與 HTML 設定 `no-cache`
+- **Netlify Forms（意見回饋）**：
+  - 前端表單由 React 產生，Netlify 無法在部署時偵測，因此另放一份隱藏的靜態表單 `public/__forms.html` 供偵測；欄位名稱需與 `src/lib/feedback.ts` 一致，新增或改名欄位時兩邊都要改
+  - 送出時以 `fetch` POST 到 `/__forms.html`（實體檔案），避免被 `/* → /index.html` 的 SPA rewrite 攔截
+  - 防垃圾：Netlify honeypot 欄位 `bot-field`
+  - **Netlify 後台需手動設定**：Site configuration → Forms → Enable form detection（未開啟時送出會被丟棄）；Forms → Form notifications 設定寄到 `reptilemanager@heysaori.com`
+  - 本機 `npm run dev` / `preview` 無法實際收件，需部署後測試
 
 ---
 

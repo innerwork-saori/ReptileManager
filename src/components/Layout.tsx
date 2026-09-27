@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, List, ClipboardList, Egg, Settings, ArrowLeft, Menu, X, ListChecks, Tags, ScanLine, Mail } from 'lucide-react'
+import { Home, List, ClipboardList, Egg, Settings, ArrowLeft, Menu, X, ListChecks, Tags, ScanLine, MessageSquareHeart } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
@@ -15,7 +15,6 @@ export function Layout({ children, title, back, action }: Props) {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const supportMailto = 'mailto:reptilemanager@heysaori.com?subject=ReptileManager%20Support'
 
   const handleBack = () => {
     if (typeof back === 'string') navigate(back)
@@ -138,14 +137,14 @@ export function Layout({ children, title, back, action }: Props) {
             </NavLink>
           ))}
 
-          <a
-            href={supportMailto}
+          <NavLink
+            to="/feedback"
             onClick={closeDrawer}
-            className="mx-2 mt-1 mb-2 inline-flex items-center justify-center gap-2 rounded-xl bg-primary-container px-4 py-3 text-sm font-semibold text-on-primary-container shadow-sm hover:brightness-95 active:scale-[0.99] transition-all"
+            className="mt-1 mb-2 flex items-center justify-center gap-2 rounded-xl bg-primary-container px-4 py-3 text-sm font-semibold text-on-primary-container shadow-sm hover:brightness-95 active:scale-[0.99] transition-all"
           >
-            <Mail size={18} />
+            <MessageSquareHeart size={18} />
             <span>{t('nav.supportContact')}</span>
-          </a>
+          </NavLink>
 
           {/* Divider before todos */}
           <div className="mx-4 my-2 border-t border-outline-variant/50" />

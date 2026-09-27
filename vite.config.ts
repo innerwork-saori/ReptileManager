@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { defineConfig } from 'vite'
@@ -5,7 +6,12 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url), 'utf-8')) as { version: string }
+
 export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   // 放在系統暫存目錄，避免 Dropbox 同步鎖檔造成 EBUSY
   cacheDir: path.join(os.tmpdir(), 'reptile-manager-vite'),
   plugins: [

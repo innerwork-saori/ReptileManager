@@ -21,6 +21,7 @@ import { TasksPage } from './pages/TasksPage'
 import { CategoriesPage } from './pages/CategoriesPage'
 import { ScanPage } from './pages/ScanPage'
 import { WelcomePage } from './pages/WelcomePage'
+import { FeedbackPage } from './pages/FeedbackPage'
 import { shouldShowWelcome } from './lib/welcome'
 import { isDemoMode, exitDemoMode } from './lib/demoMode'
 import { ensureDemoData, seedDemoData } from './lib/demoSeed'
@@ -129,6 +130,7 @@ export default function App() {
         <Route path="/categories" element={<CategoriesPage />} />
         <Route path="/scan" element={<ScanPage />} />
         <Route path="/backup" element={<BackupPage />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
       </Routes>
     </HashRouter>
   )

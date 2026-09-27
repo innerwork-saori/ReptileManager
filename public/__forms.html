@@ -1,0 +1,26 @@
+<!doctype html>
+<!--
+  Netlify Forms detection only. Netlify registers forms it finds in static HTML at deploy
+  time; the real form is rendered by React (src/pages/FeedbackPage.tsx) and POSTs here.
+  Field names must match src/lib/feedback.ts.
+-->
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex" />
+    <title>Forms</title>
+  </head>
+  <body>
+    <form name="feedback" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="form-name" value="feedback" />
+      <input name="bot-field" />
+      <input name="type" />
+      <textarea name="message"></textarea>
+      <input type="email" name="email" />
+      <input name="appVersion" />
+      <input name="language" />
+      <input name="installed" />
+      <input name="demo" />
+    </form>
+  </body>
+</html>
