@@ -19,29 +19,36 @@ export default defineConfig({
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,svg,png,jpg,woff2}'],
       },
-      includeAssets: ['icon.svg', 'icon-192-v20260621.png', 'icon-512-v20260621.png'],
+      includeAssets: ['icon-192-v20260927.png', 'icon-512-v20260927.png', 'icon-maskable-512-v20260927.png', 'apple-touch-icon-180-v20260927.png'],
       manifest: {
         name: 'ReptileManager',
         short_name: 'ReptileManager',
         description: '爬蟲日常管理工具',
-        theme_color: '#f0f6f9',
-        background_color: '#f0f6f9',
+        theme_color: '#f7f4ef',
+        background_color: '#f7f4ef',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/',
         scope: '/',
         icons: [
           {
-            src: 'icon-192-v20260621.png',
+            src: 'icon-192-v20260927.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: 'icon-512-v20260621.png',
+            src: 'icon-512-v20260927.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable',
+            purpose: 'any',
+          },
+          {
+            // Logo shrunk into Android's 80% safe zone so circle/squircle masks don't clip it
+            src: 'icon-maskable-512-v20260927.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
           },
         ],
       },

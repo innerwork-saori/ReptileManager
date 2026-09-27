@@ -360,7 +360,8 @@ Reptile (1)
 
 | 特性 | 實作方式 |
 |------|---------|
-| 可安裝 | Web App Manifest（圖示、名稱、顯示模式） |
+| 可安裝 | Web App Manifest（圖示、名稱、顯示模式）；主題色與啟動畫面底色為 `#f7f4ef`（同 `--color-surface`） |
+| App 圖示 | 由 `images/reptilemanager_logo.png`（去背）疊在米白底 `#f7f4ef` 產生，不用透明背景（iOS 會把透明處填黑）：`icon-192` / `icon-512`（`any`）、`icon-maskable-512`（logo 縮進 Android 80% 安全區）、`apple-touch-icon-180`；檔名帶日期版號（目前 `v20260927`）以避開裝置快取，換圖時請改用新版號 |
 | 離線存取 | Service Worker（vite-plugin-pwa + Workbox） |
 | 更新通知 | 新版本上線時提示用戶手動更新 |
 | HTML 快取策略 | StaleWhileRevalidate |
