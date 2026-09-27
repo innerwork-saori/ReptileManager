@@ -12,6 +12,7 @@ import type { Reptile, FeedLog, WeightLog, ShedLog, HabitatLog, VisitLog } from 
 import { formatRelativeTime, formatRelativeTimeInDays, calcAge } from '../lib/todoEngine'
 import { buildReptileQrPayload } from '../lib/qrPayload'
 import { usePhotoSrc } from '../components/ReptilePhoto'
+import { ReptilePlaceholder } from '../components/ReptilePlaceholder'
 
 function getReptileQrValue(reptile: Reptile): string {
   const saved = String(reptile.qrTargetUrl || '').trim()
@@ -280,9 +281,7 @@ export function ReptileDetailPage() {
             onClick={() => setShowPhoto(true)}
           />
         ) : (
-          <div className="w-full h-full bg-primary-container flex items-center justify-center text-8xl select-none">
-            🦎
-          </div>
+          <ReptilePlaceholder className="bg-primary-container" />
         )}
 
         {/* QR Code overlay */}

@@ -7,6 +7,7 @@ import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo } from '../db/repo
 import type { Reptile } from '../db/schema'
 import { calcAge, formatRelativeTime, formatRelativeTimeInDays } from '../lib/todoEngine'
 import { ReptilePhoto } from '../components/ReptilePhoto'
+import { ReptilePlaceholder } from '../components/ReptilePlaceholder'
 
 type ReptileCardSummary = {
   lastFedAt?: string
@@ -198,7 +199,7 @@ export function ReptilesPage() {
                               photo={r}
                               alt={r.name}
                               className="w-full h-full object-cover"
-                              fallback={<div className="w-full h-full flex items-center justify-center text-4xl select-none">🦎</div>}
+                              fallback={<ReptilePlaceholder />}
                             />
                           </div>
                           <button

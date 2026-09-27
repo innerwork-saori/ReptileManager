@@ -1,12 +1,13 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { UtensilsCrossed, Scale, RefreshCw, ChevronRight, Plus, Bell, CheckCircle2 } from 'lucide-react'
+import { UtensilsCrossed, Scale, RefreshCw, ChevronRight, Plus, Bell, CheckCircle2, ScanLine } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
 import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo, medicationCourseRepo, todoRuleRepo, todoInstanceRepo } from '../db/repos'
 import type { Reptile, FeedLog, WeightLog, ShedLog, MedicationCourse } from '../db/schema'
 import { formatRelativeTime, formatDate, computeTodayInstances } from '../lib/todoEngine'
 import { ReptilePhoto, type PhotoRef } from '../components/ReptilePhoto'
+import { ReptilePlaceholder } from '../components/ReptilePlaceholder'
 
 function todayStr(): string {
   return new Date().toISOString().slice(0, 10)
@@ -105,26 +106,27 @@ export function HomePage() {
     pendingMeds.map((med) => ({ ...med, reptileName: reptile.name }))
   )
 
+  const scanAction = (
+    <button
+      onClick={() => navigate('/scan')}
+      aria-label={t('nav.scan')}
+      title={t('nav.scan')}
+      className="p-1.5 rounded-full bg-primary-container text-on-primary-container hover:bg-primary-container/80 transition-colors"
+    >
+      <ScanLine size={18} />
+    </button>
+  )
+
   if (loading) {
     return (
-      <Layout title={t('home.title')}>
+      <Layout title={t('home.title')} action={scanAction}>
         <div className="flex items-center justify-center py-20 text-on-surface-variant">{t('common.loading')}</div>
       </Layout>
     )
   }
 
   return (
-    <Layout
-      title={t('home.title')}
-      action={
-        <button
-          onClick={() => navigate('/reptile/new')}
-          className="p-1.5 rounded-full bg-primary-container text-on-primary-container hover:bg-primary-container/80 transition-colors"
-        >
-          <Plus size={18} />
-        </button>
-      }
-    >
+    <Layout title={t('home.title')} action={scanAction}>
       <div className="py-4 space-y-6">
 
         {/* Todo banner */}
@@ -165,7 +167,7 @@ export function HomePage() {
                           photo={feed.reptilePhoto}
                           alt={feed.reptileName}
                           className="w-full h-full object-cover"
-                          fallback={<div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
+                          fallback={<ReptilePlaceholder />}
                         />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -210,7 +212,7 @@ export function HomePage() {
                           photo={weight.reptilePhoto}
                           alt={weight.reptileName}
                           className="w-full h-full object-cover"
-                          fallback={<div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
+                          fallback={<ReptilePlaceholder />}
                         />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -255,7 +257,7 @@ export function HomePage() {
                           photo={shed.reptilePhoto}
                           alt={shed.reptileName}
                           className="w-full h-full object-cover"
-                          fallback={<div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
+                          fallback={<ReptilePlaceholder />}
                         />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -310,11 +312,7 @@ export function HomePage() {
                       photo={reptile}
                       alt={reptile.name}
                       className="w-full h-full object-cover"
-                      fallback={
-                        <div className="w-full h-full flex items-center justify-center text-4xl">
-                          🦎
-                        </div>
-                      }
+                      fallback={<ReptilePlaceholder />}
                     />
                   </div>
                   <div className="p-3">

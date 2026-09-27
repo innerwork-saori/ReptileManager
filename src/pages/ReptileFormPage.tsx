@@ -9,6 +9,7 @@ import { categoryRepo, photoRepo, reptileRepo } from '../db/repos'
 import type { Reptile } from '../db/schema'
 import { buildReptileQrPayload } from '../lib/qrPayload'
 import { compressImage, type CompressedImage } from '../lib/imageCompress'
+import { ReptilePlaceholder } from '../components/ReptilePlaceholder'
 
 const SEX_LABEL: Record<string, string> = { male: '公', female: '母', unknown: '未知' }
 
@@ -346,7 +347,7 @@ export function ReptileFormPage() {
                 <div className="w-24 h-24 shrink-0 rounded-xl overflow-hidden border border-gray-300 bg-surface-container flex items-center justify-center">
                   {uploadPreview
                     ? <img src={uploadPreview} alt={form.name} className="w-full h-full object-cover" />
-                    : <span className="text-3xl select-none">🦎</span>}
+                    : <ReptilePlaceholder />}
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className={`inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white ${photoProcessing ? 'opacity-60 pointer-events-none' : 'cursor-pointer'}`}>
