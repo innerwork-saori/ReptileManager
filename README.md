@@ -102,8 +102,8 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 
 提供全域分類維護頁，入口位於 burger menu。
 
-- 預設分類：`ball python`、`boa constrictor`、`leopard gecko`、`african fat tail gecko`
-- 支援新增、修改、刪除分類
+- 預設分類：`ball python`、`boa constrictor`、`leopard gecko`、`african fat tail gecko`，只在全新資料庫（分類表為空）時建立一次，並以 settings `defaultCategoriesSeeded` 標記；之後改名或刪除預設分類不會被自動補回
+- 支援新增、修改、刪除分類；修改分類名稱時會同步更新使用該分類的爬蟲
 - 若分類已被爬蟲使用，會阻擋刪除並提示先調整爬蟲分類
 - 相容舊資料：既有 reptile 的歷史分類值會自動收編進分類清單
 

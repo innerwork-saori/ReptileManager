@@ -45,11 +45,14 @@ const DEFAULT_CATEGORY_NAMES = [
   'African fat tail gecko',
 ]
 
+const DEFAULT_CATEGORIES_SEEDED_KEY = 'defaultCategoriesSeeded'
+
 async function seedDefaultCategoriesIfEmpty(): Promise<void> {
-  await db.transaction('rw', [db.categories, db.reptiles], async () => {
-    const [existingCategories, reptiles] = await Promise.all([
+  await db.transaction('rw', [db.categories, db.reptiles, db.settings], async () => {
+    const [existingCategories, reptiles, seededFlag] = await Promise.all([
       db.categories.toArray(),
       db.reptiles.toArray(),
+      db.settings.get(DEFAULT_CATEGORIES_SEEDED_KEY),
     ])
 
     const keepByNormalized = new Map<string, Category>()
@@ -75,12 +78,18 @@ async function seedDefaultCategoriesIfEmpty(): Promise<void> {
     const namesToAdd = new Set<string>()
     const normalizedExisting = new Set(keepByNormalized.keys())
 
-    for (const defaultName of DEFAULT_CATEGORY_NAMES) {
-      const normalized = normalizeCategoryName(defaultName)
-      if (!normalizedExisting.has(normalized)) {
-        namesToAdd.add(defaultName)
-        normalizedExisting.add(normalized)
+    // Seed defaults only once on a fresh database, so renamed or deleted defaults don't come back
+    if (!seededFlag) {
+      if (existingCategories.length === 0) {
+        for (const defaultName of DEFAULT_CATEGORY_NAMES) {
+          const normalized = normalizeCategoryName(defaultName)
+          if (!normalizedExisting.has(normalized)) {
+            namesToAdd.add(defaultName)
+            normalizedExisting.add(normalized)
+          }
+        }
       }
+      await db.settings.put({ key: DEFAULT_CATEGORIES_SEEDED_KEY, value: true })
     }
 
     for (const reptile of reptiles) {
