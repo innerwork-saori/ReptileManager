@@ -383,6 +383,14 @@ h1{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--on-surface)}
           </button>
         </section>
 
+        {/* About */}
+        <footer className="pt-2 text-center space-y-0.5" aria-label={t('backup.aboutSection')}>
+          <p className="text-xs font-semibold text-on-surface-variant">
+            {t('common.appName')} · {t('backup.version', { version: __APP_VERSION__ })}
+          </p>
+          <p className="text-[10px] text-outline">{t('backup.description')}</p>
+        </footer>
+
       </div>
 
       {/* QR Export Modal */}

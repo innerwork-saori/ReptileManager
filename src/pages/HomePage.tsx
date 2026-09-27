@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { UtensilsCrossed, Scale, RefreshCw, ChevronRight, Plus, Bell, CheckCircle2, ScanLine } from 'lucide-react'
+import { UtensilsCrossed, Scale, RefreshCw, ChevronRight, Plus, Bell, CheckCircle2, ScanLine, QrCode, HeartPulse, Pill, Thermometer, Egg } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
 import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo, medicationCourseRepo, todoRuleRepo, todoInstanceRepo } from '../db/repos'
@@ -332,15 +332,48 @@ export function HomePage() {
             </div>
           </section>
         ) : (
-          <div className="flex flex-col items-center justify-center py-16 gap-4 text-on-surface-variant mx-4">
-            <span className="text-6xl">🦎</span>
-            <p className="text-center text-sm">{t('home.noReptiles')}</p>
-            <button
-              onClick={() => navigate('/reptile/new')}
-              className="bg-primary text-on-primary px-6 py-2.5 rounded-full text-sm font-semibold"
-            >
-              {t('home.addFirst')}
-            </button>
+          <div className="mx-4 max-w-md sm:mx-auto flex flex-col items-center gap-5 py-8 text-center">
+            <img src="/logo-512-v20260927.png" alt="" draggable={false} className="h-28 w-28 select-none" />
+            <div className="space-y-1">
+              <h2 className="text-xl font-bold text-primary">{t('common.appName')}</h2>
+              <p className="text-sm text-on-surface-variant">{t('home.emptyTagline')}</p>
+            </div>
+
+            <section className="w-full text-left">
+              <h3 className="mb-2 text-sm font-semibold text-on-surface">{t('home.featuresTitle')}</h3>
+              <ul className="grid grid-cols-2 gap-2">
+                {[
+                  { Icon: UtensilsCrossed, key: 'feed' },
+                  { Icon: HeartPulse, key: 'health' },
+                  { Icon: Pill, key: 'med' },
+                  { Icon: Thermometer, key: 'env' },
+                  { Icon: Egg, key: 'breed' },
+                  { Icon: QrCode, key: 'qr' },
+                ].map(({ Icon, key }) => (
+                  <li key={key} className="rounded-xl border border-outline-variant bg-surface-container-lowest p-3 shadow-sm">
+                    <Icon size={20} className="mb-1.5 text-primary" aria-hidden="true" />
+                    <p className="text-sm font-semibold text-on-surface">{t(`home.features.${key}Title`)}</p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-on-surface-variant">{t(`home.features.${key}Body`)}</p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <p className="text-sm text-on-surface-variant">{t('home.noReptiles')}</p>
+            <div className="flex w-full flex-col gap-2">
+              <button
+                onClick={() => navigate('/reptile/new')}
+                className="w-full bg-primary text-on-primary py-3 rounded-xl text-sm font-semibold active:scale-[0.98] transition-transform"
+              >
+                {t('home.addFirst')}
+              </button>
+              <a
+                href="/?demo=1#/"
+                className="w-full py-2.5 rounded-xl text-sm font-semibold text-primary hover:bg-surface-container"
+              >
+                {t('welcome.ctaTryDemo')}
+              </a>
+            </div>
           </div>
         )}
 
