@@ -1,4 +1,18 @@
-import { db } from '../db/schema'
+import { db, type Photo } from '../db/schema'
+import { blobToDataUrl, dataUrlToBlob } from './imageCompress'
+
+const BACKUP_VERSION = 2
+
+// Backups embed photo blobs as base64 data URLs so a single JSON file stays self-contained
+type SerializedPhoto = Omit<Photo, 'blob'> & { dataUrl: string }
+
+async function serializePhotos(photos: Photo[]): Promise<SerializedPhoto[]> {
+  return Promise.all(photos.map(async ({ blob, ...rest }) => ({ ...rest, dataUrl: await blobToDataUrl(blob) })))
+}
+
+function deserializePhotos(rows: unknown[]): Photo[] {
+  return (rows as SerializedPhoto[]).map(({ dataUrl, ...rest }) => ({ ...rest, blob: dataUrlToBlob(dataUrl) }))
+}
 
 function stripLegacyReptileFields(row: unknown): unknown {
   if (!row || typeof row !== 'object') return row
@@ -23,6 +37,7 @@ export async function exportAllData(): Promise<void> {
     visit_logs,
     clutch_logs,
     settings,
+    photos,
   ] = await Promise.all([
     db.categories.toArray(),
     db.reptiles.toArray(),
@@ -39,12 +54,13 @@ export async function exportAllData(): Promise<void> {
     db.visit_logs.toArray(),
     db.clutch_logs.toArray(),
     db.settings.toArray(),
+    db.photos.toArray().then(serializePhotos),
   ])
 
   const sanitizedReptiles = reptiles.map(stripLegacyReptileFields)
 
   const backup = {
-    version: 1,
+    version: BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
     data: {
       categories,
@@ -62,6 +78,7 @@ export async function exportAllData(): Promise<void> {
       visit_logs,
       clutch_logs,
       settings,
+      photos,
     },
   }
 
@@ -105,6 +122,7 @@ const ALL_TABLES = [
   'categories', 'reptiles', 'weight_logs', 'feed_logs', 'medication_courses',
   'medication_logs', 'shed_logs', 'habitat_logs', 'uvb_logs',
   'substrate_logs', 'todo_rules', 'todo_instances', 'visit_logs', 'clutch_logs', 'settings',
+  'photos',
 ] as const
 
 export async function importAllData(file: File): Promise<void> {
@@ -119,6 +137,8 @@ export async function importAllData(file: File): Promise<void> {
     throw new Error('invalid_format')
   }
   const { data } = backup
+  // Decode photos before the transaction; v1 backups have no photos table
+  const photoRows = Array.isArray(data.photos) ? deserializePhotos(data.photos) : []
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const tableRefs = ALL_TABLES.map((t) => (db as any)[t])
   await db.transaction('rw', tableRefs, async () => {
@@ -126,9 +146,11 @@ export async function importAllData(file: File): Promise<void> {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (db as any)[t].clear()
       const rows = data[t]
-      const cleanRows = t === 'reptiles' && Array.isArray(rows)
-        ? rows.map(stripLegacyReptileFields)
-        : rows
+      const cleanRows = t === 'photos'
+        ? photoRows
+        : t === 'reptiles' && Array.isArray(rows)
+          ? rows.map(stripLegacyReptileFields)
+          : rows
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (cleanRows?.length) await (db as any)[t].bulkAdd(cleanRows)
     }

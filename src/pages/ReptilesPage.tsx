@@ -6,6 +6,7 @@ import { Layout } from '../components/Layout'
 import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo } from '../db/repos'
 import type { Reptile } from '../db/schema'
 import { calcAge, formatRelativeTime, formatRelativeTimeInDays } from '../lib/todoEngine'
+import { ReptilePhoto } from '../components/ReptilePhoto'
 
 type ReptileCardSummary = {
   lastFedAt?: string
@@ -193,11 +194,12 @@ export function ReptilesPage() {
                       <div className="w-28 md:w-36 shrink-0 flex md:flex-col gap-3">
                         <div className="relative">
                           <div className="w-28 h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden border border-outline-variant bg-surface-container shadow-sm">
-                            {r.photoUrl ? (
-                              <img src={r.photoUrl} alt={r.name} className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-4xl select-none">🦎</div>
-                            )}
+                            <ReptilePhoto
+                              photo={r}
+                              alt={r.name}
+                              className="w-full h-full object-cover"
+                              fallback={<div className="w-full h-full flex items-center justify-center text-4xl select-none">🦎</div>}
+                            />
                           </div>
                           <button
                             onClick={(e) => {

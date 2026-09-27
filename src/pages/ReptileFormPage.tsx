@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Trash2 } from 'lucide-react'
+import { ImagePlus, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
 import { InputField, SelectField, TextareaField } from '../components/FormField'
-import { categoryRepo, reptileRepo } from '../db/repos'
+import { usePhotoSrc } from '../components/ReptilePhoto'
+import { categoryRepo, photoRepo, reptileRepo } from '../db/repos'
 import type { Reptile } from '../db/schema'
 import { buildReptileQrPayload } from '../lib/qrPayload'
+import { compressImage, type CompressedImage } from '../lib/imageCompress'
 
 const SEX_LABEL: Record<string, string> = { male: '公', female: '母', unknown: '未知' }
 
@@ -56,6 +58,19 @@ export function ReptileFormPage() {
   const [showDelete, setShowDelete] = useState(false)
   const [allReptiles, setAllReptiles] = useState<Reptile[]>([])
   const [categories, setCategories] = useState<string[]>([])
+  const [photoMode, setPhotoMode] = useState<'upload' | 'url'>('upload')
+  const [existingPhotoId, setExistingPhotoId] = useState<string>()
+  const [newPhoto, setNewPhoto] = useState<CompressedImage | null>(null)
+  const [newPhotoPreview, setNewPhotoPreview] = useState<string>()
+  const [photoProcessing, setPhotoProcessing] = useState(false)
+  const [photoError, setPhotoError] = useState('')
+  const { src: existingPhotoSrc } = usePhotoSrc(existingPhotoId ? { photoId: existingPhotoId } : undefined)
+  const uploadPreview = newPhotoPreview ?? existingPhotoSrc
+
+  useEffect(() => {
+    if (!newPhotoPreview) return
+    return () => URL.revokeObjectURL(newPhotoPreview)
+  }, [newPhotoPreview])
 
   useEffect(() => {
     reptileRepo.getAll().then(setAllReptiles)
@@ -83,6 +98,8 @@ export function ReptileFormPage() {
         fatherId: r.fatherId ?? '',
         motherId: r.motherId ?? '',
       })
+      setExistingPhotoId(r.photoId)
+      setPhotoMode(r.photoUrl && !r.photoId ? 'url' : 'upload')
       setLoading(false)
     })
   }, [id, isEdit, navigate])
@@ -101,6 +118,35 @@ export function ReptileFormPage() {
       species: f.species.trim() ? f.species : nextCategory,
     }))
     setErrors((e2) => ({ ...e2, category: '' }))
+  }
+
+  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setPhotoError('')
+    setPhotoProcessing(true)
+    try {
+      const compressed = await compressImage(file)
+      setNewPhoto(compressed)
+      setNewPhotoPreview(URL.createObjectURL(compressed.blob))
+    } catch (err) {
+      const code = err instanceof Error ? err.message : ''
+      setPhotoError(
+        code === 'not_image' ? t('reptile.form.photoErrorNotImage')
+          : code === 'too_large' ? t('reptile.form.photoErrorTooLarge')
+            : t('reptile.form.photoErrorDecode'),
+      )
+    } finally {
+      setPhotoProcessing(false)
+    }
+  }
+
+  const handlePhotoRemove = () => {
+    setNewPhoto(null)
+    setNewPhotoPreview(undefined)
+    setExistingPhotoId(undefined)
+    setPhotoError('')
   }
 
   const categoryOptions = useMemo(() => {
@@ -175,7 +221,8 @@ export function ReptileFormPage() {
       sex: (form.sex || undefined) as Reptile['sex'],
       birthDate: buildBirthDate(),
       enclosureName: form.enclosureName.trim() || undefined,
-      photoUrl: form.photoUrl.trim() || undefined,
+      photoUrl: photoMode === 'url' ? form.photoUrl.trim() || undefined : undefined,
+      photoId: photoMode === 'upload' && !newPhoto ? existingPhotoId : undefined,
       notes: form.notes.trim() || undefined,
       chronicInfo: form.chronicInfo.trim() || undefined,
       fatherId: form.fatherId || undefined,
@@ -183,14 +230,15 @@ export function ReptileFormPage() {
       qrTargetUrl: '',
     }
 
-    if (isEdit) {
-      await reptileRepo.update(id!, data)
-      navigate(`/reptile/${id}`)
-    } else {
-      const created = await reptileRepo.create(data)
-      await reptileRepo.update(created.id, { qrTargetUrl: buildQrPayload(created.id) })
-      navigate(`/reptile/${created.id}`)
+    const reptileId = isEdit ? id! : (await reptileRepo.create(data)).id
+    const patch: Partial<Reptile> = isEdit ? data : { qrTargetUrl: buildQrPayload(reptileId) }
+    if (photoMode === 'upload' && newPhoto) {
+      patch.photoId = (await photoRepo.saveForReptile(reptileId, newPhoto)).id
+    } else if (!data.photoId) {
+      await photoRepo.deleteByReptile(reptileId)
     }
+    await reptileRepo.update(reptileId, patch)
+    navigate(`/reptile/${reptileId}`)
   }
 
   const handleDelete = async () => {
@@ -276,12 +324,64 @@ export function ReptileFormPage() {
             ]}
           />
         </section>
-        <InputField label={t('reptile.form.photoUrl')} type="url" value={form.photoUrl} onChange={set('photoUrl')} placeholder={t('reptile.form.photoUrlPlaceholder')} />
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="block text-sm font-medium text-gray-700">{t('reptile.form.photo')}</label>
+            <div className="flex rounded-lg border border-gray-300 p-0.5 text-xs">
+              {(['upload', 'url'] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setPhotoMode(mode)}
+                  className={`px-3 py-1 rounded-md font-medium transition-colors ${photoMode === mode ? 'bg-green-600 text-white' : 'text-gray-600'}`}
+                >
+                  {mode === 'upload' ? t('reptile.form.photoModeUpload') : t('reptile.form.photoModeUrl')}
+                </button>
+              ))}
+            </div>
+          </div>
+          {photoMode === 'upload' ? (
+            <div className="space-y-1">
+              <div className="flex items-center gap-3">
+                <div className="w-24 h-24 shrink-0 rounded-xl overflow-hidden border border-gray-300 bg-surface-container flex items-center justify-center">
+                  {uploadPreview
+                    ? <img src={uploadPreview} alt={form.name} className="w-full h-full object-cover" />
+                    : <span className="text-3xl select-none">🦎</span>}
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className={`inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white ${photoProcessing ? 'opacity-60 pointer-events-none' : 'cursor-pointer'}`}>
+                    <ImagePlus size={16} />
+                    {photoProcessing
+                      ? t('reptile.form.photoProcessing')
+                      : uploadPreview ? t('reptile.form.photoChange') : t('reptile.form.photoChoose')}
+                    <input type="file" accept="image/*" className="hidden" onChange={handlePhotoSelect} disabled={photoProcessing} />
+                  </label>
+                  {uploadPreview && (
+                    <button type="button" onClick={handlePhotoRemove} className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600">
+                      {t('reptile.form.photoRemove')}
+                    </button>
+                  )}
+                </div>
+              </div>
+              {photoError && <p className="text-xs text-red-500">{photoError}</p>}
+              <p className="text-xs text-gray-500">{t('reptile.form.photoLocalHint')}</p>
+            </div>
+          ) : (
+            <input
+              type="url"
+              value={form.photoUrl}
+              onChange={set('photoUrl')}
+              placeholder={t('reptile.form.photoUrlPlaceholder')}
+              aria-label={t('reptile.form.photoUrl')}
+              className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
+          )}
+        </div>
         <TextareaField label={t('reptile.form.chronicInfo')} value={form.chronicInfo} onChange={set('chronicInfo')} />
         <TextareaField label={t('common.notes')} value={form.notes} onChange={set('notes')} />
         <InputField label={t('reptile.form.enclosure')} value={form.enclosureName} onChange={set('enclosureName')} placeholder={t('reptile.form.enclosurePlaceholder')} />
 
-        <button type="submit" disabled={saving}
+        <button type="submit" disabled={saving || photoProcessing}
           className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold disabled:opacity-60">
           {saving ? t('common.saving') : isEdit ? t('reptile.form.saveChanges') : t('reptile.new')}
         </button>

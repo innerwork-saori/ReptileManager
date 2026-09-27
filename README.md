@@ -1,6 +1,6 @@
 # ReptileManager — 功能架構書
 
-> 版本：0.4.0　　最後更新：2026-09-25
+> 版本：0.5.0　　最後更新：2026-09-27
 
 ---
 
@@ -63,7 +63,7 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 | 出生日期 | 自動計算年齡（年月日精度） |
 | 分類（Category） | 由使用者自訂維護，預設包含 4 個常用分類 |
 | 配對（Pairing：Sire / Dam） | 父母爬蟲選擇區塊 |
-| 照片 URL | 自定義大頭照 |
+| 照片 | 大頭照，可「上傳照片」（存於本機 IndexedDB）或「貼網址」二擇一 |
 | 健康資訊（Healthy Info） | 爬蟲健康摘要欄位 |
 | 飼育箱名稱 | 用於首頁快速識別 |
 | QR Code | 以 `rm:v1:reptile:{id}` 載荷產生 QR Code，可供 PWA 內掃描直接開啟資料 |
@@ -74,6 +74,11 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 - Category 預設為空值（需由使用者選擇），未選擇時不可儲存
 - 選擇 Category 時，若 Species 目前為空，會自動帶入同值，之後可由使用者自行修改
 - 送出表單若有必填錯誤，會自動捲動並聚焦到第一個錯誤欄位
+- 照片欄位可切換「上傳照片 / 貼網址」：
+  - 上傳：選圖後即在前端壓縮（最長邊 1280px、WebP，不支援時改用 JPEG，並依 EXIF 轉正；原圖已夠小時保留原檔），預覽後隨表單儲存；可更換或移除，原始檔上限 20MB
+  - 照片以 Blob 存於 `photos` 資料表，只存在該裝置，表單會提示使用者定期匯出備份；首次存照片時會呼叫 `navigator.storage.persist()` 降低被瀏覽器清除的機率
+  - 兩種模式互斥：儲存上傳照片會清除網址，改用網址會刪除已存的照片
+- 刪除爬蟲時會一併刪除其照片
 
 **爬蟲清單 UI**：
 
@@ -256,9 +261,9 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 | PWA 狀態 | 顯示目前連線狀態（online / offline） |
 | 語言切換 | 繁體中文 / English，偏好存於 localStorage |
 | 資料統計 | Bento Grid 顯示爬寵數量、餵食紀錄、健康紀錄、IndexedDB 佔用大小 |
-| 匯出備份 | 將所有資料表（含 categories）序列化為 JSON 下載，並自動排除已移除的舊 reptile 健康欄位 |
+| 匯出備份 | 將所有資料表（含 categories、photos）序列化為單一 JSON 下載（備份格式 version 2，照片以 base64 data URL 內嵌），並自動排除已移除的舊 reptile 健康欄位 |
 | 匯出 QR Code | 批次產生所有爬蟲 QR Code，每張顯示名稱與性別（M ♂ / F ♀ / Unknown），支援列印 / PDF |
-| 匯入備份 | 上傳 JSON 檔，驗證後寫入 IndexedDB（覆蓋模式） |
+| 匯入備份 | 上傳 JSON 檔，驗證後寫入 IndexedDB（覆蓋模式）；相容不含照片的舊版 version 1 備份 |
 | 聯絡支援 | 設定頁與側邊抽屜提供官方聯絡信箱 `reptilemanager@heysaori.com`，支援問題回報與功能建議 |
 | 重設所有數據 | 危險區域操作，清除全部資料表並重新載入 |
 
@@ -266,7 +271,7 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 
 ## 4. 資料模型
 
-資料庫以 Dexie 定義，共 **15 張資料表**，全部儲存於瀏覽器 IndexedDB。示範模式（`?demo=1`）使用相同結構的獨立資料庫 `reptileManagerDb-demo`。
+資料庫以 Dexie 定義，共 **16 張資料表**，全部儲存於瀏覽器 IndexedDB。示範模式（`?demo=1`）使用相同結構的獨立資料庫 `reptileManagerDb-demo`。
 
 ```
 ReptileDB (Dexie)
@@ -285,6 +290,7 @@ ReptileDB (Dexie)
 ├── todo_rules           → 待辦規則
 ├── todo_instances       → 待辦實例
 ├── clutch_logs          → 繁殖記錄（ClutchLog）
+├── photos               → 爬蟲照片（Blob，Reptile.photoId 指向）
 └── settings             → 應用設定（key-value）
 ```
 
@@ -408,7 +414,7 @@ Reptile (1)
          ClutchLog
 
 備份（Backup）
-  讀寫 → 全部 15 張資料表
+  讀寫 → 全部 16 張資料表
 ```
 
 ---
@@ -420,5 +426,5 @@ Reptile (1)
 | 後端 / 雲端同步 | 目前純本地；架構可在 repos.ts 層加入 API 呼叫 |
 | 推播通知 | Service Worker 支援；尚未實作 Push API |
 | IoT 感測器整合 | HabitatLog 結構已預留；可接溫濕度感測器 API |
-| 照片本地上傳 | 目前僅支援 URL 輸入；可擴充為 File API + Blob 儲存 |
+| 爬蟲相簿（多張照片） | 目前每隻爬蟲一張照片；`photos` 表以 reptileId 索引，可擴充為多張 |
 | 多帳號 / 分享 | 目前單使用者；可透過 QR Code 分享靜態頁面 |

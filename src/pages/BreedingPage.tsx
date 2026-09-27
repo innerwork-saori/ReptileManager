@@ -6,6 +6,7 @@ import { Layout } from '../components/Layout'
 import { InputField, SelectField, TextareaField } from '../components/FormField'
 import { clutchLogRepo, reptileRepo } from '../db/repos'
 import type { ClutchLog, Reptile } from '../db/schema'
+import { ReptilePhoto, hasPhoto } from '../components/ReptilePhoto'
 
 function addDays(dateStr: string, days: number): string {
   const d = new Date(dateStr + 'T00:00:00')
@@ -261,21 +262,21 @@ export function BreedingPage() {
                         onClick={() => navigate(`/breeding/${c.id}`)}
                       >
                         <div className="flex -space-x-2">
-                          {father?.photoUrl && (
-                            <img
-                              src={father.photoUrl}
+                          {father && hasPhoto(father) && (
+                            <ReptilePhoto
+                              photo={father}
                               alt={father.name}
                               className="w-8 h-8 rounded-full border-2 border-surface-container-lowest object-cover"
                             />
                           )}
-                          {mother?.photoUrl && (
-                            <img
-                              src={mother.photoUrl}
+                          {mother && hasPhoto(mother) && (
+                            <ReptilePhoto
+                              photo={mother}
                               alt={mother.name}
                               className="w-8 h-8 rounded-full border-2 border-surface-container-lowest object-cover"
                             />
                           )}
-                          {!father?.photoUrl && !mother?.photoUrl && (
+                          {!hasPhoto(father) && !hasPhoto(mother) && (
                             <div className="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-surface-container flex items-center justify-center">
                               <Egg size={14} className="text-on-surface-variant" />
                             </div>

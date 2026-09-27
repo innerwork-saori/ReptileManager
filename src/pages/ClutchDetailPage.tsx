@@ -6,6 +6,7 @@ import { Layout } from '../components/Layout'
 import { InputField, TextareaField } from '../components/FormField'
 import { clutchLogRepo, reptileRepo } from '../db/repos'
 import type { ClutchLog, Reptile } from '../db/schema'
+import { ReptilePhoto } from '../components/ReptilePhoto'
 
 function addDays(dateStr: string, days: number): string {
   const d = new Date(dateStr + 'T00:00:00')
@@ -100,20 +101,19 @@ export function ClutchDetailPage() {
         <section className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="flex -space-x-3">
-              {father?.photoUrl ? (
-                <img src={father.photoUrl} alt={father.name} className="w-12 h-12 rounded-full border-2 border-surface-container-lowest object-cover" />
-              ) : (
-                <div className="w-12 h-12 rounded-full border-2 border-surface-container-lowest bg-surface-container flex items-center justify-center">
-                  <Egg size={18} className="text-on-surface-variant" />
-                </div>
-              )}
-              {mother?.photoUrl ? (
-                <img src={mother.photoUrl} alt={mother.name} className="w-12 h-12 rounded-full border-2 border-surface-container-lowest object-cover" />
-              ) : (
-                <div className="w-12 h-12 rounded-full border-2 border-surface-container-lowest bg-surface-container flex items-center justify-center">
-                  <Egg size={18} className="text-on-surface-variant" />
-                </div>
-              )}
+              {[father, mother].map((parent, i) => (
+                <ReptilePhoto
+                  key={i}
+                  photo={parent}
+                  alt={parent?.name ?? ''}
+                  className="w-12 h-12 rounded-full border-2 border-surface-container-lowest object-cover"
+                  fallback={
+                    <div className="w-12 h-12 rounded-full border-2 border-surface-container-lowest bg-surface-container flex items-center justify-center">
+                      <Egg size={18} className="text-on-surface-variant" />
+                    </div>
+                  }
+                />
+              ))}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-on-surface">

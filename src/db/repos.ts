@@ -16,7 +16,9 @@ import type {
   TodoStatus,
   VisitLog,
   ClutchLog,
+  Photo,
 } from './schema'
+import type { CompressedImage } from '../lib/imageCompress'
 
 function uid(): string {
   return crypto.randomUUID()
@@ -209,9 +211,10 @@ export const reptileRepo = {
       db.reptiles, db.feed_logs, db.weight_logs, db.medication_courses,
       db.medication_logs, db.shed_logs, db.habitat_logs, db.uvb_logs,
       db.substrate_logs, db.todo_rules, db.todo_instances, db.visit_logs,
-      db.clutch_logs,
+      db.clutch_logs, db.photos,
     ], async () => {
       await db.reptiles.delete(id)
+      await db.photos.where('reptileId').equals(id).delete()
       await db.feed_logs.where('reptileId').equals(id).delete()
       await db.weight_logs.where('reptileId').equals(id).delete()
       await db.medication_courses.where('reptileId').equals(id).delete()
@@ -227,6 +230,29 @@ export const reptileRepo = {
       await db.clutch_logs.where('motherReptileId').equals(id).delete()
     })
   },
+}
+
+// ─── Photo ───────────────────────────────────────────────────────────────────
+
+export const photoRepo = {
+  getById: (id: string) => db.photos.get(id),
+
+  // Store a reptile's photo, replacing any photo it already has
+  saveForReptile: async (reptileId: string, compressed: CompressedImage): Promise<Photo> => {
+    const photo: Photo = { id: uid(), reptileId, ...compressed, createdAt: now() }
+    await db.transaction('rw', db.photos, async () => {
+      await db.photos.where('reptileId').equals(reptileId).delete()
+      await db.photos.add(photo)
+    })
+    // Ask the browser not to evict local data now that it holds irreplaceable photos
+    void navigator.storage?.persist?.().catch(() => undefined)
+    return photo
+  },
+
+  deleteByReptile: (reptileId: string) =>
+    db.photos.where('reptileId').equals(reptileId).delete(),
+
+  count: () => db.photos.count(),
 }
 
 // ─── FeedLog ─────────────────────────────────────────────────────────────────

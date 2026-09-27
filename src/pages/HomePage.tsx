@@ -6,18 +6,19 @@ import { Layout } from '../components/Layout'
 import { reptileRepo, feedLogRepo, weightLogRepo, shedLogRepo, medicationCourseRepo, todoRuleRepo, todoInstanceRepo } from '../db/repos'
 import type { Reptile, FeedLog, WeightLog, ShedLog, MedicationCourse } from '../db/schema'
 import { formatRelativeTime, formatDate, computeTodayInstances } from '../lib/todoEngine'
+import { ReptilePhoto, type PhotoRef } from '../components/ReptilePhoto'
 
 function todayStr(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
-type RecentWeight = WeightLog & { reptileName: string; reptileBreed: string; reptilePhotoUrl?: string }
-type RecentShed = ShedLog & { reptileName: string; reptileBreed: string; reptilePhotoUrl?: string }
+type RecentWeight = WeightLog & { reptileName: string; reptileBreed: string; reptilePhoto?: PhotoRef }
+type RecentShed = ShedLog & { reptileName: string; reptileBreed: string; reptilePhoto?: PhotoRef }
 type OverdueFeed = {
   reptileId: string
   reptileName: string
   reptileBreed: string
-  reptilePhotoUrl?: string
+  reptilePhoto: PhotoRef
   lastFedAt?: string
 }
 
@@ -40,7 +41,7 @@ export function HomePage() {
   const load = useCallback(async () => {
     const reptiles = await reptileRepo.getAll()
     const rMap = new Map(reptiles.map((r) => [r.id, r.name]))
-    const rPhotoMap = new Map(reptiles.map((r) => [r.id, r.photoUrl]))
+    const rPhotoMap = new Map<string, PhotoRef>(reptiles.map((r) => [r.id, { photoId: r.photoId, photoUrl: r.photoUrl }]))
     const rBreedMap = new Map(reptiles.map((r) => [r.id, r.breed]))
 
     const [cardData, weightLogs, shedLogs] = await Promise.all([
@@ -77,14 +78,14 @@ export function HomePage() {
         reptileId: reptile.id,
         reptileName: reptile.name,
         reptileBreed: reptile.breed,
-        reptilePhotoUrl: reptile.photoUrl,
+        reptilePhoto: { photoId: reptile.photoId, photoUrl: reptile.photoUrl },
         lastFedAt: lastFeed?.fedAt,
       }))
 
     setCards(cardData)
     setOverdueFeeds(overdue)
-    setRecentWeights(weightLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown'), reptileBreed: rBreedMap.get(log.reptileId) ?? '', reptilePhotoUrl: rPhotoMap.get(log.reptileId) })))
-    setRecentSheds(shedLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown'), reptileBreed: rBreedMap.get(log.reptileId) ?? '', reptilePhotoUrl: rPhotoMap.get(log.reptileId) })))
+    setRecentWeights(weightLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown'), reptileBreed: rBreedMap.get(log.reptileId) ?? '', reptilePhoto: rPhotoMap.get(log.reptileId) })))
+    setRecentSheds(shedLogs.map((log) => ({ ...log, reptileName: rMap.get(log.reptileId) ?? t('common.unknown'), reptileBreed: rBreedMap.get(log.reptileId) ?? '', reptilePhoto: rPhotoMap.get(log.reptileId) })))
 
     // Load today's pending todos
     const [todoRules, existingInstances] = await Promise.all([
@@ -160,9 +161,12 @@ export function HomePage() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-lg overflow-hidden bg-surface-container shrink-0">
-                        {feed.reptilePhotoUrl
-                          ? <img src={feed.reptilePhotoUrl} alt={feed.reptileName} className="w-full h-full object-cover" />
-                          : <div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
+                        <ReptilePhoto
+                          photo={feed.reptilePhoto}
+                          alt={feed.reptileName}
+                          className="w-full h-full object-cover"
+                          fallback={<div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
+                        />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold text-sm text-on-surface leading-snug">{feed.reptileBreed || feed.reptileName}</p>
@@ -202,9 +206,12 @@ export function HomePage() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-lg overflow-hidden bg-surface-container shrink-0">
-                        {weight.reptilePhotoUrl
-                          ? <img src={weight.reptilePhotoUrl} alt={weight.reptileName} className="w-full h-full object-cover" />
-                          : <div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
+                        <ReptilePhoto
+                          photo={weight.reptilePhoto}
+                          alt={weight.reptileName}
+                          className="w-full h-full object-cover"
+                          fallback={<div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
+                        />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold text-sm text-on-surface leading-snug">{weight.reptileBreed || weight.reptileName}</p>
@@ -244,9 +251,12 @@ export function HomePage() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-lg overflow-hidden bg-surface-container shrink-0">
-                        {shed.reptilePhotoUrl
-                          ? <img src={shed.reptilePhotoUrl} alt={shed.reptileName} className="w-full h-full object-cover" />
-                          : <div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
+                        <ReptilePhoto
+                          photo={shed.reptilePhoto}
+                          alt={shed.reptileName}
+                          className="w-full h-full object-cover"
+                          fallback={<div className="w-full h-full flex items-center justify-center text-2xl">🦎</div>}
+                        />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold text-sm text-on-surface leading-snug">{shed.reptileBreed || shed.reptileName}</p>
@@ -296,17 +306,16 @@ export function HomePage() {
                   className="w-[160px] bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant overflow-hidden shrink-0 cursor-pointer active:scale-95 transition-transform"
                 >
                   <div className="h-28 w-full bg-surface-container">
-                    {reptile.photoUrl ? (
-                      <img
-                        src={reptile.photoUrl}
-                        alt={reptile.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-4xl">
-                        🦎
-                      </div>
-                    )}
+                    <ReptilePhoto
+                      photo={reptile}
+                      alt={reptile.name}
+                      className="w-full h-full object-cover"
+                      fallback={
+                        <div className="w-full h-full flex items-center justify-center text-4xl">
+                          🦎
+                        </div>
+                      }
+                    />
                   </div>
                   <div className="p-3">
                     <h3 className="font-semibold text-sm text-on-surface leading-snug">{reptile.breed || reptile.name}</h3>

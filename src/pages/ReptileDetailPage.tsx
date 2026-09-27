@@ -11,6 +11,7 @@ import {
 import type { Reptile, FeedLog, WeightLog, ShedLog, HabitatLog, VisitLog } from '../db/schema'
 import { formatRelativeTime, formatRelativeTimeInDays, calcAge } from '../lib/todoEngine'
 import { buildReptileQrPayload } from '../lib/qrPayload'
+import { usePhotoSrc } from '../components/ReptilePhoto'
 
 function getReptileQrValue(reptile: Reptile): string {
   const saved = String(reptile.qrTargetUrl || '').trim()
@@ -35,6 +36,7 @@ export function ReptileDetailPage() {
   const [swipeTransition, setSwipeTransition] = useState('transform 180ms ease-out, opacity 180ms ease-out')
   const swipeStartRef = useRef<{ x: number; y: number } | null>(null)
   const swipeNavigateTimerRef = useRef<number | null>(null)
+  const { src: photoSrc, loading: photoLoading } = usePhotoSrc(reptile ?? undefined)
 
   const load = useCallback(async () => {
     if (!id) return
@@ -270,9 +272,9 @@ export function ReptileDetailPage() {
       >
       {/* Hero Section */}
       <section className="relative w-full aspect-[4/3] overflow-hidden">
-        {reptile.photoUrl ? (
+        {photoLoading ? null : photoSrc ? (
           <img
-            src={reptile.photoUrl}
+            src={photoSrc}
             alt={reptile.name}
             className="w-full h-full object-cover cursor-pointer active:opacity-80"
             onClick={() => setShowPhoto(true)}
@@ -459,13 +461,13 @@ export function ReptileDetailPage() {
       </div>
 
       {/* Photo lightbox */}
-      {showPhoto && reptile.photoUrl && (
+      {showPhoto && photoSrc && (
         <div
           className="fixed inset-0 bg-black/90 flex items-start justify-center z-50 p-4 pt-8"
           onClick={() => setShowPhoto(false)}
         >
           <img
-            src={reptile.photoUrl}
+            src={photoSrc}
             alt={reptile.name}
             className="max-w-full max-h-[calc(100vh-2rem)] rounded-xl object-contain"
           />

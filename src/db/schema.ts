@@ -20,6 +20,7 @@ export interface Reptile {
   birthDate?: string
   enclosureName?: string
   photoUrl?: string
+  photoId?: string
   notes?: string
   chronicInfo?: string
   qrTargetUrl: string
@@ -180,6 +181,16 @@ export interface Setting {
   value: unknown
 }
 
+export interface Photo {
+  id: string
+  reptileId: string
+  blob: Blob
+  mimeType: string
+  width: number
+  height: number
+  createdAt: string
+}
+
 export class ReptileManagerDb extends Dexie {
   categories!: Table<Category, string>
   reptiles!: Table<Reptile, string>
@@ -196,6 +207,7 @@ export class ReptileManagerDb extends Dexie {
   visit_logs!: Table<VisitLog, string>
   clutch_logs!: Table<ClutchLog, string>
   settings!: Table<Setting, string>
+  photos!: Table<Photo, string>
 
   constructor(name = 'reptileManagerDb') {
     super(name)
@@ -347,6 +359,10 @@ export class ReptileManagerDb extends Dexie {
           })),
         )
       }
+    })
+
+    this.version(6).stores({
+      photos: 'id, reptileId',
     })
   }
 }
