@@ -3,6 +3,7 @@ import { CircleCheck, Lightbulb, Bug, Sparkles, Send, Mail } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/Layout'
 import { InputField } from '../components/FormField'
+import { TipCard } from '../components/TipCard'
 import { submitFeedback, type FeedbackType } from '../lib/feedback'
 
 const CONTACT_EMAIL = 'reptilemanager@heysaori.com'
@@ -53,6 +54,7 @@ export function FeedbackPage() {
           >
             {t('feedback.sendAnother')}
           </button>
+          <TipCard className="mt-6 w-full" />
         </div>
       </Layout>
     )
@@ -63,6 +65,7 @@ export function FeedbackPage() {
   return (
     <Layout title={t('feedback.title')} back>
       <form onSubmit={handleSubmit} className="px-4 pt-4 pb-8 max-w-lg mx-auto space-y-5">
+        <TipCard />
         <p className="text-sm leading-relaxed text-on-surface-variant">{t('feedback.intro')}</p>
 
         <div className="space-y-2">

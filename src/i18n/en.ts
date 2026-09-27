@@ -481,6 +481,23 @@ const en: Translation = {
     sentBody: 'I will read your message carefully.',
     sendAnother: 'Write another',
   },
+  tips: {
+    title: 'Tip',
+    another: 'Another tip',
+    goTo: 'Take a look',
+    items: {
+      scan: { title: 'Scan to open records', body: 'Tap the scan button at the top right of Home and point it at the QR code on an enclosure to jump straight to that reptile.' },
+      swipe: { title: 'Swipe for the next reptile', body: 'On a reptile\'s detail page, swipe left or right to move to the previous or next one without going back to the list.' },
+      qrExport: { title: 'Print every QR code at once', body: 'Go to Settings → Export QR Codes to get all your reptiles\' QR codes laid out, ready to print or save as PDF.' },
+      breeding: { title: 'Hatch dates, worked out for you', body: 'Add a clutch under Breeding and it lists the candling, misting, and expected hatch dates from the lay date.' },
+      todoInterval: { title: 'Reminders every N days', body: 'In Tasks you can set reminders every N days, weekly, or daily — water changes, cleaning, substrate.' },
+      quickLog: { title: 'Log straight from the list', body: 'Tap Feed or Shed on a card in your Collection. When you are done it scrolls back to that card, so logging several in a row is quick.' },
+      photoBackup: { title: 'Photos are backed up too', body: 'Uploaded photos live only on this phone. Exporting a backup in Settings includes them, so switching phones is safe.' },
+      categories: { title: 'Make categories your own', body: 'In Categories you can add, rename, or delete categories. Renaming one also updates the reptiles that use it.' },
+      install: { title: 'Install it to your home screen', body: 'Installed, it opens from your home screen and works offline, and on iPhone its data is less likely to be cleared.' },
+      feedAmount: { title: 'Any feeding amount', body: 'When logging a feeding, choose "More" to enter any number. You can edit it later in the feeding log.' },
+    },
+  },
   backup: {
     title: 'Backup & Data',
     statsSection: 'Data Summary',

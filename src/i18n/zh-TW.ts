@@ -479,6 +479,23 @@ const zhTW = {
     sentBody: '你的建議我會好好看過。',
     sendAnother: '再寫一則',
   },
+  tips: {
+    title: '小技巧',
+    another: '換一個',
+    goTo: '去看看',
+    items: {
+      scan: { title: '一掃就開啟紀錄', body: '首頁右上角的掃描按鈕，對準飼育箱上的 QR Code，直接跳到那隻爬寵的頁面。' },
+      swipe: { title: '左右滑動換下一隻', body: '在爬寵的詳細頁左右滑動，就能切換上一隻、下一隻，不用回到列表。' },
+      qrExport: { title: '一次印出所有 QR Code', body: '到「設定」→「匯出 QR Code」，所有爬寵的 QR Code 會排好版，可以直接列印或存成 PDF。' },
+      breeding: { title: '孵化日自動幫你算', body: '在「繁殖」新增產蛋紀錄後，會依產卵日列出照蛋、補水和預計孵化的日子。' },
+      todoInterval: { title: '每 N 天提醒一次', body: '在「代辦管理」可以設定每 N 天、每週或每天的提醒，像是換水、清潔、換底材。' },
+      quickLog: { title: '從列表直接記錄', body: '在爬寵列表按卡片上的「餵食」或「脫皮」，記完會自動捲回那張卡片，連續記好幾隻很方便。' },
+      photoBackup: { title: '照片也會一起備份', body: '上傳的照片只存在這支手機。到「設定」匯出備份時會一起打包，換手機也不怕。' },
+      categories: { title: '分類可以自己改', body: '在「分類管理」可以新增、改名或刪除分類，改名時會一併更新用到它的爬寵。' },
+      install: { title: '裝到主畫面更安心', body: '安裝成 App 後從主畫面開啟，離線也能用；iPhone 上的資料也比較不會被系統清除。' },
+      feedAmount: { title: '餵食份量可以自訂', body: '記錄餵食時，份量選「更多」就能輸入任意數字，之後也能在餵食紀錄裡修改。' },
+    },
+  },
   backup: {
     title: '備份與資料',
     statsSection: '資料統計',

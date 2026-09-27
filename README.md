@@ -1,6 +1,6 @@
 # ReptileManager — 功能架構書
 
-> 版本：0.5.2　　最後更新：2026-09-27
+> 版本：0.5.3　　最後更新：2026-09-27
 
 ---
 
@@ -143,6 +143,7 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 - 自動附上：App 版本（build 時由 `package.json` 注入 `__APP_VERSION__`）、介面語言、是否為安裝版、是否為示範模式；不含任何爬寵資料，頁面上有隱私說明
 - 送出成功顯示感謝畫面，可「再寫一則」；失敗（離線或伺服器錯誤）時保留已輸入的內容，並提供作者信箱作為替代管道
 - 後端：Netlify Forms（表單名稱 `feedback`），設定方式見第 8 節
+- 小技巧（Tips）：表單頁最上方與送出後的感謝畫面各顯示一則隨機功能小技巧（`TipCard`），可按「換一個」隨機切換（不會連續重複）；有對應頁面的技巧附「去看看」連結。已安裝為 App 時不會出現「安裝到主畫面」這則。技巧清單在 `src/lib/tips.ts`，文字在 i18n `tips.items`，新增技巧時兩邊都要加
 
 ### 3.11 示範模式（Demo Mode）
 
@@ -366,7 +367,7 @@ Reptile (1)
 | App 名稱 | 介面顯示的名稱依語系切換（`common.appName`）：中文「爬爬管理員」、英文「Reptile Manager」，用於首頁標題、側邊選單上方與底部、歡迎頁左上角 |
 | 支援語言 | `zh-TW`（繁體中文，預設）、`en`（英文） |
 | 翻譯檔路徑 | `src/i18n/zh-TW.ts`、`src/i18n/en.ts` |
-| 命名空間 | common, nav, pwa, home, reptile, feed, medication, environment, health, todo, todoItem, categories, clutch, activityLog, scan, install, feedback, backup |
+| 命名空間 | common, nav, pwa, home, reptile, feed, medication, environment, health, todo, todoItem, categories, clutch, activityLog, scan, install, feedback, tips, backup |
 | 偏好儲存 | localStorage key: `reptileManager_lang` |
 
 ---
