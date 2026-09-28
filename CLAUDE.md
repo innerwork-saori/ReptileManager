@@ -33,6 +33,16 @@ Tech stack：Vite + React 18 + TypeScript、Dexie.js、Tailwind CSS v4、i18next
 
 **兩個版本號必須保持一致**：`package.json` 的 `version` 和 `README.md` 頂部的版本標示需同步修改。
 
+### 3. 增修 Tips 內容
+
+每次功能有更新，都要**適度增修首頁 TipCard 的 tips**，讓使用者能了解功能操作：
+
+- 新增功能 → 若有使用者不易自行發現的操作（手勢、捷徑、隱藏入口等），新增一則 tip
+- 修改功能 → 檢查既有 tip 敘述是否仍正確，過時的要改寫
+- 移除功能 → 刪除對應 tip
+- 新增 tip 需同時修改：`src/lib/tips.ts` 的 `TIPS` 陣列（`id`、`Icon`、選填 `to` / `when`），以及 `src/i18n/zh-TW.ts`、`src/i18n/en.ts` 的 `tips.items.<id>` 文案
+- 文案簡短、以操作為主（告訴使用者「怎麼做」），不是每次改動都必須新增，判斷對使用者有幫助再加
+
 ---
 
 ## Build 特殊注意事項
