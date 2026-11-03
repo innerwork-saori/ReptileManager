@@ -1,6 +1,6 @@
 # ReptileManager — 功能架構書
 
-> 版本：0.5.3　　最後更新：2026-09-27
+> 版本：0.5.3　　最後更新：2026-11-03
 
 ---
 
@@ -19,6 +19,7 @@ ReptileManager 是一款以爬蟲飼主為目標族群的**個人寵物管理 PW
 | 路由 | React Router 6（Hash 模式） |
 | 國際化 | i18next（繁中 / 英文） |
 | 部署平台 | Netlify |
+| 流量分析 | Google Analytics 4（gtag.js，`index.html`，ID `G-BCHCMB4PSC`）；僅收集瀏覽數據，不含任何爬寵資料 |
 
 ---
 
