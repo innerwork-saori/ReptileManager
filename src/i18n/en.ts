@@ -573,7 +573,7 @@ const en: Translation = {
     featWeightBody: 'Each weigh-in joins a line, so slow changes stand out.',
     featQrTitle: 'Enclosure QR codes',
     featQrBody: 'Every reptile gets its own QR code. Stick it on the enclosure and scan it to log a record.',
-    privacy: "Your data stays in this phone's browser. No sign-up, and it works offline.",
+    privacy: "Your data stays in this phone's browser. No sign-up, and it works offline. We use Google Analytics to count visits; it never reads your reptile data.",
     ctaStart: 'Add your first reptile',
     ctaTryDemo: 'See sample data first',
     ctaDemo: 'Explore the sample',

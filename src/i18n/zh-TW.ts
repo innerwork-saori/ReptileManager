@@ -571,7 +571,7 @@ const zhTW = {
     featWeightBody: '把每次秤重連成一條線，悄悄的變化也看得出來。',
     featQrTitle: '飼育箱 QR Code',
     featQrBody: '每隻爬寵都有專屬 QR Code。貼在飼育箱上，手機一掃就能記錄。',
-    privacy: '資料只存在這支手機的瀏覽器裡。不用註冊，沒網路也能用。',
+    privacy: '資料只存在這支手機的瀏覽器裡。不用註冊，沒網路也能用。網站使用 Google Analytics 統計瀏覽次數，不會讀取你的爬寵資料。',
     ctaStart: '新增第一隻爬寵',
     ctaTryDemo: '先看看範例資料',
     ctaDemo: '開始看範例',
